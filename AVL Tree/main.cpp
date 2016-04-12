@@ -64,10 +64,30 @@ template<typename ElementType>
 }
 template<typename ElementType>
 AvlNode<ElementType> * avl_tree<ElementType>::Insert(ElementType X,AvlNode<ElementType> * T) {
+	//if X already in tree ,just return
 	if (X == T->Element)return T;
-	AvlTree<ElementType> Next = T;
+	
 	AvlTree<ElementType> Parent =nullptr;
 
+
+	//if tree is null , create root
+	if (T == nullptr) {
+		T = new AvlNode<ElementType>;
+		if (T == nullptr)return nullptr;
+		else {
+			if (X > Parent->Element)Parent->Right = T;
+			else if (X < Parent->Element)Parent->Left = T;
+			T->Parent = Parent;
+			T->Element = X;
+			T->High = 0;
+			T->Left = T->Right = nullptr;
+		}
+		return T;
+	}
+
+	AvlTree<ElementType> Next = T;
+
+	//to find where should insert
 	while (Next!=nullptr)
 	{
 		Parent = Next;
@@ -85,6 +105,7 @@ AvlNode<ElementType> * avl_tree<ElementType>::Insert(ElementType X,AvlNode<Eleme
 		else if (X == Next->Element)return T;
 	};
 
+//insert node
 if(Next==nullptr)
 {
 	Next= new AvlNode<ElementType>;
@@ -104,18 +125,18 @@ if(Next==nullptr)
 intptr_t oriHeight = Height<ElementType>(Parent);
 
 
-//add height after insert node
+//update height after insert node
 if(oriHeight!=-1)
 Parent->High=Max(Height<ElementType>(Parent->Left), Height<ElementType>(Parent->Right)) + 1;
 
-// to balance
-Position<ElementType> tmp=nullptr;
+// to balance,use parent ptr for temp
+Parent=nullptr;
 if (oriHeight==0) {
-
-	Position<ElementType> K2 = Parent->Parent;
+	//K2 point to grandparent of node that insert
+	Position<ElementType> K2 = Next->Parent->Parent;
 	if(K2!=nullptr)K2->High=Max(Height<ElementType>(K2->Left), Height<ElementType>(K2->Right)) + 1;
 
-	while ( K2!=nullptr)
+	while ( K2!=nullptr&&Parent!=T)
 	{
 
 
@@ -152,15 +173,15 @@ if (oriHeight==0) {
 		}
 		K2->High = Max(Height<ElementType>(K2->Left), Height<ElementType>(K2->Right)) + 1;
 	if(K2->Parent!=nullptr)K2->Parent->High=	Max(Height<ElementType>(K2->Parent->Left), Height<ElementType>(K2->Parent->Right)) + 1;
-		tmp = K2;
+		Parent= K2;
 		K2=K2->Parent;
 
 	}
 
 
 }
-if(tmp!=nullptr)
-	T = tmp;
+if(Parent!=nullptr)
+	T = Parent;
 
 	T->High = Max(Height<ElementType>(T->Left), Height<ElementType>(T->Right)) + 1;
 	return T;
@@ -209,7 +230,7 @@ int main()
 
 	avl_tree<int> han;
     int choice, item;
-	for (int i = 1; i <= 7; i++) {
+	for (int i = 1; i <= 200; i++) {
 		root=han.Insert(i, root);
 	}
 
@@ -220,10 +241,9 @@ int main()
         cout<<"\n---------------------"<<endl;
         cout<<"1.Insert Element into the tree"<<endl;
         cout<<"2.Display Balanced AVL Tree"<<endl;
-        cout<<"3.InOrder traversal"<<endl;
-        cout<<"4.PreOrder traversal"<<endl;
-        cout<<"5.PostOrder traversal"<<endl;
-        cout<<"6.Exit"<<endl;
+		cout<<"3.Find Element in AVL Tree" << endl;
+		cout<<"5.Exit"<<endl;
+
         cout<<"Enter your Choice: ";
 
 		cin>>choice;
@@ -243,7 +263,7 @@ int main()
             cout<<"Balanced AVL Tree:"<<endl;
             display(root, 1);
             break;
-        case 6:
+        case 5:
             exit(1);    
             break;
         default:
