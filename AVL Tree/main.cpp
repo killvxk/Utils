@@ -67,13 +67,21 @@ int main()
             cout<<"Balanced AVL Tree:"<<endl;
             display(root, 1);
             break;
+		case 3:
+            cout<<"Enter value to delete: ";
+            cin>>item;
+			root=han.Delete(item,root);   display(root, 1);
+            break;
 
 		case 4:
 
 			cout <<"Enter value that want to be found: ";
 			cin >> item;
 			tmp = han.Find(item, root);
-			if (tmp == nullptr) cout << "Can not be found" << endl;
+			if (tmp == nullptr) {
+				cout << "Can not be found" << endl;
+				continue;//to next loop
+			}
 			else display(tmp, 1);
 			break;
         case 5:
