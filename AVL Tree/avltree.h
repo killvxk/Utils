@@ -41,13 +41,13 @@ public:
 
 
 template<typename ElementType>
-static AvlTree<ElementType> Balance( Position<ElementType> Node, AvlTree<ElementType> Tree)
+static AvlTree<ElementType> Balance(Position<ElementType> Node, AvlTree<ElementType> Tree)
 {
 	//K2 point to grandparent of node that insert
 	Position<ElementType> tmp = nullptr;
 	Position<ElementType> K2 = Node;
 
-	if(K2!=nullptr)updateHeight(K2);
+	if (K2 != nullptr)updateHeight(K2);
 	while (K2 != nullptr&&tmp != Tree)
 	{
 
@@ -55,7 +55,7 @@ static AvlTree<ElementType> Balance( Position<ElementType> Node, AvlTree<Element
 		if (
 			Height<ElementType>(K2->Left) - Height<ElementType>(K2->Right) == 2)
 		{
-			if ( Height<ElementType>( K2->Left->Left)>Height<ElementType>(K2->Left->Right) ){
+			if (Height<ElementType>(K2->Left->Left) > Height<ElementType>(K2->Left->Right)) {
 
 				K2 = RotationWith_L<ElementType>(K2);
 
@@ -69,7 +69,7 @@ static AvlTree<ElementType> Balance( Position<ElementType> Node, AvlTree<Element
 		}
 		else if (Height<ElementType>(K2->Right) - Height<ElementType>(K2->Left) == 2) {
 
-			if (Height<ElementType>(K2->Right->Left)<Height<ElementType>(K2->Right->Right)) {
+			if (Height<ElementType>(K2->Right->Left) < Height<ElementType>(K2->Right->Right)) {
 
 
 				K2 = RotationWith_R<ElementType>(K2);
@@ -84,7 +84,7 @@ static AvlTree<ElementType> Balance( Position<ElementType> Node, AvlTree<Element
 
 		}
 		K2->High = Max(Height<ElementType>(K2->Left), Height<ElementType>(K2->Right)) + 1;
-			tmp = K2;
+		tmp = K2;
 		K2 = K2->Parent;
 
 	}
@@ -224,7 +224,7 @@ AvlTree<ElementType> avl_tree<ElementType>::Insert(const ElementType X, AvlNode<
 	if (Parent != nullptr)
 		T = Parent;
 
- updateHeight<ElementType>(T);
+	updateHeight<ElementType>(T);
 	return T;
 }
 
@@ -236,7 +236,7 @@ intptr_t static Height(AvlNode<ElementType> * Tree)
 template<typename ElementType>
 void static updateHeight(AvlNode<ElementType> * T)
 {
-	T->High=Max(Height<ElementType>(T->Left), Height<ElementType>(T->Right)) + 1;
+	T->High = Max(Height<ElementType>(T->Left), Height<ElementType>(T->Right)) + 1;
 }
 
 
@@ -261,21 +261,22 @@ AvlTree <ElementType> avl_tree<ElementType>::Delete(const ElementType X, AvlTree
 	Position<ElementType> tmp;
 	if (node->High == 0) {
 		tmp = node->Parent;
-	delete node;
-		if (tmp != nullptr){if (tmp->Element > X)tmp->Left = nullptr;
-		else {
-			node->Parent->Right = nullptr;
-		}
-		if (tmp->Left == nullptr&&tmp->Right == nullptr)updateHeight<ElementType>(node->Parent);
+		if (tmp != nullptr) {
+			if (tmp->Element > X)tmp->Left = nullptr;
+			else {
+				node->Parent->Right = nullptr;
+			}
+			if (tmp->Left == nullptr&&tmp->Right == nullptr)updateHeight<ElementType>(node->Parent);
 
-		root=Balance<ElementType>( tmp, root);
+			root = Balance<ElementType>(tmp, root);
 		};
+
+		delete node;
 		return root;
 	};
 
-	if (node->Left == nullptr ) {
+	if (node->Left == nullptr) {
 		tmp = node->Parent;
-		delete node;
 		if (tmp != nullptr) {
 			if (X < tmp->Element)tmp->Left = node->Right;
 			else tmp->Right = node->Right;
@@ -283,11 +284,15 @@ AvlTree <ElementType> avl_tree<ElementType>::Delete(const ElementType X, AvlTree
 			updateHeight<ElementType>(tmp);
 			root = Balance<ElementType>(tmp, root);
 		}
+		else {
+			root = node->Right;
+			root->Parent = nullptr;
+		}
+		delete node;
 		return root;
 	}
 	if (node->Right == nullptr) {
 		tmp = node->Parent;
-		delete node;
 		if (tmp != nullptr) {
 			if (X < tmp->Element)tmp->Left = node->Left;
 			else tmp->Right = node->Left;
@@ -295,6 +300,12 @@ AvlTree <ElementType> avl_tree<ElementType>::Delete(const ElementType X, AvlTree
 			updateHeight<ElementType>(tmp);
 			root = Balance<ElementType>(tmp, root);
 		}
+		else {
+			root = node->Left;
+			root->Parent = nullptr;
+		}
+
+		delete			node;
 		return root;
 	}
 	if (node->Right != nullptr&&node->Left != nullptr)
@@ -304,33 +315,124 @@ AvlTree <ElementType> avl_tree<ElementType>::Delete(const ElementType X, AvlTree
 			if (X < tmp->Element) {
 				tmp = avl_tree<ElementType>::FindMax(node);
 				node->Element = tmp->Element;
-				tmp = tmp->Parent;
-				delete tmp->Right;
-				tmp->Right = nullptr;
-				updateHeight<ElementType>(tmp);
-				root = Balance<ElementType>(tmp, root);
+				if (tmp->High != 0) {
+
+
+					tmp->Left->Parent = tmp->Parent;
+
+
+
+
+
+					tmp->Parent->Right = tmp->Left;
+
+					node = tmp->Parent;
+					delete tmp;
+					updateHeight<ElementType>(node);
+					root = Balance<ElementType>(node, root);
+
+
+				}
+				else {
+					tmp = tmp->Parent;
+					delete tmp->Right;
+					tmp->Right = nullptr;
+					updateHeight<ElementType>(tmp);
+					root = Balance<ElementType>(tmp, root);
+				}
 			}
-			
+
+
+			else {
+
+				tmp = avl_tree<ElementType>::FindMin(node);
+				node->Element = tmp->Element;
+				if (tmp->High != 0) {
+
+
+					tmp->Right->Parent = tmp->Parent;
+
+
+
+
+
+					tmp->Parent->Left = tmp->Right;
+
+					node = tmp->Parent;
+					delete tmp;
+					updateHeight<ElementType>(node);
+					root = Balance<ElementType>(node, root);
+
+
+				}
+				else {
+					tmp = tmp->Parent;
+					delete tmp->Left;
+					tmp->Left = nullptr;
+					updateHeight<ElementType>(tmp);
+					root = Balance<ElementType>(tmp, root);
+				};
+				return root;
+			}
 		}
 		else {
-		
-			tmp = avl_tree<ElementType>::FindMin(node);
-		node->Element = tmp->Element;
-		tmp = tmp->Parent;
-		delete tmp->Left;
-		tmp->Left = nullptr;
-		updateHeight<ElementType>(tmp);
-		root = Balance<ElementType>(tmp, root);
-		};
-		return root;
-	}
+			tmp
+				= avl_tree<ElementType>::FindMin(node->Right);
+			if (root->High == 1) {
+				delete root->Right; root->Right = nullptr; return root;
+			}
 
+				if ( tmp->Parent == root)
+				{
+					tmp->Left = root->Left;
+					root->Left->Parent = tmp;
+					tmp->Parent = nullptr;
+					updateHeight<ElementType>(tmp);
+					delete root;
+					root = tmp;
+					root = Balance<ElementType>(root->Left, root);
+				}
+
+				else					if (tmp->High != 0 && tmp->Parent != root) {
+
+			node->Element = tmp->Element;
+					tmp->Right->Parent = tmp->Parent;
+
+
+
+
+
+					tmp->Parent->Left = tmp->Right;
+
+					node = tmp->Parent;
+					delete tmp;
+					updateHeight<ElementType>(node);
+					root = Balance<ElementType>(node, root);
+
+				}
+				else 
+				{
+			node->Element = tmp->Element;
+					tmp = tmp->Parent;
+					delete tmp->Left;
+					tmp->Left = nullptr;
+					updateHeight<ElementType>(tmp);
+					root = Balance<ElementType>(tmp, root);
+				}
+				
+		}
+		return root;
+
+
+
+	};
+	if (root->High == 0) {
+		delete root;
+		return nullptr;
+	}
 	return root;
 
-
-
-};
-
+}
 
 template<typename ElementType>
 AvlTree <ElementType> avl_tree<ElementType>::Find(const ElementType X, AvlTree<ElementType>  T) {
@@ -354,7 +456,7 @@ AvlTree <ElementType> avl_tree<ElementType>::Find(const ElementType X, AvlTree<E
 template<typename ElementType>
 Position<ElementType> avl_tree<ElementType>::FindMax(AvlTree<ElementType> T)
 {
-	while (T->Right!=nullptr)
+	while (T->Right != nullptr)
 	{
 
 		T = T->Right;
@@ -369,7 +471,7 @@ Position<ElementType> avl_tree<ElementType>::FindMax(AvlTree<ElementType> T)
 template<typename ElementType>
 Position<ElementType> avl_tree<ElementType>::FindMin(AvlTree<ElementType> T)
 {
-	while (T ->Left!= nullptr)
+	while (T->Left != nullptr)
 	{
 
 		T = T->Left;
