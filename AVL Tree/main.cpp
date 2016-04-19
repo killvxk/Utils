@@ -56,10 +56,11 @@ int main()
         case 1:
             cout<<"Enter value to be inserted: ";
             cin>>item;
-			root=han.Insert(item,root);   display(root, 1);
+			root=han.Insert(item,root);   
+			goto dis;
             break;
         case 2:
-            if (root == nullptr)
+   dis:         if (root == nullptr)
             {
                 cout<<"Tree is Empty"<<endl;
                 continue;
@@ -70,7 +71,8 @@ int main()
 		case 3:
             cout<<"Enter value to delete: ";
             cin>>item;
-			root=han.Delete(item,root);   display(root, 1);
+			root=han.Delete(item,root);   
+			goto dis;
             break;
 
 		case 4:
@@ -89,7 +91,7 @@ int main()
             break;
         default:
             cout<<"Default Insert"<<endl;
-			root=han.Insert(choice,root);   display(root, 1);
+			root = han.Insert(choice, root);  goto dis;
         }
     }
     return 0;
