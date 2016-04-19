@@ -16,7 +16,7 @@ void display(AvlNode<E> * ptr, int level)
 	{
 		display(ptr->Right, level + 1);
 		printf("\n");
-		for (i = 0; i < level ; i++)
+		for (i = 0; i < level; i++)
 			cout << "        ";
 		cout << ptr->Element;
 		display(ptr->Left, level + 1);
@@ -28,56 +28,56 @@ void display(AvlNode<E> * ptr, int level)
 
 int main()
 {
-	AvlNode<int> * root =new AvlNode<int>(),*tmp;
+	AvlNode<int> * root = new AvlNode<int>(), *tmp;
 	root->Element = 1;
 
 	avl_tree<int> han;
-    int choice, item;
+	int choice, item;
 	for (int i = 1; i <= 10; i++) {
-		root=han.Insert(i, root);
+		root = han.Insert(i, root);
 	}
 
-    while (1)
-    {
-        cout<<"\n---------------------"<<endl;
-        cout<<"AVL Tree Implementation"<<endl;
-        cout<<"\n---------------------"<<endl;
-        cout<<"1.Insert Element into the tree"<<endl;
-        cout<<"2.Display Balanced AVL Tree"<<endl;
-		cout<<"3.Delete Element in AVL Tree" << endl;
-		cout<<"4.Find Element in AVL Tree" << endl;
-		cout<<"5.Exit"<<endl;
+	while (1)
+	{
+		cout << "\n---------------------" << endl;
+		cout << "AVL Tree Implementation" << endl;
+		cout << "\n---------------------" << endl;
+		cout << "1.Insert Element into the tree" << endl;
+		cout << "2.Display Balanced AVL Tree" << endl;
+		cout << "3.Delete Element in AVL Tree" << endl;
+		cout << "4.Find Element in AVL Tree" << endl;
+		cout << "5.Exit" << endl;
 
-        cout<<"Enter your Choice: ";
+		cout << "Enter your Choice: ";
 
-		cin>>choice;
-        switch(choice)
-        {
-        case 1:
-            cout<<"Enter value to be inserted: ";
-            cin>>item;
-			root=han.Insert(item,root);   
+		cin >> choice;
+		switch (choice)
+		{
+		case 1:
+			cout << "Enter value to be inserted: ";
+			cin >> item;
+			root = han.Insert(item, root);
 			goto dis;
-            break;
-        case 2:
-   dis:         if (root == nullptr)
-            {
-                cout<<"Tree is Empty"<<endl;
-                continue;
-            }
-            cout<<"Balanced AVL Tree:"<<endl;
-            display(root, 1);
-            break;
+			break;
+		case 2:
+		dis:         if (root == nullptr)
+		{
+			cout << "Tree is Empty" << endl;
+			continue;
+		}
+					 cout << "Balanced AVL Tree:" << endl;
+					 display(root, 1);
+					 break;
 		case 3:
-            cout<<"Enter value to delete: ";
-            cin>>item;
-			root=han.Delete(item,root);   
+			cout << "Enter value to delete: ";
+			cin >> item;
+			root = han.Delete(item, root);
 			goto dis;
-            break;
+			break;
 
 		case 4:
 
-			cout <<"Enter value that want to be found: ";
+			cout << "Enter value that want to be found: ";
 			cin >> item;
 			tmp = han.Find(item, root);
 			if (tmp == nullptr) {
@@ -86,13 +86,13 @@ int main()
 			}
 			else display(tmp, 1);
 			break;
-        case 5:
-            exit(1);    
-            break;
-        default:
-            cout<<"Default Insert"<<endl;
+		case 5:
+			exit(1);
+			break;
+		default:
+			cout << "Default Insert" << endl;
 			root = han.Insert(choice, root);  goto dis;
-        }
-    }
-    return 0;
+		}
+	}
+	return 0;
 }

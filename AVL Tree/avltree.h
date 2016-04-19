@@ -35,7 +35,7 @@ public:
 	AvlNode <ElementType>* Delete(const ElementType X, AvlNode<ElementType> * T);
 
 
-	ElementType Retrieve(AvlNode<ElementType> * P);
+//	ElementType Retrieve(AvlNode<ElementType> * P);
 
 };
 
@@ -153,7 +153,7 @@ static Position<ElementType> RotationWith_RL(Position<ElementType> K3) {
 }
 template<typename ElementType>
 AvlTree<ElementType> avl_tree<ElementType>::Insert(const ElementType X, AvlNode<ElementType> * T) {
-	
+
 
 	AvlTree<ElementType> Parent = nullptr;
 
@@ -252,10 +252,10 @@ static inline intptr_t Max(intptr_t a, intptr_t b)
 template<typename ElementType>
 AvlTree <ElementType> avl_tree<ElementType>::Delete(const ElementType X, AvlTree<ElementType>  T) {
 	if (T == nullptr)return T;
-	AvlTree<ElementType> root = T;	
+	AvlTree<ElementType> root = T;
 	Position<ElementType> node = avl_tree<ElementType>::Find(X, root);
 	if (node == nullptr)return root;
-if (root==node&&root->High==0) {
+	if (root == node&&root->High == 0) {
 		delete root;
 		return nullptr;
 	}
@@ -310,7 +310,7 @@ if (root==node&&root->High==0) {
 		delete			node;
 		return root;
 	}
-	else 
+	else
 	{
 
 		tmp = avl_tree<ElementType>::FindMin(node->Right);
