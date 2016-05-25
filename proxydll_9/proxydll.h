@@ -1,16 +1,8 @@
 // proxydll.h
-#pragma once
-#include <tchar.h>
+
 // Exported function
-
+#include"stdafx.h"
 // regular functions
-void InitInstance(HANDLE hModule);
-void ExitInstance(void);
-void LoadOriginalDll(void);
-
-
-#pragma once
-
 
 
 struct dinput8_dll

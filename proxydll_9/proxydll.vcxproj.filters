@@ -23,16 +23,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="proxydll.def">
-      <Filter>Quelldateien</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="proxydll.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="proxydll.def" />
   </ItemGroup>
 </Project>
