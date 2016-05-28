@@ -130,11 +130,11 @@ void _D3D11CoreCreateDevice() {
 
 
 
-void LoadOriginalLibrary(PWCHAR);
+void Redirect(PWCHAR);
 
 void LoadPlugins(PWCHAR dllname)
 {
-	LoadOriginalLibrary(dllname);
+	Redirect(dllname);
 }
 
 
@@ -205,7 +205,7 @@ HRESULT __stdcall mod_D3D11CreateDevice(
 	//d3d11.D3D11CreateDevice = GetProcAddress(d3d11.dll, "D3D11CreateDevice")
 
 }
-void LoadOriginalLibrary(PWCHAR name) {
+void Redirect(PWCHAR name) {
 
 	PWCHAR DllName = name;
 	_tcscpy(szSystemDllPath,szSystemPath);

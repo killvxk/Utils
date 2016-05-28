@@ -1,9 +1,7 @@
 // proxydll.cpp
 #include "stdafx.h"
 #include "proxydll.h"
-#define IDR_VBHKD   101
-#define IDR_WNDMODE 103
-#define IDR_WNDWINI 10
+
 
 // global variables
 BYTE 					originalCode[5];
@@ -14,24 +12,13 @@ WCHAR *DllPath = new WCHAR[MAX_PATH],
 *szSystemPath = new WCHAR[MAX_PATH],
 *szSystemDllPath = new WCHAR[MAX_PATH];
 
-HRESULT __stdcall mod_D3D11CreateDevice(
-	_In_opt_        IDXGIAdapter        *pAdapter,
-	D3D_DRIVER_TYPE     DriverType,
-	HMODULE             Software,
-	UINT                Flags,
-	_In_opt_  D3D_FEATURE_LEVEL   *pFeatureLevels,
-	UINT                FeatureLevels,
-	UINT                SDKVersion,
-	_Out_opt_       ID3D11Device        **ppDevice,
-	_Out_opt_       D3D_FEATURE_LEVEL   *pFeatureLevel,
-	_Out_opt_       ID3D11DeviceContext **ppImmediateContext
-);
 
-void LoadOriginalLibrary(PWCHAR);
+
+void Redirect(PWCHAR);
 
 void LoadPlugins(PWCHAR dllname)
 {
-	LoadOriginalLibrary(dllname);
+	Redirect(dllname);
 }
 
 
@@ -70,13 +57,14 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 	return TRUE;
 }
 
-void LoadOriginalLibrary(PWCHAR name)
+void Redirect(PWCHAR name)
 {
 	PWCHAR DllName = name;
+
 	_tcscpy(szSystemDllPath, szSystemPath);
 	_tcscat(szSystemDllPath, DllName);
 
-
+	MessageBox(NULL, szSystemDllPath, L"Proxy Dll", MB_ICONWARNING);
 
 	if (_tcsicmp(DllName + 1, L"dsound.dll") == NULL) {
 		dsound.dll = LoadLibrary(szSystemDllPath);
@@ -416,7 +404,8 @@ void LoadOriginalLibrary(PWCHAR name)
 								}
 								else
 								{
-									MessageBox(0, L"This library isn't supported. Try to rename it to d3d8.dll, d3d9.dll, d3d11.dll, winmmbase.dll, msacm32.dll, dinput8.dll, dsound.dll, vorbisFile.dll or ddraw.dll.", L"ASI Loader", MB_ICONERROR);
+									MessageBox(0, L"This library isn't supported. Try to rename it to d3d8.dll, d3d9.dll, d3d11.dll, winmmbase.dll, msacm32.dll, dinput8.dll, dsound.dll, vorbisFile.dll or ddraw.dll.",
+										L"ASI Loader", MB_ICONERROR);
 									ExitProcess(0);
 								}
 
@@ -452,7 +441,7 @@ HRESULT __stdcall mod_D3D11CreateDevice(
 		ID3D11DeviceContext **);
 
 	D3D_FEATURE_LEVEL
-		d3d10_1 = { D3D_FEATURE_LEVEL_9_3 };
+		d3d10_1 = { D3D_FEATURE_LEVEL_10_0 };
 
 	ori_Create_fn ori_D3D11CreateDevice
 
@@ -530,20 +519,4 @@ HRESULT __stdcall mod_D3D11CreateDevice(
 //	// Debug
 //	if (!gl_hOriginalDll)
 //	{
-//		OutputDebugString(L"PROXYDLL: Original d3d9.dll not loaded ERROR ****\r\n");
-//		::ExitProcess(0); // exit the hard way
-//	}
-//}
-
-//void ExitInstance() 
-//{    
-//    OutputDebugString(L"PROXYDLL: ExitInstance called.\r\n");
-//	
-//	// Release the system's d3d9.dll
-//	if (gl_hOriginalDll)
-//	{
-//		::FreeLibrary(gl_hOriginalDll);
-//	    gl_hOriginalDll = NULL;  
-//	}
-//}
 //

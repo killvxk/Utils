@@ -4,7 +4,18 @@
 #include"stdafx.h"
 // regular functions
 
-
+HRESULT __stdcall mod_D3D11CreateDevice(
+	_In_opt_        IDXGIAdapter        *,
+	D3D_DRIVER_TYPE    ,
+	HMODULE             ,
+	UINT                ,
+	_In_opt_  D3D_FEATURE_LEVEL   *,
+	UINT              ,
+	UINT               , 
+	_Out_opt_       ID3D11Device        **,
+	_Out_opt_       D3D_FEATURE_LEVEL   *,
+	_Out_opt_       ID3D11DeviceContext **
+);
 struct dinput8_dll
 {
 	HMODULE dll;
@@ -655,75 +666,3 @@ __declspec(naked) void _acmStreamPrepareHeader() { _asm { jmp[msacm32.acmStreamP
 __declspec(naked) void _acmStreamReset() { _asm { jmp[msacm32.acmStreamReset] } }
 __declspec(naked) void _acmStreamSize() { _asm { jmp[msacm32.acmStreamSize] } }
 __declspec(naked) void _acmStreamUnprepareHeader() { _asm { jmp[msacm32.acmStreamUnprepareHeader] } }
-
-struct ExcludedEntry {
-	char*			entry;
-	ExcludedEntry*	prev;
-	ExcludedEntry*	next;
-};
-
-struct ExcludedEntriesList {
-	ExcludedEntry*	first;
-	ExcludedEntry*	last;
-};
-
-void ExcludedEntriesListInit(ExcludedEntriesList* list)
-{
-	list->first = NULL;
-	list->last = NULL;
-}
-
-void ExcludedEntriesListPush(ExcludedEntriesList* list, const char* entryName)
-{
-	ExcludedEntry* 	newEntry = (ExcludedEntry*)malloc(sizeof(ExcludedEntry));
-	size_t 			length = strlen(entryName) + 1;
-	if (!list->first)
-		list->first = newEntry;
-	else
-		list->last->next = newEntry;
-
-	newEntry->prev = list->last;
-	newEntry->next = NULL;
-	list->last = newEntry;
-
-	newEntry->entry = (char*)malloc(length);
-	strncpy(newEntry->entry, entryName, length);
-}
-
-bool ExcludedEntriesListHasEntry(ExcludedEntriesList* list, const char* entryName)
-{
-	ExcludedEntry*	it = list->first;
-	while (it)
-	{
-		if (!strcmp(it->entry, entryName))
-		{
-			// It has an entry, we can pop it now
-			if (it->next)
-				it->next->prev = it->prev;
-			if (it->prev)
-				it->prev->next = it->next;
-
-			if (list->first == it)
-				list->first = it->next;
-
-			free(it->entry);
-			free(it);
-			return true;
-		}
-		it = it->next;
-	}
-
-	return false;
-}
-
-void ExcludedEntriesListFree(ExcludedEntriesList* list)
-{
-	ExcludedEntry*	it = list->first;
-	while (it)
-	{
-		ExcludedEntry* nextEntry = it->next;
-		free(it->entry);
-		free(it);
-		it = nextEntry;
-	}
-}
