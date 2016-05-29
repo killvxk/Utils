@@ -1,10 +1,7 @@
-// proxydll.h
 
-// Exported function
-#include"stdafx.h"
-// regular functions
+#pragma once
 
-HRESULT __stdcall mod_D3D11CreateDevice(
+HRESULT WINAPI mod_D3D11CreateDevice(
 	_In_opt_        IDXGIAdapter        *,
 	D3D_DRIVER_TYPE    ,
 	HMODULE             ,
@@ -16,6 +13,50 @@ HRESULT __stdcall mod_D3D11CreateDevice(
 	_Out_opt_       D3D_FEATURE_LEVEL   *,
 	_Out_opt_       ID3D11DeviceContext **
 );
+
+IDirect3D9* WINAPI mod_Direct3DCreate9(UINT);
+
+
+namespace FindExeHwnd{
+
+	HWND  g_hwnd;
+	int  g_nFound;
+	BOOL CALLBACK FindHwndFromPID(HWND hwnd, LPARAM lParam)
+	{
+		DWORD   dwPID2Find = (DWORD)lParam;
+		DWORD   dwPID = 0;
+
+		if (GetWindowThreadProcessId(hwnd, &dwPID))
+		{
+			if (dwPID == dwPID2Find)
+			{
+				g_hwnd = hwnd;
+
+
+				return  (FALSE);
+			}
+		}
+
+		return  (TRUE);
+	}
+HWND GetHwndFromPID(DWORD dwProcessId)
+{
+	g_hwnd = NULL;
+	g_nFound = 0;
+
+	EnumWindows(FindHwndFromPID, (LPARAM)dwProcessId);
+
+	if (g_hwnd)  // we found one...
+		return (g_hwnd);
+
+	// nothing found :-(
+
+	return (NULL);
+}
+
+
+
+}
 struct dinput8_dll
 {
 	HMODULE dll;

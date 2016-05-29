@@ -1,9 +1,9 @@
 // proxydll.cpp
 #include "stdafx.h"
 #include "proxydll.h"
+#include "myIDirect3D9.h"
 
 
-// global variables
 BYTE 					originalCode[5];
 BYTE* 					originalEP = 0;
 HMODULE dllModule;
@@ -15,7 +15,7 @@ WCHAR *DllPath = new WCHAR[MAX_PATH],
 
 
 void Redirect(PWCHAR);
-
+BOOL CALLBACK FindHwndFromPID(HWND hwnd, LPARAM lParam);
 void LoadPlugins(PWCHAR dllname)
 {
 	Redirect(dllname);
@@ -139,8 +139,10 @@ void Redirect(PWCHAR name)
 						d3d9.D3DPERF_SetRegion = GetProcAddress(d3d9.dll, "D3DPERF_SetRegion");
 						d3d9.DebugSetLevel = GetProcAddress(d3d9.dll, "DebugSetLevel");
 						d3d9.DebugSetMute = GetProcAddress(d3d9.dll, "DebugSetMute");
+					
 						//d3d9.Direct3D9EnableMaximizedWindowedModeShim = GetProcAddress(d3d9.dll, "Direct3D9EnableMaximizedWindowedModeShim");
-						d3d9.Direct3DCreate9 = GetProcAddress(d3d9.dll, "Direct3DCreate9");
+						//d3d9.Direct3DCreate9 = GetProcAddress(d3d9.dll, "Direct3DCreate9");
+						d3d9.Direct3DCreate9 = (FARPROC)mod_Direct3DCreate9;
 						d3d9.Direct3DCreate9Ex = GetProcAddress(d3d9.dll, "Direct3DCreate9Ex");
 						d3d9.Direct3DShaderValidatorCreate9 = GetProcAddress(d3d9.dll, "Direct3DShaderValidatorCreate9");
 						d3d9.PSGPError = GetProcAddress(d3d9.dll, "PSGPError");
@@ -417,7 +419,7 @@ void Redirect(PWCHAR name)
 
 }
 
-HRESULT __stdcall mod_D3D11CreateDevice(
+HRESULT WINAPI mod_D3D11CreateDevice(
 	_In_opt_        IDXGIAdapter        *pAdapter,
 	D3D_DRIVER_TYPE     DriverType,
 	HMODULE             Software,
@@ -440,17 +442,17 @@ HRESULT __stdcall mod_D3D11CreateDevice(
 		D3D_FEATURE_LEVEL   *,
 		ID3D11DeviceContext **);
 
-	D3D_FEATURE_LEVEL
-		d3d10_1 = { D3D_FEATURE_LEVEL_10_0 };
+	//D3D_FEATURE_LEVEL
+	//	d3d10_1 = { D3D_FEATURE_LEVEL_11_0 };
 
-	ori_Create_fn ori_D3D11CreateDevice
+	
 
-		= (ori_Create_fn)GetProcAddress(d3d11.dll, "D3D11CreateDevice");
+	ori_Create_fn ori_D3D11CreateDevice= (ori_Create_fn)GetProcAddress(d3d11.dll, "D3D11CreateDevice");
 
 	HRESULT hr=
 
 	 ori_D3D11CreateDevice(pAdapter, DriverType, Software,
-		Flags, &d3d10_1, 1, SDKVersion, ppDevice
+		Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice
 		, pFeatureLevel, ppImmediateContext);
 
 	//*pFeatureLevel = { D3D_FEATURE_LEVEL_10_1 };
@@ -460,7 +462,31 @@ HRESULT __stdcall mod_D3D11CreateDevice(
 
 }
 
+IDirect3D9* WINAPI mod_Direct3DCreate9(UINT SDKVersion)
+{
+	 // looking for the "right d3d9.dll"
+//	MessageBox(NULL, L"OK", L"mod_Direct3DCreate9", MB_ICONWARNING);
+											 // Hooking IDirect3D Object from Original Library
+	typedef IDirect3D9 *(WINAPI* D3D9_Type)(UINT );
 
+	D3D9_Type D3DCreate9_fn = (D3D9_Type)GetProcAddress(d3d9.dll, "Direct3DCreate9");
+
+	// Debug
+//	if (!D3DCreate9_fn)
+//{
+	//	::ExitProcess(0); // exit the hard way
+	//}
+
+	// Request pointer from Original Dll. 
+	IDirect3D9 *pIDirect3D9_orig = D3DCreate9_fn(SDKVersion);
+
+	// Create my IDirect3D8 object and store pointer to original object there.
+	// note: the object will delete itself once Ref count is zero (similar to COM objects)
+	myIDirect3D9* gl_pmyIDirect3D9 = new myIDirect3D9(pIDirect3D9_orig);
+
+	// Return pointer to hooking Object instead of "real one"
+	return (gl_pmyIDirect3D9);
+}
 
 // Exported function (faking d3d9.dll's one-and-only export)
 //IDirect3D9* WINAPI Direct3DCreate9(UINT SDKVersion)
@@ -520,3 +546,5 @@ HRESULT __stdcall mod_D3D11CreateDevice(
 //	if (!gl_hOriginalDll)
 //	{
 //
+
+
