@@ -1,5 +1,4 @@
 #include"stdafx.h"
-#include "myIDirect3D9.h"
 
 myIDirect3D9::myIDirect3D9(IDirect3D9 *pOriginal)
 {
@@ -120,6 +119,11 @@ HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter,
 	D3DPRESENT_PARAMETERS* pPresentationParameters,
 	IDirect3DDevice9** ppReturnedDeviceInterface)
 {
+
+	
+
+	
+
     // global var
 	//extern myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
 	//pPresentationParameters->BackBufferWidth = 0;
@@ -136,13 +140,15 @@ HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter,
 	HRESULT hres = m_pIDirect3D9->CreateDevice( 
 		Adapter, DeviceType, hFocusWindow, BehaviorFlags,
 		pPresentationParameters, ppReturnedDeviceInterface);
+
+	myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
     
 	// Create our own Device object and store it in global pointer
 	// note: the object will delete itself once Ref count is zero (similar to COM objects)
-	//gl_pmyIDirect3DDevice9 = new myIDirect3DDevice9(*ppReturnedDeviceInterface);
+	gl_pmyIDirect3DDevice9 = new myIDirect3DDevice9(*ppReturnedDeviceInterface);
 	
 	// store our pointer (the fake one) for returning it to the calling progam
-//	*ppReturnedDeviceInterface = gl_pmyIDirect3DDevice9;
+	*ppReturnedDeviceInterface = gl_pmyIDirect3DDevice9;
 
 	return(hres); 
 }

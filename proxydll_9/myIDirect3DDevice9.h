@@ -132,5 +132,5 @@ private:
     IDirect3DDevice9 *m_pIDirect3DDevice9;
     
 	// This is our test function
-	//void ShowWeAreHere(void);
+	
 };

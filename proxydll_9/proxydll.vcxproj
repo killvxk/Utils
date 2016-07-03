@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="myIDirect3D9.cpp" />
+    <ClCompile Include="myIDirect3DDevice9.cpp" />
     <ClCompile Include="proxydll.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -163,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myIDirect3D9.h" />
+    <ClInclude Include="myIDirect3DDevice9.h" />
     <ClInclude Include="proxydll.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

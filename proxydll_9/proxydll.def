@@ -18,7 +18,7 @@ DirectSoundEnumerateA = _DirectSoundEnumerateA @2
 DirectSoundEnumerateW = _DirectSoundEnumerateW @3
 DirectSoundFullDuplexCreate = _DirectSoundFullDuplexCreate @10
 DllCanUnloadNow_dsound = _DllCanUnloadNow_dsound PRIVATE
-DllGetClassObject = _DllGetClassObject PRIVATE
+;DllGetClassObject = _DllGetClassObject PRIVATE
 GetDeviceID = _GetDeviceID @9
 
 ;LIBRARY "ddraw"
@@ -38,8 +38,8 @@ DirectDrawEnumerateA		= FakeDirectDrawEnumerateA			@112
 DirectDrawEnumerateExA		= FakeDirectDrawEnumerateExA		@113
 DirectDrawEnumerateExW		= FakeDirectDrawEnumerateExW		@114
 DirectDrawEnumerateW		= FakeDirectDrawEnumerateW			@115
-DllCanUnloadNow				= FakeDllCanUnloadNow				PRIVATE
-DllGetClassObject			= FakeDllGetClassObject				PRIVATE
+;DllCanUnloadNow				= FakeDllCanUnloadNow				PRIVATE
+;DllGetClassObject			= FakeDllGetClassObject				PRIVATE
 GetDDSurfaceLocal			= FakeGetDDSurfaceLocal				@118
 GetOLEThunkData				= FakeGetOLEThunkData				@119
 GetSurfaceFromDC			= FakeGetSurfaceFromDC				@120
