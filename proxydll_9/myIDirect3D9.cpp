@@ -1,4 +1,39 @@
 #include"stdafx.h"
+namespace MyInterface {
+#pragma warning(push)
+#define CINTERFACE                  // Windows SDK : BaseTypes.h
+#pragma warning(disable : 4005)
+#define STDMETHOD_(type,method)     type (STDMETHODCALLTYPE * method)
+#define STDMETHOD(method)           STDMETHOD_(HRESULT,method)
+#define PURE
+#define THIS                        INTERFACE FAR* This
+#define THIS_                       THIS,
+#define DECLARE_INTERFACE(iface)    typedef interface iface { struct iface##Vtbl FAR* lpVtbl; } iface; \
+                                        typedef struct iface##Vtbl iface##Vtbl; struct iface##Vtbl
+#define DECLARE_INTERFACE_(iface,b) DECLARE_INTERFACE(iface)
+#undef _D3D9_H_
+#include <d3d9.h>
+#pragma warning(pop)
+} // namespace MyInterface
+HRESULT(WINAPI *o_IDirect3DDevice9_Reset)( D3DPRESENT_PARAMETERS*);
+HRESULT(WINAPI *o_IDirect3DDevice9_Present)( const RECT    *pSourceRect,
+	 const RECT    *pDestRect,
+	     HWND    hDestWindowOverride,
+	 const RGNDATA *pDirtyRegion);
+
+
+HRESULT WINAPI my_IDirect3DDevice9_Present( const RECT    *pSourceRect,
+	 const RECT    *pDestRect,
+	       HWND    hDestWindowOverride,
+	 const RGNDATA *pDirtyRegion) {
+
+	return o_IDirect3DDevice9_Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+}
+HRESULT WINAPI my_IDirect3DDevice9_Reset( D3DPRESENT_PARAMETERS* pPresentationParameters) {
+	pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+	return o_IDirect3DDevice9_Reset( pPresentationParameters);
+}
+
 
 myIDirect3D9::myIDirect3D9(IDirect3D9 *pOriginal)
 {
@@ -33,7 +68,7 @@ ULONG    __stdcall myIDirect3D9::AddRef(void)
 
 ULONG    __stdcall myIDirect3D9::Release(void)
 {
-    //extern myIDirect3D9* gl_pmyIDirect3D9;
+    extern myIDirect3D9* gl_pmyIDirect3D9;
 
 	// call original routine
 	ULONG count = m_pIDirect3D9->Release();
@@ -42,7 +77,7 @@ ULONG    __stdcall myIDirect3D9::Release(void)
 	// so do we here
 	if (count == 0) 
 	{
-		//gl_pmyIDirect3D9 = NULL;
+		gl_pmyIDirect3D9 = NULL;
   	    delete(this); 
 	}
 
@@ -113,7 +148,10 @@ HMONITOR __stdcall myIDirect3D9::GetAdapterMonitor(UINT Adapter)
 {
     return(m_pIDirect3D9->GetAdapterMonitor(Adapter));
 }
-
+void store_IDirect3DDevice9_function(IDirect3DDevice9* pDevice) {
+	MyInterface::IDirect3DDevice9Vtbl* v = ((MyInterface::IDirect3DDevice9*) pDevice)->lpVtbl;
+	*(void**)&v->Reset = (void*)my_IDirect3DDevice9_Reset;
+}
 HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter,
 	D3DDEVTYPE DeviceType,HWND hFocusWindow,DWORD BehaviorFlags,
 	D3DPRESENT_PARAMETERS* pPresentationParameters,
@@ -128,12 +166,13 @@ HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter,
 	//extern myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
 	//pPresentationParameters->BackBufferWidth = 0;
 	//pPresentationParameters->BackBufferHeight = 0;
-	pPresentationParameters->BackBufferCount = 2;
+
 	//pPresentationParameters->MultiSampleType = D3DMULTISAMPLE_2_SAMPLES;
 	//pPresentationParameters->SwapEffect = D3DSWAPEFFECT_FLIP;
 	//pPresentationParameters->Windowed = TRUE;
 	//pPresentationParameters->FullScreen_RefreshRateInHz = 0;
 	//pPresentationParameters->hDeviceWindow = FindExeHwnd::GetHwndFromPID(GetCurrentProcessId());
+	pPresentationParameters->BackBufferCount = 2;
 	pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 	
 	// we intercept this call and provide our own "fake" Device Object
@@ -141,14 +180,20 @@ HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter,
 		Adapter, DeviceType, hFocusWindow, BehaviorFlags,
 		pPresentationParameters, ppReturnedDeviceInterface);
 
-	myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
-    
-	// Create our own Device object and store it in global pointer
-	// note: the object will delete itself once Ref count is zero (similar to COM objects)
-	gl_pmyIDirect3DDevice9 = new myIDirect3DDevice9(*ppReturnedDeviceInterface);
-	
-	// store our pointer (the fake one) for returning it to the calling progam
-	*ppReturnedDeviceInterface = gl_pmyIDirect3DDevice9;
+	//HRESULT(WINAPI IDirect3DDevice9::*ori)(D3DPRESENT_PARAMETERS*)= &IDirect3DDevice9::Reset; 
+	//IDirect3DDevice9 * v = *ppReturnedDeviceInterface;
+	//int ori_reset= reinterpret_cast<int>(*(void**)(&ori)) + reinterpret_cast<int>(v);//ponit to v->reset
+	//o_IDirect3DDevice9_Reset =(HRESULT(WINAPI*)(D3DPRESENT_PARAMETERS*))ori_reset;
+
+	//DWORD protect = PAGE_EXECUTE_WRITECOPY;
+	//VirtualProtect(v, sizeof(*v), protect, &protect);
+	/*if (SUCCEEDED(hres)) {
+		MyInterface::IDirect3DDevice9Vtbl* v = ((MyInterface::IDirect3DDevice9*) (*ppReturnedDeviceInterface))->lpVtbl;
+		*(void**)&o_IDirect3DDevice9_Reset = (void*)v->Reset;
+		*(void**)&o_IDirect3DDevice9_Present = (void*)v->Present;
+			store_IDirect3DDevice9_function(*ppReturnedDeviceInterface);
+		
+	}*/
 
 	return(hres); 
 }

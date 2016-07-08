@@ -38,7 +38,7 @@ ULONG myIDirect3DDevice9::Release(void)
 	// Release function	
 
 	// global var
-	//extern myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
+	extern myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
 
 	// release/delete own objects
 	// .....
@@ -47,7 +47,7 @@ ULONG myIDirect3DDevice9::Release(void)
 	ULONG count = m_pIDirect3DDevice9->Release();
 
 	// now, the Original Object has deleted itself, so do we here
-	//gl_pmyIDirect3DDevice9 = NULL;
+	gl_pmyIDirect3DDevice9 = NULL;
 	delete(this);  // destructor will be called automatically
 
 	return (count);
@@ -120,9 +120,9 @@ UINT    myIDirect3DDevice9::GetNumberOfSwapChains(void)
 
 HRESULT myIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParameters)
 {
-	pPresentationParameters->BackBufferCount = 2;
+	//pPresentationParameters->BackBufferCount = 2;
 
-	pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+	//pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 
 	return(m_pIDirect3DDevice9->Reset(pPresentationParameters));
 }
@@ -134,9 +134,9 @@ HRESULT myIDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDestRe
 	//this->ShowWeAreHere();
 
 	// call original routine
-	HRESULT hres = m_pIDirect3DDevice9->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+	return    m_pIDirect3DDevice9->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 
-	return (hres);
+	
 }
 
 HRESULT myIDirect3DDevice9::GetBackBuffer(UINT iSwapChain, UINT iBackBuffer, D3DBACKBUFFER_TYPE Type, IDirect3DSurface9** ppBackBuffer)

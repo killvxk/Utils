@@ -1,8 +1,12 @@
 // proxydll.cpp
 #include "stdafx.h"
 #include "proxydll.h"
-#include "myIDirect3D9.h"
-
+// global variables
+#pragma data_seg (".d3d9_shared")
+myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
+myIDirect3D9*       gl_pmyIDirect3D9;
+HINSTANCE           gl_hThisInstance;
+#pragma data_seg ()
 
 BYTE 					originalCode[5];
 BYTE* 					originalEP = 0;
@@ -21,12 +25,26 @@ void LoadPlugins(PWCHAR dllname)
 	Redirect(dllname);
 }
 
+void InitInstance(HANDLE hModule)
+{
+//	OutputDebugString("PROXYDLL: InitInstance called.\r\n");
+
+	// Initialisation
+	gl_hThisInstance = NULL;
+	gl_pmyIDirect3D9 = NULL;
+	gl_pmyIDirect3DDevice9 = NULL;
+
+	// Storing Instance handle into global var
+	gl_hThisInstance = (HINSTANCE)hModule;
+}
+
 
 BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 {
 	if (reason == DLL_PROCESS_ATTACH)
 	{
 		dllModule = hInst;
+		InitInstance(hInst);
 		hExecutableInstance = GetModuleHandle(NULL); // passing NULL should be safe even with the loader lock being held (according to ReactOS ldr.c)
 		GetModuleFileName(dllModule, DllPath, MAX_PATH);
 
@@ -59,14 +77,16 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 
 void Redirect(PWCHAR name)
 {
-	PWCHAR DllName = name;
+	
 
 	_tcscpy(szSystemDllPath, szSystemPath);
-	_tcscat(szSystemDllPath, DllName);
+	_tcscat(szSystemDllPath, name);
 
-	MessageBox(NULL, szSystemDllPath, L"Proxy Dll", MB_ICONWARNING);
+	//MessageBox(NULL, szSystemDllPath, L"Proxy Dll", MB_ICONWARNING);
 
-	if (_tcsicmp(DllName + 1, L"dsound.dll") == NULL) {
+	PWCHAR DllName = name+sizeof('\\');
+
+	if (_tcsicmp(DllName , L"dsound.dll") == NULL) {
 		dsound.dll = LoadLibrary(szSystemDllPath);
 		dsound.DirectSoundCaptureCreate = GetProcAddress(dsound.dll, "DirectSoundCaptureCreate");
 		dsound.DirectSoundCaptureCreate8 = GetProcAddress(dsound.dll, "DirectSoundCaptureCreate8");
@@ -83,7 +103,7 @@ void Redirect(PWCHAR name)
 	}
 	else
 
-		if (_tcsicmp(DllName + 1, L"dinput8.dll") == NULL) {
+		if (_tcsicmp(DllName , L"dinput8.dll") == NULL) {
 			dinput8.dll = LoadLibrary(szSystemDllPath);
 			dinput8.DirectInput8Create = GetProcAddress(dinput8.dll, "DirectInput8Create");
 			dinput8.DllCanUnloadNow = GetProcAddress(dinput8.dll, "DllCanUnloadNow");
@@ -93,7 +113,7 @@ void Redirect(PWCHAR name)
 		}
 		else
 
-			if (_tcsicmp(DllName + 1, L"ddraw.dll") == NULL) {
+			if (_tcsicmp(DllName , L"ddraw.dll") == NULL) {
 				ddraw.dll = LoadLibrary(szSystemDllPath);
 				ddraw.AcquireDDThreadLock = GetProcAddress(ddraw.dll, "AcquireDDThreadLock");
 				ddraw.CheckFullscreen = GetProcAddress(ddraw.dll, "CheckFullscreen");
@@ -120,7 +140,7 @@ void Redirect(PWCHAR name)
 			}
 			else
 
-				if (_tcsicmp(DllName + 1, L"d3d8.dll") == NULL) {
+				if (_tcsicmp(DllName , L"d3d8.dll") == NULL) {
 					d3d8.dll = LoadLibrary(szSystemDllPath);
 					d3d8.DebugSetMute_d3d8 = GetProcAddress(d3d8.dll, "DebugSetMute_d3d8");
 					d3d8.Direct3DCreate8 = GetProcAddress(d3d8.dll, "Direct3DCreate8");
@@ -128,7 +148,7 @@ void Redirect(PWCHAR name)
 					d3d8.ValidateVertexShader = GetProcAddress(d3d8.dll, "ValidateVertexShader");
 				}
 				else
-					if (_tcsicmp(DllName + 1, L"d3d9.dll") == NULL) {
+					if (_tcsicmp(DllName , L"d3d9.dll") == NULL) {
 						d3d9.dll = LoadLibrary(szSystemDllPath);
 						d3d9.D3DPERF_BeginEvent = GetProcAddress(d3d9.dll, "D3DPERF_BeginEvent");
 						d3d9.D3DPERF_EndEvent = GetProcAddress(d3d9.dll, "D3DPERF_EndEvent");
@@ -150,7 +170,7 @@ void Redirect(PWCHAR name)
 					}
 					else
 
-						if (_tcsicmp(DllName + 1, L"d3d11.dll") == NULL) {
+						if (_tcsicmp(DllName , L"d3d11.dll") == NULL) {
 							d3d11.dll = LoadLibrary(szSystemDllPath);
 							d3d11.D3D11CoreCreateDevice = GetProcAddress(d3d11.dll, "D3D11CoreCreateDevice");
 							d3d11.D3D11CoreCreateLayeredDevice = GetProcAddress(d3d11.dll, "D3D11CoreCreateLayeredDevice");
@@ -203,7 +223,7 @@ void Redirect(PWCHAR name)
 						}
 						else
 
-							if (_tcsicmp(DllName + 1, L"winmmbase.dll") == NULL) {
+							if (_tcsicmp(DllName , L"winmmbase.dll") == NULL) {
 								winmmbase.dll = LoadLibrary(szSystemDllPath);
 								winmmbase.CloseDriver = GetProcAddress(winmmbase.dll, "CloseDriver");
 								winmmbase.DefDriverProc = GetProcAddress(winmmbase.dll, "DefDriverProc");
@@ -359,7 +379,7 @@ void Redirect(PWCHAR name)
 							}
 							else
 
-								if (_tcsicmp(DllName + 1, L"msacm32.dll") == NULL) {
+								if (_tcsicmp(DllName , L"msacm32.dll") == NULL) {
 									msacm32.dll = LoadLibrary(szSystemDllPath);
 									msacm32.acmDriverAddA = GetProcAddress(msacm32.dll, "acmDriverAddA");
 									msacm32.acmDriverAddW = GetProcAddress(msacm32.dll, "acmDriverAddW");
