@@ -331,7 +331,7 @@ void _stdcall PlayerIteration()
 
 		if (!POINTERCHK(pMySoldier))
 			return;
-		if (!isalive(pMySoldier->Alive())) return;
+	//	if (!isalive(pMySoldier->Alive())) return;
 		int size = pVecCP.size();
 		for (int i = 0; i < size; i++)
 		{
@@ -481,10 +481,10 @@ void _stdcall VehicleWeaponUpgrade()
 			}
 			if (bInstantBullet)
 			{
-				pWeaponFiring->m_data->m_primaryFire->m_shot.m_initialSpeed.z = 99999.0f;
-				pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_instantHit = true;
-				pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_timeToLive = 10.0f;
-				pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_gravity = 0.0f;
+				pWeaponFiring->m_data->m_primaryFire->m_shot.m_initialSpeed.z = 1224.0f;
+			//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_instantHit = true;
+			//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_timeToLive = 10.0f;
+			//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_gravity = 0.0f;
 			}
 		}
 	}
@@ -711,7 +711,7 @@ void _stdcall SoldierWeaponUpgrade()
 
 	fb::FiringFunctionData* pFFD = pMySoldier->getCurrentWeaponFiringData()->m_primaryFire;
 	if (!POINTERCHK(pFFD)) return; else {
-
+		
 	}
 	//weaponmodifier only active if its your mainweapon
 	fb::BulletEntityData* pBED;
@@ -741,7 +741,7 @@ void _stdcall SoldierWeaponUpgrade()
 
 				cl_SoldierWeapon = iWeaponID;
 
-				if (pBED->m_startDamage > 79.0f&&pBED->m_startDamage < 95.1f)pBED->m_startDamage = 101.0f;
+				if (pBED->m_startDamage > 79.0f)pBED->m_startDamage = 111.0f;
 				else if (pBED->m_startDamage > 42.0f&&pBED->m_startDamage < 51.0f) {
 					pBED->m_startDamage = 59.0f;
 				}
@@ -751,19 +751,20 @@ void _stdcall SoldierWeaponUpgrade()
 
 				if (pBED->m_startDamage >= pBED->m_endDamage)
 					pBED->m_endDamage = pBED->m_startDamage;
-				
+			
 				pBED->m_damageFalloffStartDistance = 9999.0f;
 				pBED->m_damageFalloffEndDistance = 9999.1f;
-
+			//	if (pFFD->m_shot.m_numberOfBulletsPerShell == 1)pFFD->m_shot.m_numberOfBulletsPerShell = 5;
 				
 					if (bInstantBullet&&pBED->m_endDamage > 2.00 && pFFD->m_shot.m_initialSpeed.z > 39.0f)
 
 					{
-
-					pFFD->m_shot.m_initialSpeed.z = 99999.0f;
-					pBED->m_instantHit = true;
-					pBED->m_timeToLive = 10.0f;
-					pBED->m_gravity = 0.0f;
+						pFFD->m_shot.m_initialSpeed.z = 1224.0f;
+				////	pFFD->m_shot.m_initialSpeed.z = 99999.0f;
+				//////	if(pFFD->m_shot.m_numberOfBulletsPerShell ==1)pFFD->m_shot.m_numberOfBulletsPerShell = 5;
+				////	pBED->m_instantHit = true;
+				////	pBED->m_timeToLive = 10.0f;
+				////	pBED->m_gravity = 0.0f;
 
 				}
 
