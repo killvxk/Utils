@@ -327,10 +327,10 @@ void _stdcall PlayerIteration()
 		eastl::vector<fb::ClientPlayer*> pVecCP = pPlayerManager->m_players;
 		if (pVecCP.empty()) return;
 
-		fb::ClientSoldierEntity* pMySoldier = pPlayerManager->m_localPlayer->getSoldierEnt();
+		//fb::ClientSoldierEntity* pMySoldier = pPlayerManager->m_localPlayer->getSoldierEnt();
 
-		if (!POINTERCHK(pMySoldier))
-			return;
+		//if (!POINTERCHK(pMySoldier))
+		//	return;
 	//	if (!isalive(pMySoldier->Alive())) return;
 		int size = pVecCP.size();
 		for (int i = 0; i < size; i++)
@@ -340,8 +340,8 @@ void _stdcall PlayerIteration()
 			if (!POINTERCHK(pSoldier)) continue;
 
 			if (pSoldier->isInVehicle()) continue;
-			if (pMySoldier->m_teamId == pClientPlayer->m_teamId)
-				continue;
+			/*	if (pMySoldier->m_teamId == pClientPlayer->m_teamId)
+					continue;*/
 			if (bForceSquadSpawn)
 				pClientPlayer->m_isAllowedToSpawnOn = true;
 
@@ -406,28 +406,28 @@ void _stdcall EntityWorld()
 				}
 			}
 		}
+		return;
+		//fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
+		//if (!POINTERCHK(pPlayerManager) || pPlayerManager->m_players.empty()) return;
 
-		/*	fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
-		if (!POINTERCHK(pPlayerManager) || pPlayerManager->m_players.empty()) return;
+		//fb::ClientPlayer* pLocalPlayer = pPlayerManager->m_localPlayer;
+		//if (!POINTERCHK(pLocalPlayer)) return;
 
-		fb::ClientPlayer* pLocalPlayer = pPlayerManager->m_localPlayer;
-		if (!POINTERCHK(pLocalPlayer)) return;
-
-		fb::EntityWorld::EntityCollection supplybox = g_pGameWorld->m_collections.at(ENTITY_CLIENT_SUPPLYBOX);
-		if (supplybox.firstSegment)
-		{
-		for (int i = 0; i < (int)supplybox.firstSegment->m_Collection.size(); i++)
-		{
-		if (supplybox.firstSegment->m_Collection.size() > 0)
-		{
-		fb::ClientSupplySphereEntity* pEntity = reinterpret_cast<fb::ClientSupplySphereEntity*>(supplybox.firstSegment->m_Collection.at(i));
-		if (POINTERCHK(pEntity))
-		{
-		pEntity->m_teamId = pLocalPlayer->m_teamId;
-		}
-		}
-		}
-		}*/
+		//fb::EntityWorld::EntityCollection supplybox = g_pGameWorld->m_collections.at(ENTITY_CLIENT_SUPPLYBOX);
+		//if (supplybox.firstSegment)
+		//{
+		//	for (int i = 0; i < (int)supplybox.firstSegment->m_Collection.size(); i++)
+		//	{
+		//		if (supplybox.firstSegment->m_Collection.size() > 0)
+		//		{
+		//			fb::ClientSupplySphereEntity* pEntity = reinterpret_cast<fb::ClientSupplySphereEntity*>(supplybox.firstSegment->m_Collection.at(i));
+		//			if (POINTERCHK(pEntity))
+		//			{
+		//				pEntity->m_teamId = pLocalPlayer->m_teamId;
+		//			}
+		//		}
+		//	}
+		//}
 	}
 }
 void _stdcall VehicleWeaponUpgrade()
@@ -462,14 +462,25 @@ void _stdcall VehicleWeaponUpgrade()
 		{
 			if (bNoRecoil)
 			{
+				fb::WeaponSway* pCurWps = pWeaponFiring->m_weaponSway;
+				if (POINTERCHK(pCurWps)) //
+				{
+					
+					HookRecoil(pCurWps);
+
+
+
+
+
+				}
 
 				pWeaponFiring->m_recoilAngleX = 0.0f;
 				pWeaponFiring->m_recoilAngleY = 0.0f;
 				pWeaponFiring->m_recoilAngleZ = 0.0f;
 
 				pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_endDamage = pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_startDamage;
-				pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_damageFalloffStartDistance = 99999.0f;
-				pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_damageFalloffEndDistance = 99999.1f;
+				//pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_damageFalloffStartDistance = 99999.0f;
+			//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_damageFalloffEndDistance = 99999.1f;
 
 			}
 			if (bInstantKill)
@@ -481,10 +492,10 @@ void _stdcall VehicleWeaponUpgrade()
 			}
 			if (bInstantBullet)
 			{
-				pWeaponFiring->m_data->m_primaryFire->m_shot.m_initialSpeed.z = 1224.0f;
-			//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_instantHit = true;
-			//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_timeToLive = 10.0f;
-			//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_gravity = 0.0f;
+				pWeaponFiring->m_data->m_primaryFire->m_shot.m_initialSpeed.z = 1124.0f;
+				//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_instantHit = true;
+				//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_timeToLive = 10.0f;
+				//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_gravity = 0.0f;
 			}
 		}
 	}
@@ -711,7 +722,7 @@ void _stdcall SoldierWeaponUpgrade()
 
 	fb::FiringFunctionData* pFFD = pMySoldier->getCurrentWeaponFiringData()->m_primaryFire;
 	if (!POINTERCHK(pFFD)) return; else {
-		
+
 	}
 	//weaponmodifier only active if its your mainweapon
 	fb::BulletEntityData* pBED;
@@ -729,49 +740,49 @@ void _stdcall SoldierWeaponUpgrade()
 	if ((POINTERCHK(pBED)
 		) && iWeaponID != cl_SoldierWeapon)
 	{
-	
+
 		if (iWeaponID != -1) {
 
 
+
+
+			//if (pBED->m_endDamage > 0)ori_enddamage = pBED->m_endDamage;
+			//if (pBED->m_startDamage > 0)ori_startdamage = pBED->m_startDamage;
+
+
+			cl_SoldierWeapon = iWeaponID;
+
+			if (pBED->m_startDamage > 79.0f)pBED->m_startDamage = 111.0f;
+			else if (pBED->m_startDamage > 42.0f&&pBED->m_startDamage < 51.0f) {
+				pBED->m_startDamage = 59.0f;
+			}
+
+
+
+
 			
-	
-				//if (pBED->m_endDamage > 0)ori_enddamage = pBED->m_endDamage;
-				//if (pBED->m_startDamage > 0)ori_startdamage = pBED->m_startDamage;
+				pBED->m_endDamage = pBED->m_startDamage;
 
-
-				cl_SoldierWeapon = iWeaponID;
-
-				if (pBED->m_startDamage > 79.0f)pBED->m_startDamage = 111.0f;
-				else if (pBED->m_startDamage > 42.0f&&pBED->m_startDamage < 51.0f) {
-					pBED->m_startDamage = 59.0f;
-				}
-
-				
-
-
-				if (pBED->m_startDamage >= pBED->m_endDamage)
-					pBED->m_endDamage = pBED->m_startDamage;
-			
-				pBED->m_damageFalloffStartDistance = 9999.0f;
-				pBED->m_damageFalloffEndDistance = 9999.1f;
+		//	pBED->m_damageFalloffStartDistance = 9999.0f;
+		//	pBED->m_damageFalloffEndDistance = 9999.1f;
 			//	if (pFFD->m_shot.m_numberOfBulletsPerShell == 1)pFFD->m_shot.m_numberOfBulletsPerShell = 5;
-				
-					if (bInstantBullet&&pBED->m_endDamage > 2.00 && pFFD->m_shot.m_initialSpeed.z > 39.0f)
 
-					{
-						pFFD->m_shot.m_initialSpeed.z = 1224.0f;
+			if (bInstantBullet&&pBED->m_endDamage > 2.00 && pFFD->m_shot.m_initialSpeed.z > 40.1f)
+
+			{
+				pFFD->m_shot.m_initialSpeed.z = 1124.0f;
 				////	pFFD->m_shot.m_initialSpeed.z = 99999.0f;
 				//////	if(pFFD->m_shot.m_numberOfBulletsPerShell ==1)pFFD->m_shot.m_numberOfBulletsPerShell = 5;
 				////	pBED->m_instantHit = true;
 				////	pBED->m_timeToLive = 10.0f;
 				////	pBED->m_gravity = 0.0f;
 
-				}
+			}
 
 		}
-		
 
-	
+
+
 
 	}
 	else {
