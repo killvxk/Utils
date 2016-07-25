@@ -492,7 +492,7 @@ void _stdcall VehicleWeaponUpgrade()
 			}
 			if (bInstantBullet)
 			{
-				pWeaponFiring->m_data->m_primaryFire->m_shot.m_initialSpeed.z = 1124.0f;
+				pWeaponFiring->m_data->m_primaryFire->m_shot.m_initialSpeed.z = 1000.4f;
 				//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_instantHit = true;
 				//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_timeToLive = 10.0f;
 				//	pWeaponFiring->m_data->m_primaryFire->m_shot.m_projectileData->m_gravity = 0.0f;
@@ -699,25 +699,26 @@ void _stdcall SoldierWeaponUpgrade()
 
 	}
 	fb::WeaponFiring* pWeaponFiring = pMySoldier->getCurrentWeaponFiring();
+	if (!POINTERCHK(pWeaponFiring))return;
 	//m_weaponSway
 
 
-	if (POINTERCHK(pWeaponFiring))
-	{
-		pWeaponFiring->m_overheatDropMultiplier = 500;
-		pWeaponFiring->m_primaryFire.isOverheated = false;
-		pWeaponFiring->m_autoReplenishTime = 0.00001f;
-		pWeaponFiring->m_primaryFire.heat = 0.0f;
-		pWeaponFiring->m_recoilAngleX = 0.0f;
-		pWeaponFiring->m_recoilAngleY = 0.0f;
-		pWeaponFiring->m_recoilAngleZ = 0.0f;
-		//pWeaponFiring->m_timeToWait = 0.01f;
+	//if (POINTERCHK(pWeaponFiring))
+	//{
+	//	pWeaponFiring->m_overheatDropMultiplier = 500;
+	//	pWeaponFiring->m_primaryFire.isOverheated = false;
+	//	pWeaponFiring->m_autoReplenishTime = 0.00001f;
+	//	pWeaponFiring->m_primaryFire.heat = 0.0f;
+	//	pWeaponFiring->m_recoilAngleX = 0.0f;
+	//	pWeaponFiring->m_recoilAngleY = 0.0f;
+	//	pWeaponFiring->m_recoilAngleZ = 0.0f;
+	//	//pWeaponFiring->m_timeToWait = 0.01f;
 
-		//	fb::WeaponFiring::Function pWeaponFiring->Function.currentFireModeIndex;
+	//	//	fb::WeaponFiring::Function pWeaponFiring->Function.currentFireModeIndex;
 
 
 
-	}
+	//}
 
 
 	fb::FiringFunctionData* pFFD = pMySoldier->getCurrentWeaponFiringData()->m_primaryFire;
@@ -737,11 +738,10 @@ void _stdcall SoldierWeaponUpgrade()
 		pBED = pFFD->m_shot.m_projectileData;
 	if (!POINTERCHK(pBED)) return;
 
-	if ((POINTERCHK(pBED)
-		) && iWeaponID != cl_SoldierWeapon)
+	if ( iWeaponID != cl_SoldierWeapon)
 	{
 
-		if (iWeaponID != -1) {
+		if (iWeaponID != -1 && bInstantBullet&&pBED->m_endDamage > 2.00 && pFFD->m_shot.m_initialSpeed.z > 40.1f) {
 
 
 
@@ -752,10 +752,13 @@ void _stdcall SoldierWeaponUpgrade()
 
 			cl_SoldierWeapon = iWeaponID;
 
-			if (pBED->m_startDamage > 79.0f)pBED->m_startDamage = 111.0f;
+			if (pBED->m_startDamage > 79.0f)pBED->m_startDamage = 100.1f;
 			else if (pBED->m_startDamage > 42.0f&&pBED->m_startDamage < 51.0f) {
-				pBED->m_startDamage = 59.0f;
+				pBED->m_startDamage = 59.5f;
 			}
+			else if (pBED->m_startDamage == 25.f)
+				pBED->m_startDamage = 34.5f;
+			
 
 
 
@@ -767,9 +770,7 @@ void _stdcall SoldierWeaponUpgrade()
 		//	pBED->m_damageFalloffEndDistance = 9999.1f;
 			//	if (pFFD->m_shot.m_numberOfBulletsPerShell == 1)pFFD->m_shot.m_numberOfBulletsPerShell = 5;
 
-			if (bInstantBullet&&pBED->m_endDamage > 2.00 && pFFD->m_shot.m_initialSpeed.z > 40.1f)
-
-			{
+			
 				pFFD->m_shot.m_initialSpeed.z = 1124.0f;
 				////	pFFD->m_shot.m_initialSpeed.z = 99999.0f;
 				//////	if(pFFD->m_shot.m_numberOfBulletsPerShell ==1)pFFD->m_shot.m_numberOfBulletsPerShell = 5;
@@ -777,7 +778,7 @@ void _stdcall SoldierWeaponUpgrade()
 				////	pBED->m_timeToLive = 10.0f;
 				////	pBED->m_gravity = 0.0f;
 
-			}
+	
 
 		}
 
