@@ -32,9 +32,9 @@ namespace fb
 		virtual void function0(); 
 		virtual SoldierEntity* getSoldier();// 
 		virtual EntryComponent * getEntry();  //
-		virtual bool isInVehicle(); //
-		virtual unsigned int getId(); //
-		virtual bool isUnlocked(const class UnlockAssetBase *);  //
+		virtual bool isInVehicle(); //0xC
+		virtual unsigned int getId(); //0x14
+		virtual bool isUnlocked(const class UnlockAssetBase *);  //0x18
 
 		//char unknown4[4]; // 0x0004
 		PlayerData* m_data;						// 0x08

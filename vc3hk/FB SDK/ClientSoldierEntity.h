@@ -96,6 +96,7 @@ namespace fb
         FLOAT m_clearMovementTimer;                                        // 0x24C
         ClientCharacterCustomizationComponent * m_customizationComponent;// 0x250
         INT m_received1pHint;                                            // 0x254
+	//	ClientCharacterCameraComponent *
         DWORD m_cameraComponent;                                        // 0x258
         MaterialContainerPair* m_footMaterial;                            // 0x25C
         PersonView m_personViews[2];                                    // 0x260

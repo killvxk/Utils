@@ -31,7 +31,10 @@ namespace fb
 		FLOAT m_zoomTransitionTimer;							// 0xFC	
 		FLOAT m_fovMultiplier;									// 0x100
 		FLOAT m_fovTransitionTimer;								// 0x104
-		PAD(0x4);												// 0x108
+		BYTE m_zoomLevelLocked;						// 0x108
+		BYTE m_zoomDisabled;						// 0x109
+		BYTE m_trySwitchOnNextUpdate;				// 0x10A
+		BYTE m_forceZoom;							// 0x10B
 		ZoomFadeState m_fadeState;								// 0x10C
 		FLOAT m_fadeTimer;										// 0x110
 		eastl::vector<AimerModifierData*> m_modifierData;		// 0x114
