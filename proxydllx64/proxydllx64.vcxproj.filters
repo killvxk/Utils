@@ -32,6 +32,5 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="proxydllx64.def" />
-    <None Include="..\..\..\..\..\Desktop\gen.dns.py" />
   </ItemGroup>
 </Project>

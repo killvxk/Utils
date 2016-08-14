@@ -1,9 +1,4 @@
-// vc3hk.cpp : 定义 DLL 应用程序的导出函数。
-//
 
-
-
-// dllmain.cpp : 定义 DLL 应用程序的入口点。
 #include "stdafx.h"
 #include "FB SDK\Frostbite.h"
 
@@ -37,6 +32,7 @@ tPresent oPresent;
 #pragma endregion Hook
 
 #pragma region
+LPCSTR time = __TIME__;
 float g_pInputBuffers[123];
 
 DWORD GIVEDAMAGE = 0x00770F40;
@@ -74,7 +70,7 @@ bool bSnaplines = false;
 
 bool bMinimapHack = true;
 bool bForceSquadSpawn = true;
-bool bSpottedExplosive = false;
+bool bSpottedExplosive =true;
 
 int nMenuindex = 0;
 int nMenuelements = 21;
@@ -192,50 +188,13 @@ DWORD WINAPI PBSSThread(LPVOID a)
 
 #pragma region HookRecoil
 //Source: http://dumpz.org/398889/
-void hookedRecoil(fb::WeaponSway* thisptr, D3DXMATRIX* trans, bool scale)
-{
-	if (bNoRecoil)
-	{
-		thisptr->m_currentRecoilDeviation.m_pitch = 0.0f;
-		thisptr->m_currentRecoilDeviation.m_yaw = 0.0f;
-		thisptr->m_currentRecoilDeviation.m_roll = 0.0f;
-		thisptr->m_currentRecoilDeviation.m_transY = 0.0f;
 
-		thisptr->m_DeviationPitch = 0.0f;
-
-		thisptr->m_currentGameplayDeviationScaleFactor = 0.0000000001f;
-		thisptr->m_currentVisualDeviationScaleFactor = 0.0000000001f;
-
-		thisptr->m_randomAngle = 0.0000f;
-		thisptr->m_randomRadius = 0.0000f;
-
-		thisptr->m_SpringPos = 0.0f;
-		thisptr->m_SpringRestPos = 0.0f;
-		thisptr->m_SpringVelocity = 0.0f;
-		thisptr->m_fireShot = false;
-		thisptr->m_initialFireShot = 0;
-		//thisptr->m_isFiring = true;
-
-		thisptr->m_currentDispersionDeviation.m_pitch = 0.0f;
-		thisptr->m_currentDispersionDeviation.m_yaw = 0.0f;
-		thisptr->m_currentDispersionDeviation.m_roll = 0.0f;
-		thisptr->m_currentDispersionDeviation.m_transY = 0.0f;
-
-		thisptr->m_currentLagDeviation.m_pitch = 0.0f;
-		thisptr->m_currentLagDeviation.m_yaw = 0.0f;
-		thisptr->m_currentLagDeviation.m_roll = 0.0f;
-		thisptr->m_currentLagDeviation.m_transY = 0.0f;
-	}
-
-	//if (bNoSpread)thisptr->m_dispersionAngle = 0.0f; //small crosshair
-}
 DWORD originalGetRecoil;
 DWORD ori_getDispersion;
 DWORD dwDispersionRetAddr;
 DWORD dwRecoilRetAddress;
 fb::WeaponSway* recoilThisPtr;
-D3DXMATRIX mtx;
-D3DXMATRIX* arg1;
+
 __declspec(naked) void hkGetRecoil(void)
 {
 	__asm
@@ -399,7 +358,7 @@ void _stdcall EntityWorld()
 						fb::ClientExplosionPackEntity* pEntity = reinterpret_cast<fb::ClientExplosionPackEntity*>(explosive.firstSegment->m_Collection.at(i));
 						if (POINTERCHK(pEntity))
 						{
-							pEntity->m_isSpotted = 2; // 1 is spotted on map, 2 is spotted map and HUD (3D)
+							pEntity->m_isSpotted = 1; // 1 is spotted on map, 2 is spotted map and HUD (3D)
 						}
 					}
 				}
@@ -635,8 +594,8 @@ void _stdcall SoldierWeaponUpgrade()
 	fb::ClientPlayer* pLocalPlayer = pPlayerManager->m_localPlayer;//[0x2380b58]fb::ClientPlayer*
 	if (!POINTERCHK(pLocalPlayer)) return;
 	//hook isUnlocked()
-//	HookUnlock( pLocalPlayer);
-	
+	//HookUnlock( pLocalPlayer);
+
 
 	fb::ClientSoldierEntity* pMySoldier = pLocalPlayer->getSoldierEnt();
 	if (!POINTERCHK(pMySoldier)) return;
@@ -672,16 +631,16 @@ void _stdcall SoldierWeaponUpgrade()
 	if (bNoSway && POINTERCHK(pCWSCI))
 	{
 		fb::SoldierAimingSimulationData* pSASD = MyCSW->m_authorativeAiming->m_data;
-		MyCSW->m_authorativeAiming->m_sway.x=0.f;
-		MyCSW->m_authorativeAiming->m_sway.y = 0.f;
+
 
 
 		if (POINTERCHK(pSASD->m_zoomLevels[0]))
 		{
 			pSASD->m_zoomLevels.At(0)->m_swayPitchMultiplier = 0.0f;
-			pSASD->m_zoomLevels.At(0)->m_swayYawMultiplier = 0.0f;
 
-	
+			pSASD->m_zoomLevels.At(0)->m_swayYawMultiplier = 0.0f;
+			//printf_s("%x\n", &pSASD->m_zoomLevels.At(0)->m_swayPitchMultiplier);
+
 			if (pCWSCI->m_isSupported)
 			{
 				pSASD->m_zoomLevels.At(0)->m_supportedSwayPitchMultiplier = 0.0f;
@@ -694,15 +653,21 @@ void _stdcall SoldierWeaponUpgrade()
 			{
 				pSASD->m_zoomLevels.At(1)->m_swayPitchMultiplier = 0.0f;
 				pSASD->m_zoomLevels.At(1)->m_swayYawMultiplier = 0.0f;
-				
-			//	printf_s("fov:%f", pSASD->m_zoomLevels.At(1)->m_fieldOfView);
-				if (pSASD->m_zoomLevels.At(1)->m_fieldOfView <= 20.5f&&pSASD->m_zoomLevels.At(1)->m_fieldOfView >= 19.9f) {
-					pSASD->m_zoomLevels.At(1)->m_lookSpeedMultiplier = 0.08f;
-					pSASD->m_zoomLevels.At(1)->m_fieldOfView = 2.8f;
-				
+				//	printf_s("%x\n", &pSASD->m_zoomLevels.At(1)->m_swayPitchMultiplier);
+				//	printf_s("fov:%f", pSASD->m_zoomLevels.At(1)->m_fieldOfView);
+				if (pSASD->m_zoomLevels.At(1)->m_fieldOfView ==20.f) {
+					pSASD->m_zoomLevels.At(1)->m_lookSpeedMultiplier = 0.09f;
+					pSASD->m_zoomLevels.At(1)->m_fieldOfView = 4.6666f;
+
 				}
-		
-			
+				else if (pSASD->m_zoomLevels.At(1)->m_fieldOfView > 8.0f&&pSASD->m_zoomLevels.At(1)->m_fieldOfView < 9.0f
+					
+					) {
+					pSASD->m_zoomLevels.At(1)->m_lookSpeedMultiplier = 0.05f;
+					pSASD->m_zoomLevels.At(1)->m_fieldOfView = 2.3333f;
+				}
+
+
 				if (pCWSCI->m_isSupported)
 				{
 					pSASD->m_zoomLevels.At(1)->m_supportedSwayPitchMultiplier = 0.0f;
@@ -735,33 +700,22 @@ void _stdcall SoldierWeaponUpgrade()
 	{
 
 		HookRecoil(pWps);
-	
+
 
 
 
 
 	}
 	fb::WeaponFiring* pWeaponFiring = pMySoldier->getCurrentWeaponFiring();
-	if (!POINTERCHK(pWeaponFiring))return;
-	//m_weaponSway
-
-
-	//if (POINTERCHK(pWeaponFiring))
-	//{
-	//	pWeaponFiring->m_overheatDropMultiplier = 500;
-	//	pWeaponFiring->m_primaryFire.isOverheated = false;
-	//	pWeaponFiring->m_autoReplenishTime = 0.00001f;
-	//	pWeaponFiring->m_primaryFire.heat = 0.0f;
-	//	pWeaponFiring->m_recoilAngleX = 0.0f;
-	//	pWeaponFiring->m_recoilAngleY = 0.0f;
-	//	pWeaponFiring->m_recoilAngleZ = 0.0f;
-	//	//pWeaponFiring->m_timeToWait = 0.01f;
-
-	//	//	fb::WeaponFiring::Function pWeaponFiring->Function.currentFireModeIndex;
-
-
-
-	//}
+	if (!POINTERCHK(pWeaponFiring)) { return;
+	} else if(POINTERCHK(pWeaponFiring))
+	{
+		pWeaponFiring->m_overheatDropMultiplier = 500;
+		pWeaponFiring->m_primaryFire.isOverheated = false;
+		pWeaponFiring->m_autoReplenishTime = 0.00001f;
+		pWeaponFiring->m_primaryFire.heat = 0.0f;
+	
+	}
 
 
 	fb::FiringFunctionData* pFFD = pMySoldier->getCurrentWeaponFiringData()->m_primaryFire;
@@ -781,58 +735,68 @@ void _stdcall SoldierWeaponUpgrade()
 		pBED = pFFD->m_shot.m_projectileData;
 	if (!POINTERCHK(pBED)) return;
 
-	//if (iWeaponID != cl_SoldierWeapon)
-	//{
+	if (iWeaponID != cl_SoldierWeapon)
+	{
 
 		if (iWeaponID != -1 && bInstantBullet&&pBED->m_endDamage > 2.00 && pFFD->m_shot.m_initialSpeed.z > 40.1f) {
 
-
+			//	printf_s("addr: %x",(UINT)& pBED->m_gravity);
 
 
 			cl_SoldierWeapon = iWeaponID;
+			//	pBED->m_gravity = 0.f;
 
 			if (pBED->m_startDamage > 79.5f&&pBED->m_startDamage < 80.5f) {
-				pBED->m_startDamage = 110.10f;	pBED->m_endDamage = 74.f;
-				pBED->m_damageFalloffStartDistance = 30.f;
-				pBED->m_damageFalloffEndDistance = 30.001f;
+				pBED->m_startDamage = 110.10f;
+				pBED->m_endDamage = 74.f;
+				pBED->m_damageFalloffStartDistance = 52.f;
+				pBED->m_damageFalloffEndDistance = 52.001f;
 			}
-			else if (pBED->m_startDamage==95.f) {
+			else if (pBED->m_startDamage == 95.f) {
 				pBED->m_startDamage = 110.1f;
-				pBED->m_endDamage = 87.f; 
-				pBED->m_damageFalloffStartDistance = 30.f;
-				pBED->m_damageFalloffEndDistance = 30.001f;
+				pBED->m_endDamage = 87.f;
+				pBED->m_damageFalloffStartDistance = 52.f;
+				pBED->m_damageFalloffEndDistance = 52.001f;
 			}
-			else
-				if (pBED->m_startDamage > 42.0f&&pBED->m_startDamage < 51.0f) {
+			else if (pBED->m_startDamage > 42.0f&&pBED->m_startDamage < 51.0f) {
 				pBED->m_startDamage = 59.5f;
 			}
 			else if (pBED->m_startDamage == 16.7f)
+			{
 				pBED->m_startDamage = 22.5f;
+			}
 			else if (pBED->m_startDamage == 20.f)
+			{
 				pBED->m_startDamage = 26.5f;
+			}
 			else if (pBED->m_startDamage == 25.f)
+			{
 				pBED->m_startDamage = 34.5f;
-			
+			}
+
 			else if (pBED->m_startDamage == 34.f)
+			{
 				pBED->m_startDamage = 40.5f;
+			}
 
-		//	if (pBED->m_gravity== (-9.8100f))
+			//	if (pBED->m_gravity== (-9.8100f))
 
 
-		//	pBED->m_timeToLive = 10.f;
-		
-	//			pBED->m_firstFrameTravelDistance = 100.f;
-	//			pBED->m_initialSpeed=1100.f;
-	//			pFFD->m_shot.m_initialSpeed.z = 710.f;
-	//			pBED->m_damageFalloffEndDistance = 9000.1f;
-			
-			
-			if (pBED->m_startDamage < 80.f&&pBED->m_startDamage >= pBED->m_endDamage)
+			//	pBED->m_timeToLive = 10.f;
+
+		//			pBED->m_firstFrameTravelDistance = 100.f;
+		//			pBED->m_initialSpeed=1100.f;
+		//			pFFD->m_shot.m_initialSpeed.z = 710.f;
+		//			pBED->m_damageFalloffEndDistance = 9000.1f;
+
+
+			if (pBED->m_startDamage < 79.6f&&pBED->m_endDamage < 74.f&&
+				pBED->m_startDamage > pBED->m_endDamage)
 			{
 				pBED->m_endDamage = pBED->m_startDamage;
 			}
-			
-		
+
+
 
 			//	pBED->m_damageFalloffStartDistance = 9999.0f;
 			//	pBED->m_damageFalloffEndDistance = 9999.1f;
@@ -852,11 +816,10 @@ void _stdcall SoldierWeaponUpgrade()
 
 
 
-
-	
-	/*else {
-		cl_SoldierWeapon = 0xffff;
-	}*/
+		else 		{
+			cl_SoldierWeapon = 0xffff;
+		}
+	}
 }
 signed int __stdcall hkPresent(int a1, int a2, int a3) {
 	__asm pushad;
