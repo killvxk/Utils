@@ -657,14 +657,14 @@ void _stdcall SoldierWeaponUpgrade()
 				//	printf_s("fov:%f", pSASD->m_zoomLevels.At(1)->m_fieldOfView);
 				if (pSASD->m_zoomLevels.At(1)->m_fieldOfView ==20.f) {
 					pSASD->m_zoomLevels.At(1)->m_lookSpeedMultiplier = 0.09f;
-					pSASD->m_zoomLevels.At(1)->m_fieldOfView = 4.6666f;
+					pSASD->m_zoomLevels.At(1)->m_fieldOfView = 5.f;
 
 				}
 				else if (pSASD->m_zoomLevels.At(1)->m_fieldOfView > 8.0f&&pSASD->m_zoomLevels.At(1)->m_fieldOfView < 9.0f
 					
 					) {
 					pSASD->m_zoomLevels.At(1)->m_lookSpeedMultiplier = 0.05f;
-					pSASD->m_zoomLevels.At(1)->m_fieldOfView = 2.3333f;
+					pSASD->m_zoomLevels.At(1)->m_fieldOfView = 2.8f;
 				}
 
 
@@ -735,8 +735,8 @@ void _stdcall SoldierWeaponUpgrade()
 		pBED = pFFD->m_shot.m_projectileData;
 	if (!POINTERCHK(pBED)) return;
 
-	if (iWeaponID != cl_SoldierWeapon)
-	{
+
+	
 
 		if (iWeaponID != -1 && bInstantBullet&&pBED->m_endDamage > 2.00 && pFFD->m_shot.m_initialSpeed.z > 40.1f) {
 
@@ -758,34 +758,34 @@ void _stdcall SoldierWeaponUpgrade()
 				pBED->m_damageFalloffStartDistance = 52.f;
 				pBED->m_damageFalloffEndDistance = 52.001f;
 			}
-			else if (pBED->m_startDamage > 42.0f&&pBED->m_startDamage < 51.0f) {
-				pBED->m_startDamage = 59.5f;
+			else if (pBED->m_startDamage == 43.f||pBED->m_startDamage == 50.0f) {
+				pBED->m_startDamage = 59.3f;
 			}
 			else if (pBED->m_startDamage == 16.7f)
 			{
-				pBED->m_startDamage = 22.5f;
+				pBED->m_startDamage = 26.7f;
 			}
 			else if (pBED->m_startDamage == 20.f)
 			{
-				pBED->m_startDamage = 26.5f;
+				pBED->m_startDamage = 30.5f;
 			}
 			else if (pBED->m_startDamage == 25.f)
 			{
-				pBED->m_startDamage = 34.5f;
+				pBED->m_startDamage = 36.5f;
 			}
 
 			else if (pBED->m_startDamage == 34.f)
 			{
-				pBED->m_startDamage = 40.5f;
+				pBED->m_startDamage = 41.5f;
 			}
 
 			//	if (pBED->m_gravity== (-9.8100f))
 
 
-			//	pBED->m_timeToLive = 10.f;
+				pBED->m_timeToLive = 10.f;
 
 		//			pBED->m_firstFrameTravelDistance = 100.f;
-		//			pBED->m_initialSpeed=1100.f;
+					pBED->m_initialSpeed=650.f;
 		//			pFFD->m_shot.m_initialSpeed.z = 710.f;
 		//			pBED->m_damageFalloffEndDistance = 9000.1f;
 
@@ -820,7 +820,7 @@ void _stdcall SoldierWeaponUpgrade()
 			cl_SoldierWeapon = 0xffff;
 		}
 	}
-}
+
 signed int __stdcall hkPresent(int a1, int a2, int a3) {
 	__asm pushad;
 
