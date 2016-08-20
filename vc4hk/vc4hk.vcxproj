@@ -82,6 +82,24 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DXTK\Inc\Audio.h" />
+    <ClInclude Include="DXTK\Inc\CommonStates.h" />
+    <ClInclude Include="DXTK\Inc\DDSTextureLoader.h" />
+    <ClInclude Include="DXTK\Inc\DirectXHelpers.h" />
+    <ClInclude Include="DXTK\Inc\Effects.h" />
+    <ClInclude Include="DXTK\Inc\GamePad.h" />
+    <ClInclude Include="DXTK\Inc\GeometricPrimitive.h" />
+    <ClInclude Include="DXTK\Inc\Keyboard.h" />
+    <ClInclude Include="DXTK\Inc\Model.h" />
+    <ClInclude Include="DXTK\Inc\Mouse.h" />
+    <ClInclude Include="DXTK\Inc\PrimitiveBatch.h" />
+    <ClInclude Include="DXTK\Inc\ScreenGrab.h" />
+    <ClInclude Include="DXTK\Inc\SimpleMath.h" />
+    <ClInclude Include="DXTK\Inc\SpriteBatch.h" />
+    <ClInclude Include="DXTK\Inc\SpriteFont.h" />
+    <ClInclude Include="DXTK\Inc\VertexTypes.h" />
+    <ClInclude Include="DXTK\Inc\WICTextureLoader.h" />
+    <ClInclude Include="DXTK\Inc\XboxDDSTextureLoader.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="x64_sdk.h" />
