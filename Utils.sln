@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vc3hk", "vc3hk\vc3hk.vcxpro
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ACR SAVEGAME TOOL VB", "ACR SAVEGAME TOOL VB\ACR SAVEGAME TOOL VB.vbproj", "{0C86F78D-DB6A-4420-91E9-ADB16D7C73D0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vc4hk", "vc4hk\vc4hk.vcxproj", "{CB81C021-7897-4323-B231-E9394CFE24A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +81,17 @@ Global
 		{0C86F78D-DB6A-4420-91E9-ADB16D7C73D0}.Release|x64.Build.0 = Release|Any CPU
 		{0C86F78D-DB6A-4420-91E9-ADB16D7C73D0}.Release|x86.ActiveCfg = Release|Any CPU
 		{0C86F78D-DB6A-4420-91E9-ADB16D7C73D0}.Release|x86.Build.0 = Release|Any CPU
+		{CB81C021-7897-4323-B231-E9394CFE24A3}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{CB81C021-7897-4323-B231-E9394CFE24A3}.Debug|ARM.ActiveCfg = Debug|x64
+		{CB81C021-7897-4323-B231-E9394CFE24A3}.Debug|x64.ActiveCfg = Debug|x64
+		{CB81C021-7897-4323-B231-E9394CFE24A3}.Debug|x64.Build.0 = Debug|x64
+		{CB81C021-7897-4323-B231-E9394CFE24A3}.Debug|x86.ActiveCfg = Debug|x64
+		{CB81C021-7897-4323-B231-E9394CFE24A3}.Release|Any CPU.ActiveCfg = Release|x64
+		{CB81C021-7897-4323-B231-E9394CFE24A3}.Release|ARM.ActiveCfg = Release|x64
+		{CB81C021-7897-4323-B231-E9394CFE24A3}.Release|x64.ActiveCfg = Release|x64
+		{CB81C021-7897-4323-B231-E9394CFE24A3}.Release|x64.Build.0 = Release|x64
+		{CB81C021-7897-4323-B231-E9394CFE24A3}.Release|x86.ActiveCfg = Release|x64
+		{CB81C021-7897-4323-B231-E9394CFE24A3}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

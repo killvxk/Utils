@@ -95,15 +95,26 @@ private:
 	int unhookindex;
 };
 
-static PBYTE HookVtblFunction(PDWORD* dwVTable, PBYTE dwHook, INT Index)
+void* HookVtblFunction(void* pClassInstance,void* dwHook, const INT Index, const INT newVtableSize)
 {
-	DWORD dwOld = 0;
-	VirtualProtect((void*)((*dwVTable) + Index), 4, PAGE_EXECUTE_READWRITE, &dwOld);
+	void* pOrig;
+	DWORD *vtable = (DWORD *)*(DWORD *)pClassInstance;
+	pOrig = (void*)(vtable[Index]);
+	if (pOrig != dwHook) {
 
-	PBYTE pOrig = ((PBYTE)(*dwVTable)[Index]);
-	(*dwVTable)[Index] = (DWORD)dwHook;
+	DWORD* newVtable = new DWORD[newVtableSize]; //leave some space
+	memcpy(newVtable, vtable, newVtableSize * sizeof(DWORD));
+	newVtable[Index] = (DWORD)dwHook;
 
-	VirtualProtect((void*)((*dwVTable) + Index), 4, dwOld, &dwOld);
+	DWORD dwOld;
+
+	VirtualProtect(pClassInstance, sizeof(DWORD), PAGE_EXECUTE_READWRITE, &dwOld);
+
+	*(DWORD *)pClassInstance = (DWORD)newVtable; //Replace Vtable
+
+	VirtualProtect(pClassInstance, sizeof(DWORD), dwOld, NULL);
+
+}
 
 	return pOrig;
 }

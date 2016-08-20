@@ -29,6 +29,8 @@ fb::BorderInputNode* g_pBorderInputNode = fb::BorderInputNode::Singleton();
 CVMTHookManager* PresentHook = 0;
 typedef signed int(__stdcall* tPresent)(int, int, int);
 tPresent oPresent;
+
+
 #pragma endregion Hook
 
 #pragma region
@@ -36,6 +38,8 @@ LPCSTR time = __TIME__;
 float g_pInputBuffers[123];
 
 DWORD GIVEDAMAGE = 0x00770F40;
+DWORD ori_GetRecoil = 0x701a50;//fb__GunSway__getRecoil .text 00701A50 
+DWORD ori_getDispersion = 0x701a00;//fb__GunSway__getDispersion
 
 bool bDrawMenu = false;
 
@@ -189,8 +193,7 @@ DWORD WINAPI PBSSThread(LPVOID a)
 #pragma region HookRecoil
 //Source: http://dumpz.org/398889/
 
-DWORD originalGetRecoil;
-DWORD ori_getDispersion;
+
 DWORD dwDispersionRetAddr;
 DWORD dwRecoilRetAddress;
 fb::WeaponSway* recoilThisPtr;
@@ -207,7 +210,7 @@ __declspec(naked) void hkGetRecoil(void)
 		mov[esi + 0x16C], edi
 		pop edi
 		pop esi
-		jmp dword ptr[originalGetRecoil]
+		jmp dword ptr[ori_GetRecoil]
 
 		//	pop dwRecoilRetAddress
 		//	mov recoilThisPtr, ecx
@@ -241,6 +244,7 @@ __declspec(naked) void hkGetDispersion(void)
 		mov[esi + 0x140], edi
 
 		mov[esi + 0x13C], edi
+
 		pop edi
 		pop esi
 
@@ -248,30 +252,28 @@ __declspec(naked) void hkGetDispersion(void)
 	}
 }
 
+
+
+
 void _stdcall HookRecoil(fb::WeaponSway* pWps)
 {
-	if (bNoRecoil || bNoSpread)
+	if ( bNoSpread)
 	{
-		DWORD *vtable = (DWORD *)*(DWORD *)pWps;
-		//printf("%x\n", vtable[24]);
-		if (vtable[24] != (DWORD)hkGetDispersion || vtable[25] != (DWORD)hkGetRecoil)
+		if ((void*)hkGetDispersion != HookVtblFunction(pWps, hkGetDispersion, 24, 64))
 		{
-			originalGetRecoil = vtable[25]; //Backup old function
-			ori_getDispersion = vtable[24];
-
-
-			DWORD* newVtable = new DWORD[64]; //leave some space
-			memcpy(newVtable, vtable, 64 * sizeof(DWORD));
-			newVtable[25] = (DWORD)hkGetRecoil;
-			newVtable[24] = (DWORD)hkGetDispersion;
-
-			DWORD dwOld;
-			VirtualProtect(pWps, sizeof(DWORD), PAGE_EXECUTE_READWRITE, &dwOld);
-			*(DWORD *)pWps = (DWORD)newVtable; //Replace Vtable
-			VirtualProtect(pWps, sizeof(DWORD), dwOld, NULL);
+			HookVtblFunction(pWps, hkGetDispersion, 24, 64);
 		}
+	
+	}
+	if (bNoRecoil) {
+		if ((void*)hkGetRecoil != HookVtblFunction(pWps, hkGetRecoil, 25, 64))
+		{
+			HookVtblFunction(pWps, hkGetRecoil, 25, 64);
+		}
+
 	}
 }
+
 #pragma endregion HookRecoil
 void _stdcall PlayerIteration()
 {
@@ -552,37 +554,8 @@ void _stdcall VehicleWeaponUpgrade()
 		}
 	}
 }
-__declspec(naked) void hkUnlock(void)
-{
-	__asm {
-		mov al,1
-		ret 4
-		}
-}
-void _stdcall HookUnlock(fb::ClientPlayer* pWps)
-{
-	DWORD ori_isUnlocked;
-		DWORD *vtable = (DWORD *)*(DWORD *)pWps;
-		//printf("%x\n", vtable[24]);
-		if (vtable[6] != (DWORD)hkUnlock)
-		{
-			ori_isUnlocked = vtable[6]; //Backup old function
-			
-
-
-			DWORD* newVtable = new DWORD[64]; //leave some space
-			memcpy(newVtable, vtable, 64 * sizeof(DWORD));
-			newVtable[6] = (DWORD)hkUnlock;
-	
-
-			DWORD dwOld;
-			VirtualProtect(pWps, sizeof(DWORD), PAGE_EXECUTE_READWRITE, &dwOld);
-			*(DWORD *)pWps = (DWORD)newVtable; //Replace Vtable
-			VirtualProtect(pWps, sizeof(DWORD), dwOld, NULL);
-		}
-	
-}
 void _stdcall SoldierWeaponUpgrade()
+
 {
 
 	fb::ClientGameContext* g_pGameContext = fb::ClientGameContext::Singleton();
@@ -631,28 +604,31 @@ void _stdcall SoldierWeaponUpgrade()
 	if (bNoSway && POINTERCHK(pCWSCI))
 	{
 		fb::SoldierAimingSimulationData* pSASD = MyCSW->m_authorativeAiming->m_data;
-
+	//	MyCSW->m_authorativeAiming->m_sway.x = 0.f;
+	
 
 
 		if (POINTERCHK(pSASD->m_zoomLevels[0]))
 		{
-			pSASD->m_zoomLevels.At(0)->m_swayPitchMultiplier = 0.0f;
-
-			pSASD->m_zoomLevels.At(0)->m_swayYawMultiplier = 0.0f;
-			//printf_s("%x\n", &pSASD->m_zoomLevels.At(0)->m_swayPitchMultiplier);
+			pSASD->m_zoomLevels.At(0)->m_swayPitchMultiplier = 0.001f;
+			pSASD->m_zoomLevels.At(0)->m_swayYawMultiplier = 0.001f;
+		
 
 			if (pCWSCI->m_isSupported)
 			{
-				pSASD->m_zoomLevels.At(0)->m_supportedSwayPitchMultiplier = 0.0f;
-				pSASD->m_zoomLevels.At(0)->m_supportedSwayYawMultiplier = 0.0f;
+				pSASD->m_zoomLevels.At(0)->m_supportedSwayPitchMultiplier = 0.001f;
+				pSASD->m_zoomLevels.At(0)->m_supportedSwayYawMultiplier = 0.001f;
 			}
 		}
 		if (MyCSW->m_authorativeAiming->m_zoomLevel > 0)
 		{
 			if (POINTERCHK(pSASD->m_zoomLevels[1]))
 			{
-				pSASD->m_zoomLevels.At(1)->m_swayPitchMultiplier = 0.0f;
-				pSASD->m_zoomLevels.At(1)->m_swayYawMultiplier = 0.0f;
+				printf_s("x:%x,y:%x\n", &MyCSW->m_authorativeAiming->m_sway.x, &MyCSW->m_authorativeAiming->m_sway.y);
+				printf_s("%x\n", &pSASD->m_zoomLevels.At(1)->m_swayYawMultiplier);
+				printf_s("pCWSCI->m_isSupported addr:%x\n", &pCWSCI->m_isSupported);
+			//	pSASD->m_zoomLevels.At(1)->m_swayPitchMultiplier = 0.001f;
+			//	pSASD->m_zoomLevels.At(1)->m_swayYawMultiplier = 0.001f;
 				//	printf_s("%x\n", &pSASD->m_zoomLevels.At(1)->m_swayPitchMultiplier);
 				//	printf_s("fov:%f", pSASD->m_zoomLevels.At(1)->m_fieldOfView);
 				if (pSASD->m_zoomLevels.At(1)->m_fieldOfView ==20.f) {
@@ -667,7 +643,7 @@ void _stdcall SoldierWeaponUpgrade()
 					pSASD->m_zoomLevels.At(1)->m_fieldOfView = 2.8f;
 				}
 
-
+			
 				if (pCWSCI->m_isSupported)
 				{
 					pSASD->m_zoomLevels.At(1)->m_supportedSwayPitchMultiplier = 0.0f;
@@ -759,7 +735,8 @@ void _stdcall SoldierWeaponUpgrade()
 				pBED->m_damageFalloffEndDistance = 52.001f;
 			}
 			else if (pBED->m_startDamage == 43.f||pBED->m_startDamage == 50.0f) {
-				pBED->m_startDamage = 59.3f;
+				pBED->m_startDamage = 60.f;
+				pBED->m_endDamage = 46.f;
 			}
 			else if (pBED->m_startDamage == 16.7f)
 			{
@@ -779,18 +756,20 @@ void _stdcall SoldierWeaponUpgrade()
 				pBED->m_startDamage = 41.5f;
 			}
 
-			//	if (pBED->m_gravity== (-9.8100f))
-
+			if (pBED->m_gravity== (-9.8100f))
+			{
+				//pBED->m_gravity =(- 5.f);
+			}
 
 				pBED->m_timeToLive = 10.f;
 
-		//			pBED->m_firstFrameTravelDistance = 100.f;
-					pBED->m_initialSpeed=650.f;
+			//		pBED->m_firstFrameTravelDistance = 50.f;
+					pBED->m_initialSpeed=750.f;
 		//			pFFD->m_shot.m_initialSpeed.z = 710.f;
 		//			pBED->m_damageFalloffEndDistance = 9000.1f;
 
 
-			if (pBED->m_startDamage < 79.6f&&pBED->m_endDamage < 74.f&&
+			if (pBED->m_endDamage != 46.f&&pBED->m_startDamage < 79.6f&&pBED->m_endDamage < 74.f&&
 				pBED->m_startDamage > pBED->m_endDamage)
 			{
 				pBED->m_endDamage = pBED->m_startDamage;
