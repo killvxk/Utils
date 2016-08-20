@@ -5,7 +5,18 @@
 #define OFFSET_GAMERENDERER         0x1424ad330
 #define OFFSET_ANGLES				0x1421caee0
 #define OFFSET_WORLDRENDERSETTINGS  0x1424ad460
+#define OFFSET_MAIN 0x14219ff68
+#define OFFSET_FIRSTTYPEINFO 0x0
+#define OFFSET_SYBCEDBFSETTINGS		 0x1421AC5A0
+#define OFFSET_BORDERINPUTNODE 0x1424acf70
+#define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
+#define POINTERCHK(p)  ((p >= (PVOID)0x10000) && (p < _PTR_MAX_VALUE) && (p != nullptr))
+#define PAD(SIZE) (char __pad[SIZE]);
+
+
 namespace SM = DirectX::SimpleMath;
+
+namespace fb{
 class TestList
 {
 public:
@@ -1107,7 +1118,20 @@ struct TransformAABBStruct {
 	TransformAABBStruct()
 	{}
 };
-
+class BreathControlHandler
+{
+public:
+	char _0x0000[56];
+	float m_breathControlTimer; //0x0038  
+	float m_breathControlMultiplier; //0x003C  
+	float m_breathControlPenaltyTimer; //0x0040  
+	float m_breathControlPenaltyMultiplier; //0x0044  
+	float m_breathControlActive; //0x0048  
+	float m_breathControlInput; //0x004C  
+	bool m_breathActive; //0x0050  
+	char _0x0054[4];
+	bool m_Enabled; //0x0058  
+};
 class ClientControllableEntity
 {
 public:
@@ -1211,9 +1235,15 @@ public:
 	SoldierWeaponComponent* m_pWeaponComponent; //0x0570 
 	ClientSoldierBodyComponent* m_pBodyComponent; //0x0578 
 	RagdollComponent* m_pRagdollComponent; //0x0580 
-	char _0x0588[40];
-	unsigned char m_Sprinting; //0x05B0 
-	unsigned char m_Occluded; //0x05B1 
+	
+	BreathControlHandler* m_breathControlHandler; //0x0588
+	char pad_0x0570[16];
+	void* m_sprintInputHandler; //0x0580  + 20
+	__int32 padThis; //0x0588  + 20
+	float m_timeSinceLastSprinted; //0x058C  + 20
+	BYTE m_sprinting; //0x0590  + 20
+	BYTE m_occluded; //0x0591  + 20
+
 	char N00001BCE[6]; //0x05B2 
 	char _0x05B8[1432];
 	ParachuteComponent* m_pParachute; //0x0B50 
@@ -1228,6 +1258,7 @@ public:
 	char _0x0D38[1264];
 
 };//Size=0x1228
+
 
 class AntAnimatableComponent
 {
@@ -1272,7 +1303,7 @@ public:
 
 	SoldierWeapon* GetActiveSoldierWeapon()
 	{
-		if (!PLH::IsValidPtr(m_Handler))
+		if (!POINTERCHK(m_Handler))
 			return nullptr;
 
 		if (m_CurrentWeaponIndex == 0 || m_CurrentWeaponIndex == 1)
@@ -1849,7 +1880,7 @@ public:
 		if (PoseResult.m_ValidTransforms)
 		{
 			QuatTransform* pQuat = PoseResult.m_ActiveWorldTransforms;
-			if (!PLH::IsValidPtr(pQuat))
+			if (!POINTERCHK(pQuat))
 				return false;
 
 			SM::Vector4 Bone = pQuat[BoneId].m_TransAndScale;
@@ -2051,7 +2082,11 @@ public:
 class GunSwayData
 {
 public:
-	char _0x0000[1088];
+	char _0x0000[1072];
+	float m_DeviationScaleFactorZoom ;           // 0x430
+	float m_GameplayDeviationScaleFactorZoom ;   // FLOAT 
+	float m_DeviationScaleFactorNoZoom ;         // FLOAT 
+	float m_GameplayDeviationScaleFactorNoZoom ; // FLOAT 
 	float m_ShootingRecoilDecreaseScale; //0x0440 
 	float m_FirstShotRecoilMultiplier; //0x0444 
 	__int64 m_CamerRecoilData; //0x0448 
@@ -2060,3 +2095,25 @@ public:
 
 
 
+}
+
+fb::ClientPlayer* GetLocalPlayer()
+{
+	fb::Main* pMain = fb::Main::GetInstance();
+	if (!POINTERCHK(pMain))
+		return nullptr;
+
+	fb::Client* pClient = pMain->m_pClient;
+	if (!POINTERCHK(pClient))
+		return nullptr;
+
+	fb::ClientGameContext* pGameContext = pClient->m_pGameContext;
+	if (!POINTERCHK(pGameContext))
+		return nullptr;
+
+	fb::PlayerManager* pPlayerMngr = pGameContext->m_pPlayerManager;
+	if (!POINTERCHK(pPlayerMngr))
+		return nullptr;
+
+	return pPlayerMngr->m_pLocalPlayer;
+}

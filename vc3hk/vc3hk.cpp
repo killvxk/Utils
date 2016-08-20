@@ -259,16 +259,16 @@ void _stdcall HookRecoil(fb::WeaponSway* pWps)
 {
 	if ( bNoSpread)
 	{
-		if ((void*)hkGetDispersion != HookVtblFunction(pWps, hkGetDispersion, 24, 64))
+		if ((void*)hkGetDispersion != HookVtblFunction(pWps, hkGetDispersion, 24 ))
 		{
-			HookVtblFunction(pWps, hkGetDispersion, 24, 64);
+			HookVtblFunction(pWps, hkGetDispersion, 24);
 		}
 	
 	}
 	if (bNoRecoil) {
-		if ((void*)hkGetRecoil != HookVtblFunction(pWps, hkGetRecoil, 25, 64))
+		if ((void*)hkGetRecoil != HookVtblFunction(pWps, hkGetRecoil, 25))
 		{
-			HookVtblFunction(pWps, hkGetRecoil, 25, 64);
+			HookVtblFunction(pWps, hkGetRecoil, 25);
 		}
 
 	}
@@ -304,7 +304,7 @@ void _stdcall PlayerIteration()
 				
 			if (bForceSquadSpawn)
 				pClientPlayer->m_isAllowedToSpawnOn = true;
-
+		
 			if (bMinimapHack)
 			{
 				fb::ClientSpottingTargetComponent* pCSTC = pSoldier->getComponent<fb::ClientSpottingTargetComponent>("ClientSpottingTargetComponent");
@@ -593,10 +593,10 @@ void _stdcall SoldierWeaponUpgrade()
 	fb::ClientSoldierEntity::BreathControlHandler* pBreath = pMySoldier->m_breathControlHandler;
 	if (bNoBreath && POINTERCHK(pBreath))
 	{
-		pBreath->m_breathControlMultiplier = 0;
-		pBreath->m_breathControlTimer = 0;
-		pBreath->m_breathControlPenaltyMultiplier = 0;
-		pBreath->m_breathControlPenaltyTimer = 0;
+		//pBreath->m_breathControlMultiplier = 0;
+	//	pBreath->m_breathControlTimer = 0;
+	//	pBreath->m_breathControlPenaltyMultiplier = 0;
+	//	pBreath->m_breathControlPenaltyTimer = 0;
 	}
 
 	//disable sway multiplier on weapons with acogs ... this needs to be executed always
@@ -624,6 +624,7 @@ void _stdcall SoldierWeaponUpgrade()
 		{
 			if (POINTERCHK(pSASD->m_zoomLevels[1]))
 			{
+			//	pSASD->m_zoomLevels.At(1)->m_fieldOfView = 2.0f;
 				printf_s("x:%x,y:%x\n", &MyCSW->m_authorativeAiming->m_sway.x, &MyCSW->m_authorativeAiming->m_sway.y);
 				printf_s("%x\n", &pSASD->m_zoomLevels.At(1)->m_swayYawMultiplier);
 				printf_s("pCWSCI->m_isSupported addr:%x\n", &pCWSCI->m_isSupported);
@@ -864,9 +865,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, unsigned long ulReason, void* param)
 #endif // DEBUG
 
 		//CloseHandle(CreateThread(NULL, 0, &HookThread, (void*)1, 0, NULL)); //Enable hook
-		PresentHook = new CVMTHookManager((DWORD**)fb::DxRenderer::Singleton()->pSwapChain);
+		PresentHook = new CVMTHookManager((intptr_t**)fb::DxRenderer::Singleton()->pSwapChain);
 		oPresent = (tPresent)PresentHook->dwGetMethodAddress(8);
-		PresentHook->dwHookMethod((DWORD)hkPresent, 8);
+		PresentHook->dwHookMethod((intptr_t)hkPresent, 8);
 	}
 	else if (ulReason == DLL_PROCESS_DETACH)
 	{

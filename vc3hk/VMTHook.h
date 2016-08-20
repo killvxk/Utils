@@ -6,7 +6,7 @@ public:
 		memset(this, 0, sizeof(CVMTHookManager));
 	}
 
-	CVMTHookManager(PDWORD* ppdwClassBase)
+	CVMTHookManager(intptr_t** ppdwClassBase)
 	{
 		bInitialize(ppdwClassBase);
 	}
@@ -15,17 +15,17 @@ public:
 	{
 		UnHook();
 	}
-	bool bInitialize(PDWORD* ppdwClassBase)
+	bool bInitialize(intptr_t** ppdwClassBase)
 	{
 		m_ppdwClassBase = ppdwClassBase;
-		m_pdwOldVMT = *ppdwClassBase;
+		m_pdwOldVMT =  *ppdwClassBase;
 		m_dwVMTSize = dwGetVMTCount(*ppdwClassBase);
-		m_pdwNewVMT = new DWORD[m_dwVMTSize];
-		memcpy(m_pdwNewVMT, m_pdwOldVMT, sizeof(DWORD) * m_dwVMTSize);
+		m_pdwNewVMT = new intptr_t[m_dwVMTSize];
+		memcpy(m_pdwNewVMT, m_pdwOldVMT, sizeof(intptr_t) * m_dwVMTSize);
 		*ppdwClassBase = m_pdwNewVMT;
 		return true;
 	}
-	bool bInitialize(PDWORD** pppdwClassBase) // fix for pp
+	bool bInitialize(intptr_t*** pppdwClassBase) // fix for pp
 	{
 		return bInitialize(*pppdwClassBase);
 	}
@@ -48,7 +48,7 @@ public:
 		return (int)m_dwVMTSize;
 	}
 
-	DWORD dwGetMethodAddress(int Index)
+	intptr_t dwGetMethodAddress(int Index)
 	{
 		if (Index >= 0 && Index <= (int)m_dwVMTSize && m_pdwOldVMT != NULL)
 		{
@@ -59,12 +59,12 @@ public:
 		return NULL;
 	}
 
-	PDWORD pdwGetOldVMT(void)
+	intptr_t* pdwGetOldVMT(void)
 	{
 		return m_pdwOldVMT;
 	}
 
-	DWORD dwHookMethod(DWORD dwNewFunc, unsigned int iIndex)
+	intptr_t dwHookMethod(intptr_t dwNewFunc, unsigned int iIndex)
 	{
 		if (m_pdwNewVMT && m_pdwOldVMT && iIndex <= m_dwVMTSize && iIndex >= 0)
 		{
@@ -76,9 +76,14 @@ public:
 	}
 
 private:
-	DWORD dwGetVMTCount(PDWORD pdwVMT)
+	intptr_t**	m_ppdwClassBase;
+	intptr_t*	m_pdwNewVMT;
+	intptr_t*		m_pdwOldVMT;
+	intptr_t	m_dwVMTSize, oFunction;
+	int unhookindex;
+	intptr_t dwGetVMTCount(intptr_t* pdwVMT)
 	{
-		DWORD dwIndex = 0;
+		intptr_t dwIndex = 0;
 
 		for (dwIndex = 0; pdwVMT[dwIndex]; dwIndex++)
 		{
@@ -89,30 +94,39 @@ private:
 		}
 		return dwIndex;
 	}
-	PDWORD*	m_ppdwClassBase;
-	PDWORD	m_pdwNewVMT, m_pdwOldVMT;
-	DWORD	m_dwVMTSize, oFunction;
-	int unhookindex;
 };
 
-void* HookVtblFunction(void* pClassInstance,void* dwHook, const INT Index, const INT newVtableSize)
+intptr_t dwGetVMTCount2(intptr_t* pdwVMT)
+{
+	intptr_t dwIndex = 0;
+
+	for (dwIndex = 0; pdwVMT[dwIndex]; dwIndex++)
+	{
+		if (IsBadCodePtr((FARPROC)pdwVMT[dwIndex]))
+		{
+			break;
+		}
+	}
+	return dwIndex;
+}
+void* HookVtblFunction(void* pClassInstance,void* dwHook, const int Index )
 {
 	void* pOrig;
-	DWORD *vtable = (DWORD *)*(DWORD *)pClassInstance;
+	intptr_t *vtable = (intptr_t *)*(intptr_t *)pClassInstance;
 	pOrig = (void*)(vtable[Index]);
 	if (pOrig != dwHook) {
-
-	DWORD* newVtable = new DWORD[newVtableSize]; //leave some space
-	memcpy(newVtable, vtable, newVtableSize * sizeof(DWORD));
-	newVtable[Index] = (DWORD)dwHook;
+		intptr_t newVtableSize = dwGetVMTCount2(vtable);
+	intptr_t* newVtable = new intptr_t[newVtableSize]; //leave some space
+	memcpy(newVtable, vtable, newVtableSize * sizeof(intptr_t));
+	newVtable[Index] = (intptr_t)dwHook;
 
 	DWORD dwOld;
 
-	VirtualProtect(pClassInstance, sizeof(DWORD), PAGE_EXECUTE_READWRITE, &dwOld);
+	VirtualProtect(pClassInstance, sizeof(intptr_t), PAGE_EXECUTE_READWRITE, &dwOld);
 
-	*(DWORD *)pClassInstance = (DWORD)newVtable; //Replace Vtable
+	*(intptr_t *)pClassInstance = (intptr_t)newVtable; //Replace Vtable
 
-	VirtualProtect(pClassInstance, sizeof(DWORD), dwOld, NULL);
+	VirtualProtect(pClassInstance, sizeof(intptr_t), dwOld, NULL);
 
 }
 

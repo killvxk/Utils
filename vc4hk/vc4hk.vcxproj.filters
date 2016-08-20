@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -27,58 +24,7 @@
     <ClInclude Include="x64_sdk.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="DXTK\Inc\Audio.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\CommonStates.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\DDSTextureLoader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\DirectXHelpers.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\Effects.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\GamePad.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\GeometricPrimitive.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\Keyboard.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\Model.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\Mouse.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\PrimitiveBatch.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\ScreenGrab.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="DXTK\Inc\SimpleMath.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\SpriteBatch.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\SpriteFont.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\VertexTypes.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\WICTextureLoader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DXTK\Inc\XboxDDSTextureLoader.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -89,5 +35,10 @@
     <ClCompile Include="vc4hk.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DXTK\Inc\SimpleMath.inl">
+      <Filter>头文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

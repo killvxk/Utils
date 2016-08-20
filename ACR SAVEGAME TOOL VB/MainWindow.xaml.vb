@@ -56,7 +56,7 @@ Class MainWindow
 
     Function Failed()
         MsgBox("Failed")
-
+        Return 1
     End Function
 
     Private Sub Button_Click_3(sender As Object, e As RoutedEventArgs)
