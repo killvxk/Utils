@@ -3,11 +3,20 @@
 #include "FB SDK/Frostbite_Classes.h"
 namespace fb
 {
+	class FirstPersonCameraData
+	{
+	public:
+		char aDataContainer[0xa0]; //+0x00 Inherited
+		char m_turnEffectSettings[0x20];//
+			char m_blurEffectSettings[0x18];
+			float m_fov;
+		char dasda[8];
+	};
 	//new class
 	class WeaponLagEffect
 	{
 	public:
-		DWORD m_data;				// 0x00 FirstPersonCameraData*
+		FirstPersonCameraData* m_data;				// 0x00 FirstPersonCameraData*
 		BYTE pad_004[0xC];			// 0x04
 		Vec3 m_weaponOffsetMod;		// 0x10
 		Vec3 m_weaponRotationMod;	// 0x20

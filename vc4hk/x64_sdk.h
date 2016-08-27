@@ -1121,7 +1121,7 @@ struct TransformAABBStruct {
 class BreathControlHandler
 {
 public:
-	char _0x0000[56];
+	char _0x0000[0x38];
 	float m_breathControlTimer; //0x0038  
 	float m_breathControlMultiplier; //0x003C  
 	float m_breathControlPenaltyTimer; //0x0040  
@@ -1129,7 +1129,7 @@ public:
 	float m_breathControlActive; //0x0048  
 	float m_breathControlInput; //0x004C  
 	bool m_breathActive; //0x0050  
-	char _0x0054[4];
+	char _0x0054[0x4];
 	bool m_Enabled; //0x0058  
 };
 class ClientControllableEntity

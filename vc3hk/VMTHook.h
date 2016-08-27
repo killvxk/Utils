@@ -64,7 +64,7 @@ public:
 		return m_pdwOldVMT;
 	}
 
-	intptr_t dwHookMethod(intptr_t dwNewFunc, unsigned int iIndex)
+	intptr_t dwHookMethod(intptr_t dwNewFunc, intptr_t iIndex)
 	{
 		if (m_pdwNewVMT && m_pdwOldVMT && iIndex <= m_dwVMTSize && iIndex >= 0)
 		{
