@@ -73,7 +73,7 @@ bool bDistance = false;
 bool bSnaplines = false;
 
 bool bMinimapHack = true;
-bool bForceSquadSpawn = true;
+bool bForceSquadSpawn = false;
 bool bSpottedExplosive =true;
 
 int nMenuindex = 0;
@@ -730,11 +730,11 @@ pBreath->m_breathControlPenaltyMultiplier = 0.0001;
 				pBED->m_damageFalloffStartDistance = 52.f;
 				pBED->m_damageFalloffEndDistance = 52.001f;
 			}
-			else if (pBED->m_startDamage == 43.f||pBED->m_startDamage == 50.0f) {
+			else if (pBED->m_startDamage > 42.f&&pBED->m_startDamage < 51.0f) {
 				pBED->m_startDamage = 60.f;
 				pBED->m_endDamage = 46.f;
-				pBED->m_damageFalloffStartDistance = 32.f;
-				pBED->m_damageFalloffEndDistance = 32.001f;
+				pBED->m_damageFalloffStartDistance = 35.f;
+				pBED->m_damageFalloffEndDistance = 35.001f;
 			}
 			else if (pBED->m_startDamage <= 17.0f)
 			{
@@ -753,17 +753,13 @@ pBreath->m_breathControlPenaltyMultiplier = 0.0001;
 			{
 				pBED->m_startDamage = 41.5f;
 			}
-
-			if (pBED->m_gravity== (-9.8100f))
-			{
-				//pBED->m_gravity =(- 5.f);
-			}
 			
 		//	pBED->m_visualConvergeDistance = 500.f;
 			//	pBED->m_timeToLive = 10.f;
 
 			//		pBED->m_firstFrameTravelDistance = 250.f;
-				if (pBED->m_initialSpeed >= 350.f&&pBED->m_initialSpeed<640.f) { pFFD->m_shot.m_initialSpeed.z = 610.f; pBED->m_initialSpeed = 610.f; }
+		//		if (pBED->m_initialSpeed >= 350.f&&pBED->m_initialSpeed<610.f) {// pFFD->m_shot.m_initialSpeed.z = 610.f;
+		//		pBED->m_initialSpeed = 610.f; }
 		//			pFFD->m_shot.m_initialSpeed.z = 710.f;
 		//			pBED->m_damageFalloffEndDistance = 9000.1f;
 
