@@ -74,7 +74,7 @@ bool bSnaplines = false;
 
 bool bMinimapHack = true;
 bool bForceSquadSpawn = false;
-bool bSpottedExplosive =true;
+bool bSpottedExplosive = true;
 
 int nMenuindex = 0;
 int nMenuelements = 21;
@@ -257,13 +257,13 @@ __declspec(naked) void hkGetDispersion(void)
 
 void _stdcall HookRecoil(fb::WeaponSway* pWps)
 {
-	if ( bNoSpread)
+	if (bNoSpread)
 	{
-		if ((void*)hkGetDispersion != HookVtblFunction(pWps, hkGetDispersion, 24 ))
+		if ((void*)hkGetDispersion != HookVtblFunction(pWps, hkGetDispersion, 24))
 		{
 			HookVtblFunction(pWps, hkGetDispersion, 24);
 		}
-	
+
 	}
 	if (bNoRecoil) {
 		if ((void*)hkGetRecoil != HookVtblFunction(pWps, hkGetRecoil, 25))
@@ -301,10 +301,10 @@ void _stdcall PlayerIteration()
 			if (!POINTERCHK(pSoldier)) continue;
 
 			if (pSoldier->isInVehicle()) continue;
-				
+
 			if (bForceSquadSpawn)
 				pClientPlayer->m_isAllowedToSpawnOn = true;
-		
+
 			if (bMinimapHack)
 			{
 				fb::ClientSpottingTargetComponent* pCSTC = pSoldier->getComponent<fb::ClientSpottingTargetComponent>("ClientSpottingTargetComponent");
@@ -435,9 +435,9 @@ void _stdcall VehicleWeaponUpgrade()
 					thisptr->m_currentLagDeviation.m_yaw = 0.0f;
 					thisptr->m_currentLagDeviation.m_roll = 0.0f;
 					thisptr->m_currentLagDeviation.m_transY = 0.0f;
-				
 
-			thisptr->m_dispersionAngle = 0.0f; //small crosshair
+
+					thisptr->m_dispersionAngle = 0.0f; //small crosshair
 
 
 
@@ -593,11 +593,11 @@ void _stdcall SoldierWeaponUpgrade()
 	fb::ClientSoldierEntity::BreathControlHandler* pBreath = pMySoldier->m_breathControlHandler;
 	if (bNoBreath && POINTERCHK(pBreath))
 	{
-	pBreath->m_breathControlMultiplier = 0.0001;
-	pBreath->m_breathControlTimer = 0.0001;
-pBreath->m_breathControlPenaltyMultiplier = 0.0001;
+		pBreath->m_breathControlMultiplier = 0.0001;
+		pBreath->m_breathControlTimer = 0.0001;
+		pBreath->m_breathControlPenaltyMultiplier = 0.0001;
 		pBreath->m_breathControlPenaltyTimer = 0.0001;
-//		pBreath->m_Enabled = false;
+		//		pBreath->m_Enabled = false;
 	}
 
 	//disable sway multiplier on weapons with acogs ... this needs to be executed always
@@ -606,12 +606,12 @@ pBreath->m_breathControlPenaltyMultiplier = 0.0001;
 	{
 		fb::SoldierAimingSimulationData* pSASD = MyCSW->m_authorativeAiming->m_data;
 		//	MyCSW->m_authorativeAiming->m_sway.x = 0.f;
-	
+
 		if (POINTERCHK(pSASD->m_zoomLevels[0]))
 		{
 			pSASD->m_zoomLevels.At(0)->m_swayPitchMultiplier = 0.0000001f;
 			pSASD->m_zoomLevels.At(0)->m_swayYawMultiplier = 0.0000001f;
-		//	pSASD->m_zoomLevels.At(0)->m_timeYawMultiplier = 0.0000001f;
+			//	pSASD->m_zoomLevels.At(0)->m_timeYawMultiplier = 0.0000001f;
 
 			if (pCWSCI->m_isSupported)
 			{
@@ -623,23 +623,23 @@ pBreath->m_breathControlPenaltyMultiplier = 0.0001;
 		{
 			if (POINTERCHK(pSASD->m_zoomLevels[1]))
 			{
-	
+
 				pSASD->m_zoomLevels.At(1)->m_swayPitchMultiplier = 0.0000001f;
 				pSASD->m_zoomLevels.At(1)->m_swayYawMultiplier = 0.0000001f;
 
-				if (pSASD->m_zoomLevels.At(1)->m_fieldOfView ==20.f) {
+				if (pSASD->m_zoomLevels.At(1)->m_fieldOfView == 20.f) {
 					pSASD->m_zoomLevels.At(1)->m_lookSpeedMultiplier = 0.08f;
 					pSASD->m_zoomLevels.At(1)->m_fieldOfView = 5.4f;
 
 				}
 				else if (pSASD->m_zoomLevels.At(1)->m_fieldOfView > 8.0f&&pSASD->m_zoomLevels.At(1)->m_fieldOfView < 9.0f
-					
+
 					) {
 					pSASD->m_zoomLevels.At(1)->m_lookSpeedMultiplier = 0.04f;
 					pSASD->m_zoomLevels.At(1)->m_fieldOfView = 2.7f;
 				}
 
-			
+
 				if (pCWSCI->m_isSupported)
 				{
 					pSASD->m_zoomLevels.At(1)->m_supportedSwayPitchMultiplier = 0.0000001f;
@@ -670,7 +670,7 @@ pBreath->m_breathControlPenaltyMultiplier = 0.0001;
 	fb::WeaponSway* pWps = pMySoldier->getWeaponSway();
 	if (POINTERCHK(pWps)) //
 	{
-	
+
 		HookRecoil(pWps);
 
 
@@ -679,14 +679,16 @@ pBreath->m_breathControlPenaltyMultiplier = 0.0001;
 
 	}
 	fb::WeaponFiring* pWeaponFiring = pMySoldier->getCurrentWeaponFiring();
-	if (!POINTERCHK(pWeaponFiring)) { return;
-	} else if(POINTERCHK(pWeaponFiring))
+	if (!POINTERCHK(pWeaponFiring)) {
+		return;
+	}
+	else if (POINTERCHK(pWeaponFiring))
 	{
 		pWeaponFiring->m_overheatDropMultiplier = 500;
 		pWeaponFiring->m_primaryFire.isOverheated = false;
 		pWeaponFiring->m_autoReplenishTime = 0.00001f;
 		pWeaponFiring->m_primaryFire.heat = 0.0f;
-	
+
 	}
 
 
@@ -708,81 +710,71 @@ pBreath->m_breathControlPenaltyMultiplier = 0.0001;
 	if (!POINTERCHK(pBED)) return;
 
 
-	
-
-		if (iWeaponID != -1 && bInstantBullet&&pBED->m_endDamage > 2.00 && pFFD->m_shot.m_initialSpeed.z > 40.1f) {
-
-			
 
 
-			cl_SoldierWeapon = iWeaponID;
-		
-
-			if (pBED->m_startDamage > 79.5f&&pBED->m_startDamage < 80.5f) {
-				pBED->m_startDamage = 110.10f;
-				pBED->m_endDamage = 74.f;
-				pBED->m_damageFalloffStartDistance = 52.f;
-				pBED->m_damageFalloffEndDistance = 52.001f;
-			}
-			else if (pBED->m_startDamage == 95.f) {
-				pBED->m_startDamage = 110.1f;
-				pBED->m_endDamage = 87.f;
-				pBED->m_damageFalloffStartDistance = 52.f;
-				pBED->m_damageFalloffEndDistance = 52.001f;
-			}
-			else if (pBED->m_startDamage > 42.f&&pBED->m_startDamage < 51.0f) {
-				pBED->m_startDamage = 60.f;
-				pBED->m_endDamage = 46.f;
-				pBED->m_damageFalloffStartDistance = 35.f;
-				pBED->m_damageFalloffEndDistance = 35.001f;
-			}
-			else if (pBED->m_startDamage <= 17.0f)
-			{
-				pBED->m_startDamage = 26.7f;
-			}
-			else if (pBED->m_startDamage == 20.f)
-			{
-				pBED->m_startDamage = 30.5f;
-			}
-			else if (pBED->m_startDamage == 25.f)
-			{
-				pBED->m_startDamage = 36.5f;
-			}
-
-			else if (pBED->m_startDamage == 34.f)
-			{
-				pBED->m_startDamage = 41.5f;
-			}
-			
-		//	pBED->m_visualConvergeDistance = 500.f;
-			//	pBED->m_timeToLive = 10.f;
-
-			//		pBED->m_firstFrameTravelDistance = 250.f;
-		//		if (pBED->m_initialSpeed >= 350.f&&pBED->m_initialSpeed<610.f) {// pFFD->m_shot.m_initialSpeed.z = 610.f;
-		//		pBED->m_initialSpeed = 610.f; }
-		//			pFFD->m_shot.m_initialSpeed.z = 710.f;
-		//			pBED->m_damageFalloffEndDistance = 9000.1f;
-
-
-			if (pBED->m_endDamage != 46.f&&pBED->m_startDamage < 79.6f&&pBED->m_endDamage < 74.f&&
-				pBED->m_startDamage > pBED->m_endDamage)
-			{
-				pBED->m_endDamage = pBED->m_startDamage;
-			}
+	if (iWeaponID != -1 && bInstantBullet&&pBED->m_endDamage > 2.00 && pFFD->m_shot.m_initialSpeed.z > 40.1f) {
 
 
 
 
+		cl_SoldierWeapon = iWeaponID;
 
 
+		if (pBED->m_startDamage > 79.5f&&pBED->m_startDamage < 80.5f) {
+			pBED->m_startDamage = 110.10f;
+			pBED->m_endDamage = 74.f;
+			pBED->m_damageFalloffStartDistance = 52.f;
+			pBED->m_damageFalloffEndDistance = 52.001f;
+		}
+		else if (pBED->m_startDamage == 95.f) {
+			pBED->m_startDamage = 110.1f;
+			pBED->m_endDamage = 87.f;
+			pBED->m_damageFalloffStartDistance = 52.f;
+			pBED->m_damageFalloffEndDistance = 52.001f;
+		}
+		else if (pBED->m_startDamage > 42.f&&pBED->m_startDamage < 51.0f) {
+			pBED->m_startDamage = 60.f;
+			pBED->m_endDamage = 46.f;
+			pBED->m_damageFalloffStartDistance = 35.f;
+			pBED->m_damageFalloffEndDistance = 35.001f;
+		}
+		else if (pBED->m_startDamage <= 17.0f)
+		{
+			pBED->m_startDamage = 26.7f;
+		}
+		else if (pBED->m_startDamage == 20.f)
+		{
+			pBED->m_startDamage = 30.5f;
+		}
+		else if (pBED->m_startDamage == 25.f)
+		{
+			pBED->m_startDamage = 36.5f;
+		}
+
+		else if (pBED->m_startDamage == 34.f)
+		{
+			pBED->m_startDamage = 41.5f;
+		}
+
+		if (pBED->m_endDamage != 46.f&&pBED->m_startDamage < 79.6f&&pBED->m_endDamage < 74.f&&
+			pBED->m_startDamage > pBED->m_endDamage)
+		{
+			pBED->m_endDamage = pBED->m_startDamage;
 		}
 
 
 
-		else 		{
-			cl_SoldierWeapon = 0xffff;
-		}
+
+
+
 	}
+
+
+
+	else {
+		cl_SoldierWeapon = 0xffff;
+	}
+}
 
 signed int __stdcall hkPresent(int a1, int a2, int a3) {
 	__asm pushad;
@@ -795,7 +787,6 @@ signed int __stdcall hkPresent(int a1, int a2, int a3) {
 
 	PlayerIteration();
 	EntityWorld();
-
 
 
 	__asm popad;
@@ -826,27 +817,16 @@ void CreateConsole()
 	fp = _fdopen(hConHandle, "w");
 	freopen_s(&fp, "CONOUT$", "w", stderr);
 }
-DWORD WINAPI BF3HookThread(LPVOID)
-{
 
-	CreateConsole();
-
-
-
-	
-
-	return 0;
-}
 
 BOOL APIENTRY DllMain(HMODULE hModule, unsigned long ulReason, void* param)
 {
 	if (ulReason == DLL_PROCESS_ATTACH)
 	{
 		DisableThreadLibraryCalls(hModule);
-		//CreateThread(NULL, NULL, PBSSThread, NULL, NULL, NULL);
 
 #ifdef _DEBUG
-		CreateThread(NULL, NULL, BF3HookThread, NULL, NULL, NULL);
+		CreateThread(NULL, NULL, CreateConsole, NULL, NULL, NULL);
 #endif // DEBUG
 
 		//CloseHandle(CreateThread(NULL, 0, &HookThread, (void*)1, 0, NULL)); //Enable hook
@@ -855,20 +835,20 @@ BOOL APIENTRY DllMain(HMODULE hModule, unsigned long ulReason, void* param)
 		PresentHook->dwHookMethod((intptr_t)hkPresent, 8);
 
 		//ping proof
-		intptr_t IcmpCreateFile = (intptr_t)GetProcAddress(GetModuleHandleW(L"iphlpapi.dll"), "IcmpCreateFile")+0x289;
+		intptr_t IcmpCreateFile = (intptr_t)GetProcAddress(GetModuleHandleW(L"iphlpapi.dll"), "IcmpCreateFile") + 0x289;
 
 		DWORD dwOld;
 		//ping spoof
-		VirtualProtect((LPVOID)IcmpCreateFile, 3*sizeof(BYTE), PAGE_EXECUTE_READWRITE, &dwOld);
+		VirtualProtect((LPVOID)IcmpCreateFile, 3 * sizeof(BYTE), PAGE_EXECUTE_READWRITE, &dwOld);
 
-		memset((LPVOID)IcmpCreateFile,0x31,1);
-		memset((LPVOID)(IcmpCreateFile+1), 0xc0, 1);
+		memset((LPVOID)IcmpCreateFile, 0x31, 1);
+		memset((LPVOID)(IcmpCreateFile + 1), 0xc0, 1);
 		memset((LPVOID)(IcmpCreateFile + 2), 0x40, 1);
 
 		VirtualProtect((LPVOID)IcmpCreateFile, 3 * sizeof(BYTE), dwOld, NULL);
 
 
-	
+
 	}
 	else if (ulReason == DLL_PROCESS_DETACH)
 	{
