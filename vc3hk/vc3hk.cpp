@@ -24,6 +24,7 @@ void* operator new[](size_t size, size_t alignment, size_t alignmentOffset, cons
 CVMTHookManager* PreFrameHook = 0;
 typedef int(__stdcall* tPreFrameUpdate)(float dt);
 tPreFrameUpdate oPreFrameUpdate = 0;
+
 fb::BorderInputNode* g_pBorderInputNode = fb::BorderInputNode::Singleton();
 
 CVMTHookManager* PresentHook = 0;
@@ -57,129 +58,31 @@ bool bInstantKill = false;
 bool bInstantBullet = true;
 
 std::map<int, fb::WeaponModifier*> oldModifier;
-int nWeaponExchange = -1;
 
-bool bMagicBullets = false;
 
-bool bAimbot = false;
+FILE * m_log;
+bool bAimbot = true;
 bool bAimHead = false;
-bool bVisibilityChecks = false;
+bool bVisibilityChecks = true;
 
-bool bBoxESP = false;
-bool bBones = false;
-bool bHealthbar = false;
-bool bNames = false;
-bool bDistance = false;
-bool bSnaplines = false;
+
 
 bool bMinimapHack = true;
 bool bForceSquadSpawn = false;
 bool bSpottedExplosive = true;
 
-int nMenuindex = 0;
-int nMenuelements = 21;
+
 
 int cl_SoldierWeapon = 0xffff;
-float ori_startdamage = 0.0f;
-float ori_enddamage = 0.0f;
+
+bool AimKeyPressed = false;
+bool LockOnEme = false;
+fb::ClientSoldierEntity* LockOn_pEnemySoldier;
+
 #pragma endregion Global Vars
-/*push ebp
-mov ebp, esp
-and esp, FFFFFFF0
-sub esp, 48
-cmp byte ptr ss : [ebp + C], 0
-push esi
-push edi
-push ecx
-je bf3.701A72
-fld dword ptr ds : [ecx + 140]
-lea eax, dword ptr ss : [esp + 14]
-fstp dword ptr ss : [esp]
-push eax
-jmp bf3.701A80
-fld dword ptr ds : [ecx + 13C]
-lea edx, dword ptr ss : [esp + 14]
-fstp dword ptr ss : [esp]
-push edx
-add ecx, AC
-call bf3.6FFE90
-mov edi, dword ptr ss : [ebp + 8]
-mov ecx, 10
-mov esi, eax
-rep movsd dword ptr es : [edi], dword ptr ds : [esi]
-pop edi
-pop esi
-mov esp, ebp
-pop ebp
-ret 8
-void __declspec(naked) hkGetRecoil(void)
-{
-__asm
-{
-push esi
-push edi
-xor edi, edi
-mov esi, ecx
-mov[esi + 0x164], edi
-mov[esi + 0x16C], edi
-pop edi
-pop esi
-push eax
-xor eax, eax
 
-pop eax
-jmp dword ptr[g_pOriginalGetRecoil]
-}
-}*/
 
-/*push ebp
-mov ebp, esp
-and esp, FFFFFFF0
-sub esp, 48
-cmp byte ptr ss : [ebp + C], 0
-push esi
-push edi
-push ecx
-je bf3.701A22
-fld dword ptr ds : [ecx + 140]
-lea eax, dword ptr ss : [esp + 14]
-fstp dword ptr ss : [esp]
-push eax
-jmp bf3.701A30
-fld dword ptr ds : [ecx + 13C]
-lea edx, dword ptr ss : [esp + 14]
-fstp dword ptr ss : [esp]
-push edx
-add ecx, 12C
-call bf3.6FFE90
-mov edi, dword ptr ss : [ebp + 8]
-mov ecx, 10
-mov esi, eax
-rep movsd dword ptr es : [edi], dword ptr ds : [esi]
-pop edi
-pop esi
-mov esp, ebp
-pop ebp
-ret 8
-void __declspec(naked) hkGetDeviation(void)
-{
-__asm
-{
-push esi
-push edi
-xor edi, edi
-mov esi, ecx
-mov[esi + 0x140], edi
-mov[esi + 0x13C], edi
-pop edi
-pop esi
-push eax
-xor eax, eax
 
-pop eax
-jmp dword ptr[g_pOriginalGetDeviation]
-}
-}*/
 DWORD WINAPI PBSSThread(LPVOID a)
 {
 	while (true)
@@ -190,13 +93,240 @@ DWORD WINAPI PBSSThread(LPVOID a)
 	return 1;
 };
 
+
 #pragma region HookRecoil
-//Source: http://dumpz.org/398889/
+
+void _stdcall Aimbot()
+{
+	fb::ClientGameContext* g_pGameContext = fb::ClientGameContext::Singleton();
+	if (!POINTERCHK(g_pGameContext))
+		return;
+
+	fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
+	if (!POINTERCHK(pPlayerManager) || pPlayerManager->m_players.empty())
+		return;
+
+	fb::ClientPlayer* pLocalPlayer = pPlayerManager->m_localPlayer;
+	if (!POINTERCHK(pLocalPlayer))
+		return;
+
+	fb::ClientSoldierEntity* pMySoldier = pLocalPlayer->getSoldierEnt();
+	if (!POINTERCHK(pMySoldier))
+		return;
+
+	if (!pMySoldier->IsAlive()) return;
+
+	int iWeaponID = GetWeaponID(pMySoldier);
+	if (iWeaponID != 0 && iWeaponID != 1) return;
+	fb::ClientSoldierWeapon* MyCSW = pMySoldier->GetCSW();
+	//valid checks on Weapons
+	if (!POINTERCHK(MyCSW)
+		|| !POINTERCHK(MyCSW->m_weapon)
+		|| !POINTERCHK(MyCSW->m_predictedFiring)
+		|| !POINTERCHK(MyCSW->m_predictedFiring->m_data->m_primaryFire)) return;
+
+	fb::FiringFunctionData* pFFD = pMySoldier->getCurrentWeaponFiringData()->m_primaryFire;
+	if (!POINTERCHK(pFFD)) return;
+
+	//weaponmodifier only active if its your mainweapon
+	fb::BulletEntityData* pBED;
+	if (POINTERCHK(MyCSW)
+		&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponProjectileModifier)
+		&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData))
+	{
+		pBED = reinterpret_cast<fb::BulletEntityData*>(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData);
+		if (!POINTERCHK(pBED)) pBED = pFFD->m_shot.m_projectileData;
+	}
+	else
+		pBED = pFFD->m_shot.m_projectileData;
+	if (!POINTERCHK(pBED)) {
+
+		return;
+	}fb::ClientSoldierAimingSimulation* aimer;
+
+	fb::ClientSoldierWeapon* pClientSoldierWeapon = pMySoldier->GetCSW();
+	if (POINTERCHK(pClientSoldierWeapon))
+	{
+		aimer = pClientSoldierWeapon->m_authorativeAiming;
+		if (!POINTERCHK(aimer))
+			return;
 
 
-DWORD dwDispersionRetAddr;
-DWORD dwRecoilRetAddress;
-fb::WeaponSway* recoilThisPtr;
+
+	}
+	else { return; }
+	if (pMySoldier->isInVehicle())return;
+	eastl::vector<fb::ClientPlayer*> pVecCP = pPlayerManager->m_players;
+
+	if (pVecCP.empty())
+		return;
+
+	int size = pVecCP.size();
+
+	fb::GameRenderer::Singleton()->m_viewParams.view.Update();//matrix not filled by default
+	fb::Vec3 Origin = fb::GameRenderer::Singleton()->m_viewParams.view.m_viewMatrixInverse.trans;
+
+	
+	fb::ClientPlayer* ClosestClient = NULL;
+	fb::ClientSoldierEntity* ClosestSold = NULL;
+	fb::Vec3 EnemyAimVec;
+	fb::ClientSoldierEntity* pEnemySoldier;
+	int index = 0;
+	fb::Vec3 Enemyvectmp;
+	
+	if (LockOnEme == false
+		|| !POINTERCHK(LockOn_pEnemySoldier)) {
+		float closestdistanceworld = 9999.0f;
+		float closestdistance = 9999.0f;
+		for (int i = 0; i < size; i++)
+		{
+			fb::ClientPlayer* pClientPlayer = pVecCP.at(i);
+			if (pMySoldier->m_teamId == pClientPlayer->m_teamId)
+				continue;
+
+			pEnemySoldier = pClientPlayer->getSoldierEnt();
+			if (!POINTERCHK(pEnemySoldier))
+				continue;
+
+			if (!isalive(pEnemySoldier->isAlive()))
+				continue;
+
+			fb::WeakPtr<fb::ClientSoldierEntity>* corpse = &pClientPlayer->m_corpse;
+			if (corpse->GetData()) continue;
+
+		
+			if (bAimHead)
+			{
+				if (!GetBonePos(pEnemySoldier, fb::Head, &Enemyvectmp)) continue;
+
+			}
+			else
+			{
+				if (!GetBonePos(pEnemySoldier, fb::Spine, &Enemyvectmp)) continue;
+			}
+
+			if (bVisibilityChecks)
+			{
+				if (!IsVisible(&Enemyvectmp, pMySoldier)) { 
+					if (bAimHead)
+					{
+					if (!GetBonePos(pEnemySoldier, fb::Spine, &Enemyvectmp)) continue;
+					}
+					else {
+						if (!GetBonePos(pEnemySoldier, fb::Head, &Enemyvectmp)) continue;
+					}
+					
+					if (!IsVisible(&Enemyvectmp, pMySoldier))continue;
+				}
+			}
+			//if ((Enemyvec - Origin).z < 0)continue;
+
+			float ScreenY = fb::DxRenderer::Singleton()->m_screenInfo.m_nHeight / 2;
+			float ScreenX = fb::DxRenderer::Singleton()->m_screenInfo.m_nWidth / 2;
+			fb::Vec3 EnemyScreen;
+			ProjectToScreen(&Enemyvectmp, &EnemyScreen);
+			if (EnemyScreen.z < 0)continue;
+			float PosX = fabs(ScreenX - EnemyScreen.x);
+			float PosY = fabs(ScreenY - EnemyScreen.y);
+
+			float flScreenDistance =PosX*PosX + PosY*PosY;
+
+			if (flScreenDistance < closestdistance)
+			{
+				ClosestClient = pClientPlayer;
+				ClosestSold = pEnemySoldier;
+				closestdistance = flScreenDistance;
+				EnemyAimVec = Enemyvectmp;
+				index = i;
+			}
+		}
+		if (!POINTERCHK(ClosestClient))
+			return;
+
+		if (!POINTERCHK(ClosestSold))
+			return;
+
+	}
+	else {
+		if (!POINTERCHK(LockOn_pEnemySoldier))return;
+		pEnemySoldier = LockOn_pEnemySoldier;
+		if (!POINTERCHK(pEnemySoldier))return;
+			
+
+		if (!isalive(pEnemySoldier->isAlive()))return;
+		
+
+	
+		if (bAimHead)
+		{
+			if (!GetBonePos(pEnemySoldier, fb::Head, &Enemyvectmp)) return;
+
+		}
+		else
+		{
+			if (!GetBonePos(pEnemySoldier, fb::Spine, &Enemyvectmp)) return;
+		}
+
+		if (bVisibilityChecks)
+		{
+			if (!IsVisible(&Enemyvectmp, pMySoldier)) {
+				if (bAimHead)
+				{
+					if (!GetBonePos(pEnemySoldier, fb::Spine, &Enemyvectmp)) return;
+				}
+				else {
+					if (!GetBonePos(pEnemySoldier, fb::Head, &Enemyvectmp)) return;
+				}
+
+				if (!IsVisible(&Enemyvectmp, pMySoldier))return; }
+		}
+
+		ClosestSold = pEnemySoldier;
+		EnemyAimVec = Enemyvectmp;
+		if (!POINTERCHK(ClosestSold))
+			return;
+	}
+
+	
+	
+		
+		
+
+	float flBulletGrav = pBED->m_gravity;
+
+	float flbulletspeed = pFFD->m_shot.m_initialSpeed.z;
+	fb::Vec3 * vDir=new fb::Vec3;
+
+
+	if (ClosestSold->isInVehicle())
+	{
+		fb::Vec3 myspeed = pMySoldier->linearVelocity();
+		fb::Vec3 enemyspeed = getVehicleSpeed(ClosestSold);
+
+		vDir=AimCorrection2(Origin, myspeed, EnemyAimVec, enemyspeed, flbulletspeed, flBulletGrav, vDir);
+	}
+	else
+	{
+		fb::Vec3 myspeed = pMySoldier->linearVelocity();
+		fb::Vec3 enemyspeed = ClosestSold->linearVelocity();
+
+		vDir = AimCorrection2(Origin, myspeed, EnemyAimVec, enemyspeed, flbulletspeed, flBulletGrav, vDir);
+	}
+	
+	if (!POINTERCHK(vDir)) return;
+
+	if (!pMySoldier->isInVehicle())
+	{
+		
+
+			aimer->m_fpsAimer->m_yaw = vDir->y;
+			aimer->m_fpsAimer->m_pitch = vDir->x;
+			LockOnEme = true;
+			LockOn_pEnemySoldier = ClosestSold;
+	}
+}
+
+
 
 __declspec(naked) void hkGetRecoil(void)
 {
@@ -212,26 +342,7 @@ __declspec(naked) void hkGetRecoil(void)
 		pop esi
 		jmp dword ptr[ori_GetRecoil]
 
-		//	pop dwRecoilRetAddress
-		//	mov recoilThisPtr, ecx
-		//	push eax
-		//	mov eax, [esp + 0x4]
-		//	mov arg1, eax
-		//	pop eax
-		//	pushad
-		//	pushfd
-		//}
-		//D3DXMatrixIdentity(&mtx);
-		//memcpy(arg1, mtx, 0x40);
-		//hookedRecoil(recoilThisPtr, arg1, false);
-		//__asm
-		//{
-		//	popfd
-		//	popad
-		//	//call originalGetRecoil
-		//	add esp, 0x8
-		//	push dwRecoilRetAddress
-		//	ret
+	
 	}
 }
 __declspec(naked) void hkGetDispersion(void)
@@ -334,8 +445,7 @@ void _stdcall EntityWorld()
 			{
 				for (int i = 0; i < (int)vehicle.firstSegment->m_Collection.size(); i++)
 				{
-					if (vehicle.firstSegment->m_Collection.size() > 0)
-					{
+					
 						fb::ClientVehicleEntity* pEntity = reinterpret_cast<fb::ClientVehicleEntity*>(vehicle.firstSegment->m_Collection.at(i));
 						if (POINTERCHK(pEntity))
 						{
@@ -343,7 +453,7 @@ void _stdcall EntityWorld()
 							if (POINTERCHK(vehicleSpotting))
 								vehicleSpotting->m_spotType = fb::SpotType_Active;
 						}
-					}
+					
 				}
 			}
 		}
@@ -355,14 +465,13 @@ void _stdcall EntityWorld()
 			{
 				for (int i = 0; i < (int)explosive.firstSegment->m_Collection.size(); i++)
 				{
-					if (explosive.firstSegment->m_Collection.size() > 0)
-					{
+					
 						fb::ClientExplosionPackEntity* pEntity = reinterpret_cast<fb::ClientExplosionPackEntity*>(explosive.firstSegment->m_Collection.at(i));
 						if (POINTERCHK(pEntity))
 						{
 							pEntity->m_isSpotted = 1; // 1 is spotted on map, 2 is spotted map and HUD (3D)
 						}
-					}
+					
 				}
 			}
 		}
@@ -470,7 +579,7 @@ void _stdcall VehicleWeaponUpgrade()
 	}
 	else if (bOpenSeat)
 	{
-		if (bMagicBullets)
+		if (false)
 		{
 			fb::ClientGameContext* g_pGameContext = fb::ClientGameContext::Singleton();
 			if (!POINTERCHK(g_pGameContext)) return;
@@ -582,6 +691,12 @@ void _stdcall SoldierWeaponUpgrade()
 	int iWeaponID = GetWeaponID(pMySoldier);
 	if (iWeaponID == -1) return;
 
+
+	fb::Vec3 myspeed = pMySoldier->linearVelocity();
+
+	printf_s("x:%fy:%fz:%f\n", myspeed.x, myspeed.y, myspeed.z);
+
+
 	fb::ClientSoldierWeapon* MyCSW = pMySoldier->GetCSW();
 	//valid checks on Weapons
 	if (!POINTERCHK(MyCSW)
@@ -602,6 +717,9 @@ void _stdcall SoldierWeaponUpgrade()
 
 	//disable sway multiplier on weapons with acogs ... this needs to be executed always
 	fb::ClientSoldierWeaponsComponent::ClientWeaponSwayCallbackImpl* pCWSCI = pMySoldier->m_soldierWeaponsComponent->m_weaponSwayCallback;
+
+
+	
 	if (bNoSway && POINTERCHK(pCWSCI))
 	{
 		fb::SoldierAimingSimulationData* pSASD = MyCSW->m_authorativeAiming->m_data;
@@ -648,21 +766,6 @@ void _stdcall SoldierWeaponUpgrade()
 			}
 		}
 
-		/*	fb::WeaponSway* pCurWps = MyCSW->m_correctedFiring->m_weaponSway;
-		if (POINTERCHK(pCurWps)){
-		pCurWps->m_currentRecoilDeviation.m_pitch = 0;
-		pCurWps->m_currentRecoilDeviation.m_yaw = 0;
-		pCurWps->m_currentRecoilDeviation.m_roll = 0;
-		pCurWps->m_currentLagDeviation.m_pitch = 0;
-		pCurWps->m_currentLagDeviation.m_yaw = 0;
-		pCurWps->m_currentLagDeviation.m_roll = 0;
-		pCurWps->m_currentDispersionDeviation.m_pitch = 0;
-		pCurWps->m_currentDispersionDeviation.m_yaw = 0;
-		pCurWps->m_currentDispersionDeviation.m_roll = 0;
-		pCurWps->m_randomRadius = 0.0f;
-		pCurWps->m_randomAngle = 0.f;
-		pCurWps->m_fireShot = 0;
-		}*/
 	}
 
 	// disable recoil and spread ... this needs to be executed always
@@ -672,9 +775,24 @@ void _stdcall SoldierWeaponUpgrade()
 	{
 
 		HookRecoil(pWps);
+		
+
+			pWps->m_currentDispersionDeviation.m_pitch = 0.0f;
+			pWps->m_currentDispersionDeviation.m_yaw = 0.0f;
+			pWps->m_currentDispersionDeviation.m_roll = 0.0f;
+			pWps->m_currentDispersionDeviation.m_transY = 0.0f;
+
+			pWps->m_currentLagDeviation.m_pitch = 0.0f;
+			pWps->m_currentLagDeviation.m_yaw = 0.0f;
+			pWps->m_currentLagDeviation.m_roll = 0.0f;
+			pWps->m_currentLagDeviation.m_transY = 0.0f;
+
+
+			
 
 
 
+		
 
 
 	}
@@ -762,10 +880,10 @@ void _stdcall SoldierWeaponUpgrade()
 			pBED->m_endDamage = pBED->m_startDamage;
 		}
 
+	//	printf_s("G:%x \n", &pBED->m_gravity);
 
-
-
-
+		
+	
 
 	}
 
@@ -775,7 +893,38 @@ void _stdcall SoldierWeaponUpgrade()
 		cl_SoldierWeapon = 0xffff;
 	}
 }
+int WINAPI hkPreFrame(float DeltaTime)
+{
+	_asm pushad
+	int returnval = oPreFrameUpdate(DeltaTime);
 
+	if (GetAsyncKeyState(VK_RMENU) & 0x8000) {
+		bAimHead = !bAimHead;
+
+	};
+	if (GetAsyncKeyState(VK_LMENU) & 0x8000) {
+		AimKeyPressed = true;
+	}
+	else { AimKeyPressed =false; }
+
+	if (bAimbot &&  AimKeyPressed) {
+	Aimbot();
+	}
+	else {
+		LockOnEme = false;
+		LockOn_pEnemySoldier = nullptr;
+	}
+
+	for (int i = 0; i < 123; i++)
+	{
+		g_pBorderInputNode->m_inputCache->flInputBuffer[i] += g_pInputBuffers[i];
+		g_pInputBuffers[i] = 0.0f;
+	}
+
+	_asm popad
+
+	return returnval;
+}
 signed int __stdcall hkPresent(int a1, int a2, int a3) {
 	__asm pushad;
 
@@ -793,7 +942,7 @@ signed int __stdcall hkPresent(int a1, int a2, int a3) {
 
 	return oPresent(a1, a2, a3);
 }
-void CreateConsole()
+DWORD WINAPI CreateConsole(LPVOID lpArgs)
 {
 	int hConHandle = 0;
 	HANDLE lStdHandle = 0;
@@ -816,6 +965,7 @@ void CreateConsole()
 	hConHandle = _open_osfhandle(PtrToUlong(lStdHandle), _O_TEXT);
 	fp = _fdopen(hConHandle, "w");
 	freopen_s(&fp, "CONOUT$", "w", stderr);
+	return 1;
 }
 
 
@@ -826,27 +976,33 @@ BOOL APIENTRY DllMain(HMODULE hModule, unsigned long ulReason, void* param)
 		DisableThreadLibraryCalls(hModule);
 
 #ifdef _DEBUG
-		CreateThread(NULL, NULL, CreateConsole, NULL, NULL, NULL);
+		CreateThread(NULL, NULL, &CreateConsole, NULL, NULL, NULL);
 #endif // DEBUG
 
-		//CloseHandle(CreateThread(NULL, 0, &HookThread, (void*)1, 0, NULL)); //Enable hook
 		PresentHook = new CVMTHookManager((intptr_t**)fb::DxRenderer::Singleton()->pSwapChain);
 		oPresent = (tPresent)PresentHook->dwGetMethodAddress(8);
 		PresentHook->dwHookMethod((intptr_t)hkPresent, 8);
+#ifndef _DEBUG
+			PreFrameHook = new CVMTHookManager((intptr_t**)g_pBorderInputNode);
+			oPreFrameUpdate = (tPreFrameUpdate)PreFrameHook->dwGetMethodAddress(27);
+			PreFrameHook->dwHookMethod((intptr_t)hkPreFrame, 27);
+#endif // DEBUG
+			//	  fopen_s(&m_log,"e:\log.txt", "a+" );
 
-		//ping proof
+				//ping proof
 		intptr_t IcmpCreateFile = (intptr_t)GetProcAddress(GetModuleHandleW(L"iphlpapi.dll"), "IcmpCreateFile") + 0x289;
 
 		DWORD dwOld;
 		//ping spoof
+		if (POINTERCHK(IcmpCreateFile)) {
 		VirtualProtect((LPVOID)IcmpCreateFile, 3 * sizeof(BYTE), PAGE_EXECUTE_READWRITE, &dwOld);
 
 		memset((LPVOID)IcmpCreateFile, 0x31, 1);
-		memset((LPVOID)(IcmpCreateFile + 1), 0xc0, 1);
-		memset((LPVOID)(IcmpCreateFile + 2), 0x40, 1);
+		memset((LPVOID)(IcmpCreateFile + 1), 0xc0, 1);//xor eax,eax
+		memset((LPVOID)(IcmpCreateFile + 2), 0x40, 1);//inc eax
 
 		VirtualProtect((LPVOID)IcmpCreateFile, 3 * sizeof(BYTE), dwOld, NULL);
-
+	}
 
 
 	}

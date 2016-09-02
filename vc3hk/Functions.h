@@ -157,11 +157,11 @@ inline float XAngle(float x1, float y1, float x2, float y2, float myangle) {
 	if (dl == 0)dl = 1.0;
 	float dl2 = abs(x2 - x1);
 	float teta = ((180.0 / M_PI)*acos(dl2 / dl));
-	if (x2<x1)teta = 180 - teta;
-	if (y2<y1)teta = teta*-1.0;
+	if (x2 < x1)teta = 180 - teta;
+	if (y2 < y1)teta = teta*-1.0;
 	teta = teta - myangle;
-	if (teta>180.0)teta = (360.0 - teta)*(-1.0);
-	if (teta<-180.0)teta = (360.0 + teta);
+	if (teta > 180.0)teta = (360.0 - teta)*(-1.0);
+	if (teta < -180.0)teta = (360.0 + teta);
 	return teta;
 }
 inline float YAngle(float x1, float y1, float z1, float x2, float y2, float z2, float myangle) {
@@ -170,10 +170,10 @@ inline float YAngle(float x1, float y1, float z1, float x2, float y2, float z2, 
 	if (dl == 0)dl = 1;
 	float dl2 = abs(z2 - z1);
 	float teta = ((180.0 / M_PI)*asin(dl2 / dl));;
-	if (z2<z1)teta = teta*-1.0;
+	if (z2 < z1)teta = teta*-1.0;
 	teta = myangle + teta;
-	if (teta>180.0)teta = (360.0 - teta)*(-1.0);
-	if (teta<-180.0)teta = (360.0 + teta);
+	if (teta > 180.0)teta = (360.0 - teta)*(-1.0);
+	if (teta < -180.0)teta = (360.0 + teta);
 	return (-1)*teta;
 }
 
@@ -225,7 +225,7 @@ fb::Vec3 getVehicleSpeed(fb::ClientSoldierEntity * soldier)
 	{
 		tempvec = *soldier->m_player->m_attachedControllable->getVehicleSpeed();
 	}
-	else{
+	else {
 		tempvec.x = 0.0f;
 		tempvec.y = 0.0f;
 		tempvec.z = 0.0f;
@@ -249,14 +249,87 @@ static bool IsVisible(fb::Vec3* target, fb::ClientSoldierEntity* pMySoldier)
 
 	return !pIRC->physicsRayQuery("OnGroundState::update", &Me, &enemy, &pRCH, fb::DontCheckWater | fb::DontCheckTerrain | fb::DontCheckRagdoll | fb::DontCheckCharacter | fb::DontCheckPhantoms, NULL); // oder "OnGroundState::update"
 }
-void AimCorrection(fb::Vec3 MyVelocity, fb::Vec3 EnemyVelocity, fb::Vec3* InVec, float Distance, float Bulletspeed, float Gravity)
+
+fb::Vec3*  AimCorrection(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
+	fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, float  v0, float Gravity, fb::Vec3* out)
 {
-	//Need to dereference pointer
-	*InVec = *InVec + EnemyVelocity * (Distance / fabs(Bulletspeed));
-	*InVec = *InVec - MyVelocity * (Distance / fabs(Bulletspeed));
-	FLOAT m_grav = fabs(Gravity);
-	FLOAT m_dist = Distance / fabs(Bulletspeed);
-	InVec->y += 0.5f * m_grav * m_dist * m_dist;
+	float Distance = MyPosition.DistanceToVector(EnemyP);
+	
+	*out = EnemyP + EnemyVelocity * (Distance / fabs(v0)) - MyVelocity * (Distance / fabs(v0));
+
+	FLOAT m_grav = -(Gravity);
+	FLOAT m_dist = Distance / fabs(v0);
+	out->y += 0.5f * m_grav * m_dist * m_dist;
+
+	*out = *out - MyPosition;
+	out->normalize();
+
+	float flYaw = -atan2(out->x, out->z);  //y
+	float flPitch = atan2(out->y, out->VectorLength2()); //x
+
+	const float MinYaw = 0; // 0 Degrees
+	const float MaxYaw = M_PI * 2; // 360 Degrees
+
+	if (flYaw < MinYaw)
+		flYaw += MaxYaw;
+
+
+	out->x = flPitch;
+	out->y = flYaw;
+	out->z = 0;
+
+	return out;
+}
+fb::Vec3*  AimCorrection2(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
+	fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, float  v0, float Gravity, fb::Vec3* out)
+{
+	try {
+		Gravity = -Gravity;
+
+		fb::Vec3 Driection, EnemyPosition = EnemyP;
+		double x, tmp, flPitch, flYaw, time;
+
+		time = (MyPosition.DistanceToVector(EnemyP)) / (v0*0.85f); //aropx 45
+
+		EnemyPosition = EnemyP + (EnemyVelocity * time) - (MyVelocity * time);
+		Driection = EnemyPosition - MyPosition;
+		
+	
+
+
+		x = fabs(Driection.VectorLength2());
+
+		tmp = sqrt((pow(v0, 4) - (Gravity*((Gravity*(x)*(x)) + 2 * (Driection.y)*v0*v0))));
+
+		flPitch = atan((v0*v0 - tmp) / (Gravity*x));
+
+
+
+		//max 0x40002f55
+		//min 
+
+		if (flPitch >= 1.48350f)flPitch = 1.48350f;
+		else if (flPitch <= -1.2217f)flPitch = -1.2216f;
+		
+		flYaw = -atan2(Driection.x, Driection.z);  //y
+
+
+		
+
+		if (flYaw < 0)flYaw = flYaw +6.2831f;
+
+
+
+
+		out->x = flPitch;
+		out->y = flYaw;
+		out->z = 0;
+
+		return out;
+	}
+	catch (int) {
+		return nullptr;
+	}
 }
 
 struct stMyVehicle
@@ -385,7 +458,7 @@ void _stdcall Bulletesp()
 		{
 			if (Entity.firstSegment->m_Collection.size() > 0)
 			{
-				fb::GameEntity* pEntity = reinterpret_cast< fb::GameEntity* >(Entity.firstSegment->m_Collection.at(i));
+				fb::GameEntity* pEntity = reinterpret_cast<fb::GameEntity*>(Entity.firstSegment->m_Collection.at(i));
 				if (!POINTERCHK(pEntity))
 					return;
 
