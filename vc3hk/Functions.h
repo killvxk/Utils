@@ -232,8 +232,12 @@ fb::Vec3 getVehicleSpeed(fb::ClientSoldierEntity * soldier)
 	}
 	return tempvec;
 }
-static bool IsVisible(fb::Vec3* target, fb::ClientSoldierEntity* pMySoldier)
+static bool IsVisible(fb::Vec3* target, fb::ClientSoldierEntity* pMySoldier,  fb::ClientSoldierEntity* pEnemySoldier)
 {
+	if (pEnemySoldier->m_character->isVisible())return true;
+
+	if (pEnemySoldier->m_isOccluded)return false;
+	
 	if (!pMySoldier->physics() || !pMySoldier->physics()->m_manager) return false;
 
 	fb::IPhysicsRayCaster* pIRC = pMySoldier->physics()->m_manager->m_rayCaster;
@@ -247,7 +251,7 @@ static bool IsVisible(fb::Vec3* target, fb::ClientSoldierEntity* pMySoldier)
 	__declspec(align(16)) fb::Vec3 Me = MyVec;
 	__declspec(align(16)) fb::Vec3 enemy = *target;
 
-	return !pIRC->physicsRayQuery("OnGroundState::update", &Me, &enemy, &pRCH, fb::DontCheckWater | fb::DontCheckTerrain | fb::DontCheckRagdoll | fb::DontCheckCharacter | fb::DontCheckPhantoms, NULL); // oder "OnGroundState::update"
+	return !pIRC->physicsRayQuery("OnGroundState::update", &Me, &enemy, &pRCH, fb::DontCheckWater  | fb::DontCheckRagdoll | fb::DontCheckCharacter | fb::DontCheckPhantoms, NULL); // oder "OnGroundState::update"
 }
 
 fb::Vec3*  AimCorrection(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
@@ -288,23 +292,32 @@ fb::Vec3*  AimCorrection2(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
 
 		fb::Vec3 Driection, EnemyPosition = EnemyP;
 		double x, tmp, flPitch, flYaw, time;
+		int i = 1;
+		flPitch = 0;
+		x = MyPosition.DistanceToVector(EnemyPosition);
 
-		time = (MyPosition.DistanceToVector(EnemyP)) / (v0*0.85f); //aropx 45
-
-		EnemyPosition = EnemyP + (EnemyVelocity * time) - (MyVelocity * time);
-		Driection = EnemyPosition - MyPosition;
-		
 	
+		
+		for (;i<=3 ; i++) {
+
+			if (x <= 20)break;
+
+				time = fabs(x / (v0*cos(flPitch)));
+
+				EnemyPosition = EnemyP + (EnemyVelocity * time) - (MyVelocity * time);
+
+				Driection = EnemyPosition - MyPosition;
+
+				x = fabs(Driection.VectorLength2());
+
+				tmp = sqrt((pow(v0, 4) - (Gravity*((Gravity*(x)*(x)) + 2 * (Driection.y)*v0*v0))));
+
+				flPitch = atan((v0*v0 - tmp) / (Gravity*x));
+
+				
 
 
-		x = fabs(Driection.VectorLength2());
-
-		tmp = sqrt((pow(v0, 4) - (Gravity*((Gravity*(x)*(x)) + 2 * (Driection.y)*v0*v0))));
-
-		flPitch = atan((v0*v0 - tmp) / (Gravity*x));
-
-
-
+			};
 		//max 0x40002f55
 		//min 
 
@@ -470,4 +483,35 @@ void _stdcall Bulletesp()
 			}
 		}
 	}
+}
+
+double DistanceToCrosshair(fb::Vec3 MyPosition,  fb::Vec3 EnemyPosition,const fb::ClientSoldierAimingSimulation* aimer) {
+	
+	double fYawDifference , flPitchDifference;
+
+	fb::Vec3 vDir = EnemyPosition - MyPosition;
+
+
+	
+
+	fYawDifference = -atan2(vDir.x, vDir.z);  
+
+	if (fYawDifference  < 0)fYawDifference = fYawDifference + 6.2831;
+
+	fYawDifference=fabs( fYawDifference - aimer->m_fpsAimer->m_yaw);
+
+	
+	if (fYawDifference > 3.1415)return -1; //if behind
+
+
+
+	flPitchDifference = atan2(vDir.y, vDir.VectorLength2());
+	if (flPitchDifference >= 1.48350f)return -1;
+	else if (flPitchDifference <= -1.2217f)return -1;
+
+	
+
+	flPitchDifference= fabs(flPitchDifference - aimer->m_fpsAimer->m_pitch);
+
+	return fabs(vDir.VectorLength()*cos(flPitchDifference)*sin(fYawDifference));
 }

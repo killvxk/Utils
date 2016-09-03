@@ -176,7 +176,8 @@ void _stdcall Aimbot()
 	
 	if (LockOnEme == false
 		|| !POINTERCHK(LockOn_pEnemySoldier)) {
-		float closestdistanceworld = 9999.0f;
+		//float closestdistanceworld = 9999.0f;
+		float flScreenDistance;
 		float closestdistance = 9999.0f;
 		for (int i = 0; i < size; i++)
 		{
@@ -207,7 +208,7 @@ void _stdcall Aimbot()
 
 			if (bVisibilityChecks)
 			{
-				if (!IsVisible(&Enemyvectmp, pMySoldier)) { 
+				if (!IsVisible(&Enemyvectmp, pMySoldier, pEnemySoldier)) {
 					if (bAimHead)
 					{
 					if (!GetBonePos(pEnemySoldier, fb::Spine, &Enemyvectmp)) continue;
@@ -216,20 +217,21 @@ void _stdcall Aimbot()
 						if (!GetBonePos(pEnemySoldier, fb::Head, &Enemyvectmp)) continue;
 					}
 					
-					if (!IsVisible(&Enemyvectmp, pMySoldier))continue;
+					if (!IsVisible(&Enemyvectmp, pMySoldier, pEnemySoldier))continue;
 				}
 			}
-			//if ((Enemyvec - Origin).z < 0)continue;
-
-			float ScreenY = fb::DxRenderer::Singleton()->m_screenInfo.m_nHeight / 2;
+			
+			flScreenDistance = DistanceToCrosshair(Origin, Enemyvectmp, aimer);
+			if (flScreenDistance < 0)continue;
+			/*float ScreenY = fb::DxRenderer::Singleton()->m_screenInfo.m_nHeight / 2;
 			float ScreenX = fb::DxRenderer::Singleton()->m_screenInfo.m_nWidth / 2;
 			fb::Vec3 EnemyScreen;
 			ProjectToScreen(&Enemyvectmp, &EnemyScreen);
-			if (EnemyScreen.z < 0)continue;
+
 			float PosX = fabs(ScreenX - EnemyScreen.x);
 			float PosY = fabs(ScreenY - EnemyScreen.y);
 
-			float flScreenDistance =PosX*PosX + PosY*PosY;
+			 =PosX*PosX + PosY*PosY;*/
 
 			if (flScreenDistance < closestdistance)
 			{
@@ -269,7 +271,7 @@ void _stdcall Aimbot()
 
 		if (bVisibilityChecks)
 		{
-			if (!IsVisible(&Enemyvectmp, pMySoldier)) {
+			if (!IsVisible(&Enemyvectmp, pMySoldier, pEnemySoldier)) {
 				if (bAimHead)
 				{
 					if (!GetBonePos(pEnemySoldier, fb::Spine, &Enemyvectmp)) return;
@@ -278,7 +280,7 @@ void _stdcall Aimbot()
 					if (!GetBonePos(pEnemySoldier, fb::Head, &Enemyvectmp)) return;
 				}
 
-				if (!IsVisible(&Enemyvectmp, pMySoldier))return; }
+				if (!IsVisible(&Enemyvectmp, pMySoldier, pEnemySoldier))return; }
 		}
 
 		ClosestSold = pEnemySoldier;
@@ -694,7 +696,7 @@ void _stdcall SoldierWeaponUpgrade()
 
 	fb::Vec3 myspeed = pMySoldier->linearVelocity();
 
-	printf_s("x:%fy:%fz:%f\n", myspeed.x, myspeed.y, myspeed.z);
+	
 
 
 	fb::ClientSoldierWeapon* MyCSW = pMySoldier->GetCSW();
@@ -880,7 +882,7 @@ void _stdcall SoldierWeaponUpgrade()
 			pBED->m_endDamage = pBED->m_startDamage;
 		}
 
-	//	printf_s("G:%x \n", &pBED->m_gravity);
+	
 
 		
 	
