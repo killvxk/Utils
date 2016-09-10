@@ -63,7 +63,7 @@ std::map<int, fb::WeaponModifier*> oldModifier;
 FILE * m_log;
 bool bAimbot = true;
 bool bAimHead = false;
-bool bVisibilityChecks = true;
+bool bVisibilityChecks = false;
 
 
 
@@ -98,6 +98,9 @@ DWORD WINAPI PBSSThread(LPVOID a)
 
 void _stdcall Aimbot()
 {
+	float flBulletGrav;
+	float flbulletspeed;
+	fb::ClientSoldierAimingSimulation* aimer;
 	fb::ClientGameContext* g_pGameContext = fb::ClientGameContext::Singleton();
 	if (!POINTERCHK(g_pGameContext))
 		return;
@@ -117,7 +120,10 @@ void _stdcall Aimbot()
 	if (!pMySoldier->IsAlive()) return;
 
 	int iWeaponID = GetWeaponID(pMySoldier);
-	if (iWeaponID != 0 && iWeaponID != 1) return;
+
+
+	if (pMySoldier->isInVehicle())return;
+
 	fb::ClientSoldierWeapon* MyCSW = pMySoldier->GetCSW();
 	//valid checks on Weapons
 	if (!POINTERCHK(MyCSW)
@@ -135,6 +141,7 @@ void _stdcall Aimbot()
 		&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData))
 	{
 		pBED = reinterpret_cast<fb::BulletEntityData*>(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData);
+	
 		if (!POINTERCHK(pBED)) pBED = pFFD->m_shot.m_projectileData;
 	}
 	else
@@ -142,19 +149,37 @@ void _stdcall Aimbot()
 	if (!POINTERCHK(pBED)) {
 
 		return;
-	}fb::ClientSoldierAimingSimulation* aimer;
-
-	fb::ClientSoldierWeapon* pClientSoldierWeapon = pMySoldier->GetCSW();
-	if (POINTERCHK(pClientSoldierWeapon))
-	{
-		aimer = pClientSoldierWeapon->m_authorativeAiming;
-		if (!POINTERCHK(aimer))
-			return;
-
-
-
 	}
-	else { return; }
+
+
+	if (POINTERCHK(MyCSW)
+		&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponShotModifier)	)
+	{
+		flbulletspeed = MyCSW->m_weaponModifier.m_weaponShotModifier->m_initialSpeed.z;
+		
+	
+	}
+	else{
+		flbulletspeed = pFFD->m_shot.m_initialSpeed.z;
+	}
+		
+
+
+
+	 flBulletGrav = pBED->m_gravity;
+	
+	//check weapon modifier
+
+//	if ((iWeaponID == -1) ||  pFFD->m_shot.m_initialSpeed.z <= 20.0f)return;
+
+
+	aimer = MyCSW->m_authorativeAiming;
+	if (!POINTERCHK(aimer))
+		return;
+
+
+
+
 	if (pMySoldier->isInVehicle())return;
 	eastl::vector<fb::ClientPlayer*> pVecCP = pPlayerManager->m_players;
 
@@ -166,14 +191,14 @@ void _stdcall Aimbot()
 	fb::GameRenderer::Singleton()->m_viewParams.view.Update();//matrix not filled by default
 	fb::Vec3 Origin = fb::GameRenderer::Singleton()->m_viewParams.view.m_viewMatrixInverse.trans;
 
-	
+
 	fb::ClientPlayer* ClosestClient = NULL;
 	fb::ClientSoldierEntity* ClosestSold = NULL;
 	fb::Vec3 EnemyAimVec;
 	fb::ClientSoldierEntity* pEnemySoldier;
 	int index = 0;
 	fb::Vec3 Enemyvectmp;
-	
+
 	if (LockOnEme == false
 		|| !POINTERCHK(LockOn_pEnemySoldier)) {
 		//float closestdistanceworld = 9999.0f;
@@ -195,15 +220,15 @@ void _stdcall Aimbot()
 			fb::WeakPtr<fb::ClientSoldierEntity>* corpse = &pClientPlayer->m_corpse;
 			if (corpse->GetData()) continue;
 
-		
+
 			if (bAimHead)
 			{
-				if (!GetBonePos(pEnemySoldier, fb::Head, &Enemyvectmp)) continue;
+				if (!GetBonePos(pEnemySoldier, fb::Neck, &Enemyvectmp)) continue;
 
 			}
 			else
 			{
-				if (!GetBonePos(pEnemySoldier, fb::Spine, &Enemyvectmp)) continue;
+				if (!GetBonePos(pEnemySoldier, fb::Spine2, &Enemyvectmp)) continue;
 			}
 
 			if (bVisibilityChecks)
@@ -211,16 +236,16 @@ void _stdcall Aimbot()
 				if (!IsVisible(&Enemyvectmp, pMySoldier, pEnemySoldier)) {
 					if (bAimHead)
 					{
-					if (!GetBonePos(pEnemySoldier, fb::Spine, &Enemyvectmp)) continue;
+						if (!GetBonePos(pEnemySoldier, fb::Spine2, &Enemyvectmp)) continue;
 					}
 					else {
-						if (!GetBonePos(pEnemySoldier, fb::Head, &Enemyvectmp)) continue;
+						if (!GetBonePos(pEnemySoldier, fb::Neck, &Enemyvectmp)) continue;
 					}
-					
+
 					if (!IsVisible(&Enemyvectmp, pMySoldier, pEnemySoldier))continue;
 				}
 			}
-			
+
 			flScreenDistance = DistanceToCrosshair(Origin, Enemyvectmp, aimer);
 			if (flScreenDistance < 0)continue;
 			/*float ScreenY = fb::DxRenderer::Singleton()->m_screenInfo.m_nHeight / 2;
@@ -253,20 +278,20 @@ void _stdcall Aimbot()
 		if (!POINTERCHK(LockOn_pEnemySoldier))return;
 		pEnemySoldier = LockOn_pEnemySoldier;
 		if (!POINTERCHK(pEnemySoldier))return;
-			
+
 
 		if (!isalive(pEnemySoldier->isAlive()))return;
-		
 
-	
+
+
 		if (bAimHead)
 		{
-			if (!GetBonePos(pEnemySoldier, fb::Head, &Enemyvectmp)) return;
+			if (!GetBonePos(pEnemySoldier, fb::Neck, &Enemyvectmp)) return;
 
 		}
 		else
 		{
-			if (!GetBonePos(pEnemySoldier, fb::Spine, &Enemyvectmp)) return;
+			if (!GetBonePos(pEnemySoldier, fb::Spine2, &Enemyvectmp)) return;
 		}
 
 		if (bVisibilityChecks)
@@ -274,13 +299,14 @@ void _stdcall Aimbot()
 			if (!IsVisible(&Enemyvectmp, pMySoldier, pEnemySoldier)) {
 				if (bAimHead)
 				{
-					if (!GetBonePos(pEnemySoldier, fb::Spine, &Enemyvectmp)) return;
+					if (!GetBonePos(pEnemySoldier, fb::Spine2, &Enemyvectmp)) return;
 				}
 				else {
-					if (!GetBonePos(pEnemySoldier, fb::Head, &Enemyvectmp)) return;
+					if (!GetBonePos(pEnemySoldier, fb::Neck, &Enemyvectmp)) return;
 				}
 
-				if (!IsVisible(&Enemyvectmp, pMySoldier, pEnemySoldier))return; }
+				if (!IsVisible(&Enemyvectmp, pMySoldier, pEnemySoldier))return;
+			}
 		}
 
 		ClosestSold = pEnemySoldier;
@@ -289,15 +315,15 @@ void _stdcall Aimbot()
 			return;
 	}
 
-	
-	
-		
-		
 
-	float flBulletGrav = pBED->m_gravity;
 
-	float flbulletspeed = pFFD->m_shot.m_initialSpeed.z;
-	fb::Vec3 * vDir=new fb::Vec3;
+
+
+
+
+
+	fb::Vec3 * vDir = new fb::Vec3;
+	DWORD rc;
 
 
 	if (ClosestSold->isInVehicle())
@@ -305,27 +331,31 @@ void _stdcall Aimbot()
 		fb::Vec3 myspeed = pMySoldier->linearVelocity();
 		fb::Vec3 enemyspeed = getVehicleSpeed(ClosestSold);
 
-		vDir=AimCorrection2(Origin, myspeed, EnemyAimVec, enemyspeed, flbulletspeed, flBulletGrav, vDir);
+		rc = AimCorrection2(Origin, myspeed, EnemyAimVec, enemyspeed, flbulletspeed, flBulletGrav, vDir);
 	}
 	else
 	{
 		fb::Vec3 myspeed = pMySoldier->linearVelocity();
 		fb::Vec3 enemyspeed = ClosestSold->linearVelocity();
 
-		vDir = AimCorrection2(Origin, myspeed, EnemyAimVec, enemyspeed, flbulletspeed, flBulletGrav, vDir);
+		rc = AimCorrection2(Origin, myspeed, EnemyAimVec, enemyspeed, flbulletspeed, flBulletGrav, vDir);
 	}
-	
+
 	if (!POINTERCHK(vDir)) return;
+	if (rc != 0x0)return;
 
-	if (!pMySoldier->isInVehicle())
-	{
-		
+	//	if (!pMySoldier->isInVehicle()) { 
 
-			aimer->m_fpsAimer->m_yaw = vDir->y;
-			aimer->m_fpsAimer->m_pitch = vDir->x;
-			LockOnEme = true;
-			LockOn_pEnemySoldier = ClosestSold;
-	}
+
+
+	aimer->m_fpsAimer->m_pitch = vDir->x;
+
+
+	aimer->m_fpsAimer->m_yaw = vDir->y;
+
+	LockOnEme = true;
+	LockOn_pEnemySoldier = ClosestSold;
+	//	}
 }
 
 
@@ -344,7 +374,7 @@ __declspec(naked) void hkGetRecoil(void)
 		pop esi
 		jmp dword ptr[ori_GetRecoil]
 
-	
+
 	}
 }
 __declspec(naked) void hkGetDispersion(void)
@@ -421,8 +451,13 @@ void _stdcall PlayerIteration()
 			if (bMinimapHack)
 			{
 				fb::ClientSpottingTargetComponent* pCSTC = pSoldier->getComponent<fb::ClientSpottingTargetComponent>("ClientSpottingTargetComponent");
-				if (POINTERCHK(pCSTC))
-					pCSTC->m_spotType = fb::SpotType_Active;
+				if (POINTERCHK(pCSTC)) {
+					if (pCSTC->m_spotType == fb::SpotType_None) { pCSTC->m_spotType = fb::SpotType_Passive; }
+					else
+					{
+						continue;
+					}
+				}
 			}
 		}
 	}
@@ -447,16 +482,21 @@ void _stdcall EntityWorld()
 			{
 				for (int i = 0; i < (int)vehicle.firstSegment->m_Collection.size(); i++)
 				{
-					
-						fb::ClientVehicleEntity* pEntity = reinterpret_cast<fb::ClientVehicleEntity*>(vehicle.firstSegment->m_Collection.at(i));
-						if (POINTERCHK(pEntity))
-						{
-							fb::ClientSpottingTargetComponent* vehicleSpotting = pEntity->getComponent<fb::ClientSpottingTargetComponent>("ClientSpottingTargetComponent");
-							if (POINTERCHK(vehicleSpotting))
-								vehicleSpotting->m_spotType = fb::SpotType_Active;
+
+					fb::ClientVehicleEntity* pEntity = reinterpret_cast<fb::ClientVehicleEntity*>(vehicle.firstSegment->m_Collection.at(i));
+					if (POINTERCHK(pEntity))
+					{
+						fb::ClientSpottingTargetComponent* vehicleSpotting = pEntity->getComponent<fb::ClientSpottingTargetComponent>("ClientSpottingTargetComponent");
+						if (POINTERCHK(vehicleSpotting)) {
+							
+							
+							if (vehicleSpotting->m_spotType == fb::SpotType_None) {
+								vehicleSpotting->m_spotType = fb::SpotType_Passive;
+							}
+							else { continue; }
 						}
 					
-				}
+				}}
 			}
 		}
 
@@ -467,13 +507,13 @@ void _stdcall EntityWorld()
 			{
 				for (int i = 0; i < (int)explosive.firstSegment->m_Collection.size(); i++)
 				{
-					
-						fb::ClientExplosionPackEntity* pEntity = reinterpret_cast<fb::ClientExplosionPackEntity*>(explosive.firstSegment->m_Collection.at(i));
-						if (POINTERCHK(pEntity))
-						{
-							pEntity->m_isSpotted = 1; // 1 is spotted on map, 2 is spotted map and HUD (3D)
-						}
-					
+
+					fb::ClientExplosionPackEntity* pEntity = reinterpret_cast<fb::ClientExplosionPackEntity*>(explosive.firstSegment->m_Collection.at(i));
+					if (POINTERCHK(pEntity))
+					{
+						pEntity->m_isSpotted = 1; // 1 is spotted on map, 2 is spotted map and HUD (3D)
+					}
+
 				}
 			}
 		}
@@ -533,25 +573,35 @@ void _stdcall VehicleWeaponUpgrade()
 		{
 			if (bNoRecoil)
 			{
-				fb::WeaponSway* thisptr = pWeaponFiring->m_weaponSway;
-				if (POINTERCHK(thisptr)) //
+				fb::WeaponSway* pWps = pWeaponFiring->m_weaponSway;
+				if (POINTERCHK(pWps)) //
 				{
 
-					thisptr->m_currentDispersionDeviation.m_pitch = 0.0f;
-					thisptr->m_currentDispersionDeviation.m_yaw = 0.0f;
-					thisptr->m_currentDispersionDeviation.m_roll = 0.0f;
-					thisptr->m_currentDispersionDeviation.m_transY = 0.0f;
+					pWps->m_currentRecoilDeviation.m_pitch = 0.0f;
+					pWps->m_currentRecoilDeviation.m_yaw = 0.0f;
+					pWps->m_currentRecoilDeviation.m_roll = 0.0f;
+					pWps->m_currentRecoilDeviation.m_transY = 0.0f;
 
-					thisptr->m_currentLagDeviation.m_pitch = 0.0f;
-					thisptr->m_currentLagDeviation.m_yaw = 0.0f;
-					thisptr->m_currentLagDeviation.m_roll = 0.0f;
-					thisptr->m_currentLagDeviation.m_transY = 0.0f;
+					pWps->m_dispersionAngle = 0.0f;
+					pWps->m_DeviationPitch = 0.0f;
 
+					pWps->m_currentGameplayDeviationScaleFactor = 0.00001f;
+					pWps->m_currentVisualDeviationScaleFactor = 0.00001f;
 
-					thisptr->m_dispersionAngle = 0.0f; //small crosshair
+					pWps->m_randomAngle = 0.00001f;
+					pWps->m_randomRadius = 0.00001f;
 
+					pWps->m_currentDispersionDeviation.m_pitch = 0.0f;
+					pWps->m_currentDispersionDeviation.m_yaw = 0.0f;
+					pWps->m_currentDispersionDeviation.m_roll = 0.0f;
+					pWps->m_currentDispersionDeviation.m_transY = 0.0f;
 
+					pWps->m_currentLagDeviation.m_pitch = 0.0f;
+					pWps->m_currentLagDeviation.m_yaw = 0.0f;
+					pWps->m_currentLagDeviation.m_roll = 0.0f;
+					pWps->m_currentLagDeviation.m_transY = 0.0f;
 
+					pWps->m_dispersionAngle = 0.00001f;//small crosshair
 				}
 
 				pWeaponFiring->m_recoilAngleX = 0.0f;
@@ -696,7 +746,7 @@ void _stdcall SoldierWeaponUpgrade()
 
 	fb::Vec3 myspeed = pMySoldier->linearVelocity();
 
-	
+
 
 
 	fb::ClientSoldierWeapon* MyCSW = pMySoldier->GetCSW();
@@ -721,7 +771,7 @@ void _stdcall SoldierWeaponUpgrade()
 	fb::ClientSoldierWeaponsComponent::ClientWeaponSwayCallbackImpl* pCWSCI = pMySoldier->m_soldierWeaponsComponent->m_weaponSwayCallback;
 
 
-	
+
 	if (bNoSway && POINTERCHK(pCWSCI))
 	{
 		fb::SoldierAimingSimulationData* pSASD = MyCSW->m_authorativeAiming->m_data;
@@ -777,24 +827,24 @@ void _stdcall SoldierWeaponUpgrade()
 	{
 
 		HookRecoil(pWps);
-		
-
-			pWps->m_currentDispersionDeviation.m_pitch = 0.0f;
-			pWps->m_currentDispersionDeviation.m_yaw = 0.0f;
-			pWps->m_currentDispersionDeviation.m_roll = 0.0f;
-			pWps->m_currentDispersionDeviation.m_transY = 0.0f;
-
-			pWps->m_currentLagDeviation.m_pitch = 0.0f;
-			pWps->m_currentLagDeviation.m_yaw = 0.0f;
-			pWps->m_currentLagDeviation.m_roll = 0.0f;
-			pWps->m_currentLagDeviation.m_transY = 0.0f;
 
 
-			
+		pWps->m_currentDispersionDeviation.m_pitch = 0.0f;
+		pWps->m_currentDispersionDeviation.m_yaw = 0.0f;
+		pWps->m_currentDispersionDeviation.m_roll = 0.0f;
+		pWps->m_currentDispersionDeviation.m_transY = 0.0f;
+
+		pWps->m_currentLagDeviation.m_pitch = 0.0f;
+		pWps->m_currentLagDeviation.m_yaw = 0.0f;
+		pWps->m_currentLagDeviation.m_roll = 0.0f;
+		pWps->m_currentLagDeviation.m_transY = 0.0f;
 
 
 
-		
+
+
+
+
 
 
 	}
@@ -814,15 +864,18 @@ void _stdcall SoldierWeaponUpgrade()
 
 	fb::FiringFunctionData* pFFD = pMySoldier->getCurrentWeaponFiringData()->m_primaryFire;
 	if (!POINTERCHK(pFFD)) return; else {
-
-	}
-	//weaponmodifier only active if its your mainweapon
+	
+	}	
+	
+		
+	
 	fb::BulletEntityData* pBED;
 	if (POINTERCHK(MyCSW)
 		&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponProjectileModifier)
 		&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData))
 	{
 		pBED = reinterpret_cast<fb::BulletEntityData*>(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData);
+
 		if (!POINTERCHK(pBED)) pBED = pFFD->m_shot.m_projectileData;
 	}
 	else
@@ -832,7 +885,7 @@ void _stdcall SoldierWeaponUpgrade()
 
 
 
-	if (iWeaponID != -1 && bInstantBullet&&pBED->m_endDamage > 2.00 && pFFD->m_shot.m_initialSpeed.z > 40.1f) {
+	if (iWeaponID != -1 && pBED->m_endDamage > 2.00 && pFFD->m_shot.m_initialSpeed.z > 40.1f) {
 
 
 
@@ -840,19 +893,21 @@ void _stdcall SoldierWeaponUpgrade()
 		cl_SoldierWeapon = iWeaponID;
 
 
-		if (pBED->m_startDamage > 79.5f&&pBED->m_startDamage < 80.5f) {
+	/*	if (pBED->m_startDamage > 79.5f&&pBED->m_startDamage < 80.5f) {
 			pBED->m_startDamage = 110.10f;
 			pBED->m_endDamage = 74.f;
-			pBED->m_damageFalloffStartDistance = 52.f;
-			pBED->m_damageFalloffEndDistance = 52.001f;
+			pBED->m_damageFalloffStartDistance = 42.f;
+			pBED->m_damageFalloffEndDistance = 42.001f;
 		}
 		else if (pBED->m_startDamage == 95.f) {
 			pBED->m_startDamage = 110.1f;
 			pBED->m_endDamage = 87.f;
-			pBED->m_damageFalloffStartDistance = 52.f;
-			pBED->m_damageFalloffEndDistance = 52.001f;
+			pBED->m_damageFalloffStartDistance = 62.f;
+			pBED->m_damageFalloffEndDistance = 62.001f;
 		}
-		else if (pBED->m_startDamage > 42.f&&pBED->m_startDamage < 51.0f) {
+		else */
+			
+			if (pBED->m_startDamage > 42.f&&pBED->m_startDamage < 51.0f) {
 			pBED->m_startDamage = 60.f;
 			pBED->m_endDamage = 46.f;
 			pBED->m_damageFalloffStartDistance = 35.f;
@@ -882,10 +937,10 @@ void _stdcall SoldierWeaponUpgrade()
 			pBED->m_endDamage = pBED->m_startDamage;
 		}
 
-	
 
-		
-	
+
+		pBED->m_timeToLive = 50.f;
+
 
 	}
 
@@ -907,10 +962,10 @@ int WINAPI hkPreFrame(float DeltaTime)
 	if (GetAsyncKeyState(VK_LMENU) & 0x8000) {
 		AimKeyPressed = true;
 	}
-	else { AimKeyPressed =false; }
+	else { AimKeyPressed = false; }
 
 	if (bAimbot &&  AimKeyPressed) {
-	Aimbot();
+		Aimbot();
 	}
 	else {
 		LockOnEme = false;
@@ -980,31 +1035,31 @@ BOOL APIENTRY DllMain(HMODULE hModule, unsigned long ulReason, void* param)
 #ifdef _DEBUG
 		CreateThread(NULL, NULL, &CreateConsole, NULL, NULL, NULL);
 #endif // DEBUG
-
+		printf_s(time);
 		PresentHook = new CVMTHookManager((intptr_t**)fb::DxRenderer::Singleton()->pSwapChain);
 		oPresent = (tPresent)PresentHook->dwGetMethodAddress(8);
 		PresentHook->dwHookMethod((intptr_t)hkPresent, 8);
 #ifndef _DEBUG
-			PreFrameHook = new CVMTHookManager((intptr_t**)g_pBorderInputNode);
-			oPreFrameUpdate = (tPreFrameUpdate)PreFrameHook->dwGetMethodAddress(27);
-			PreFrameHook->dwHookMethod((intptr_t)hkPreFrame, 27);
+		PreFrameHook = new CVMTHookManager((intptr_t**)g_pBorderInputNode);
+		oPreFrameUpdate = (tPreFrameUpdate)PreFrameHook->dwGetMethodAddress(27);
+		PreFrameHook->dwHookMethod((intptr_t)hkPreFrame, 27);
 #endif // DEBUG
-			//	  fopen_s(&m_log,"e:\log.txt", "a+" );
+		//	  fopen_s(&m_log,"e:\log.txt", "a+" );
 
-				//ping proof
+			//ping proof
 		intptr_t IcmpCreateFile = (intptr_t)GetProcAddress(GetModuleHandleW(L"iphlpapi.dll"), "IcmpCreateFile") + 0x289;
 
 		DWORD dwOld;
 		//ping spoof
 		if (POINTERCHK(IcmpCreateFile)) {
-		VirtualProtect((LPVOID)IcmpCreateFile, 3 * sizeof(BYTE), PAGE_EXECUTE_READWRITE, &dwOld);
+			VirtualProtect((LPVOID)IcmpCreateFile, 3 * sizeof(BYTE), PAGE_EXECUTE_READWRITE, &dwOld);
 
-		memset((LPVOID)IcmpCreateFile, 0x31, 1);
-		memset((LPVOID)(IcmpCreateFile + 1), 0xc0, 1);//xor eax,eax
-		memset((LPVOID)(IcmpCreateFile + 2), 0x40, 1);//inc eax
+			memset((LPVOID)IcmpCreateFile, 0x31, 1);
+			memset((LPVOID)(IcmpCreateFile + 1), 0xc0, 1);//xor eax,eax
+			memset((LPVOID)(IcmpCreateFile + 2), 0x40, 1);//inc eax
 
-		VirtualProtect((LPVOID)IcmpCreateFile, 3 * sizeof(BYTE), dwOld, NULL);
-	}
+			VirtualProtect((LPVOID)IcmpCreateFile, 3 * sizeof(BYTE), dwOld, NULL);
+		}
 
 
 	}

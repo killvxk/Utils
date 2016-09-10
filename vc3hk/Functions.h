@@ -232,18 +232,21 @@ fb::Vec3 getVehicleSpeed(fb::ClientSoldierEntity * soldier)
 	}
 	return tempvec;
 }
-static bool IsVisible(fb::Vec3* target, fb::ClientSoldierEntity* pMySoldier,  fb::ClientSoldierEntity* pEnemySoldier)
+static bool IsVisible(fb::Vec3* target, fb::ClientSoldierEntity* pMySoldier, fb::ClientSoldierEntity* pEnemySoldier)
 {
-	if (pEnemySoldier->m_character->isVisible())return true;
 
+	//return true;
 	if (pEnemySoldier->m_isOccluded)return false;
-	
+
+
+
 	if (!pMySoldier->physics() || !pMySoldier->physics()->m_manager) return false;
 
 	fb::IPhysicsRayCaster* pIRC = pMySoldier->physics()->m_manager->m_rayCaster;
 	if (!POINTERCHK(pIRC)) return false;
 
-	fb::RayCastHit pRCH;
+	fb::RayCastHit  pRCH;
+	fb::MaterialContainerPair * pM;
 
 	fb::GameRenderer::Singleton()->m_viewParams.view.Update();
 	fb::Vec3 MyVec = fb::GameRenderer::Singleton()->m_viewParams.view.m_viewMatrixInverse.trans;
@@ -251,14 +254,27 @@ static bool IsVisible(fb::Vec3* target, fb::ClientSoldierEntity* pMySoldier,  fb
 	__declspec(align(16)) fb::Vec3 Me = MyVec;
 	__declspec(align(16)) fb::Vec3 enemy = *target;
 
-	return !pIRC->physicsRayQuery("OnGroundState::update", &Me, &enemy, &pRCH, fb::DontCheckWater  | fb::DontCheckRagdoll | fb::DontCheckCharacter | fb::DontCheckPhantoms, NULL); // oder "OnGroundState::update"
+	if (!pIRC->physicsRayQuery("ControllableFinder", &Me, &enemy, &pRCH, fb::DontCheckWater | 0x10 | 0x20 | 0x80, NULL))return true;
+	else
+	{
+		pM = pRCH.m_material;
+
+		if (!POINTERCHK(pM))
+			return false;
+
+		if (pM->isPenetrable() || pM->isSeeTrough()
+	|| pM->isClientDestructible()|| pM->isBashable())
+				return true;
+
+			else return false;
+		}
 }
 
 fb::Vec3*  AimCorrection(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
 	fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, float  v0, float Gravity, fb::Vec3* out)
 {
 	float Distance = MyPosition.DistanceToVector(EnemyP);
-	
+
 	*out = EnemyP + EnemyVelocity * (Distance / fabs(v0)) - MyVelocity * (Distance / fabs(v0));
 
 	FLOAT m_grav = -(Gravity);
@@ -284,64 +300,83 @@ fb::Vec3*  AimCorrection(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
 
 	return out;
 }
-fb::Vec3*  AimCorrection2(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
-	fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, float  v0, float Gravity, fb::Vec3* out)
+DWORD  AimCorrection2(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
+	const fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, float  v0, float Gravity, fb::Vec3* out)
 {
 	try {
 		Gravity = -Gravity;
 
 		fb::Vec3 Driection, EnemyPosition = EnemyP;
 		double x, tmp, flPitch, flYaw, time;
-		int i = 1;
+		int i = 0;
 		flPitch = 0;
 		x = MyPosition.DistanceToVector(EnemyPosition);
-
-	
-		
-		for (;i<=3 ; i++) {
-
-			if (x <= 20)break;
-
-				time = fabs(x / (v0*cos(flPitch)));
-
-				EnemyPosition = EnemyP + (EnemyVelocity * time) - (MyVelocity * time);
-
-				Driection = EnemyPosition - MyPosition;
-
-				x = fabs(Driection.VectorLength2());
-
-				tmp = sqrt((pow(v0, 4) - (Gravity*((Gravity*(x)*(x)) + 2 * (Driection.y)*v0*v0))));
-
-				flPitch = atan((v0*v0 - tmp) / (Gravity*x));
-
-				
+		out->z = 0;
 
 
-			};
+		for (; i <= 5; i++) {
+
+
+
+			time = abs(x / (v0));
+
+			EnemyPosition.x = EnemyP.x + EnemyVelocity.x*time;
+			EnemyPosition.y = EnemyP.y + EnemyVelocity.y*time;
+			EnemyPosition.z = EnemyP.z + EnemyVelocity.z*time;
+
+			Driection = EnemyPosition - MyPosition;
+
+			x = abs(Driection.VectorLength2());
+
+			tmp = pow(v0, 4) - (Gravity*((Gravity*(x)*(x)) + 2 * (Driection.y)*v0*v0));
+
+			if (tmp <= 0)return 0x1;
+
+			flPitch = atan((v0*v0 - sqrt(tmp)) / (Gravity*x));
+
+
+			if (EnemyVelocity.x == 0.f&& EnemyVelocity.y == 0.f&&EnemyVelocity.z == 0.f)break;
+
+			if (x <= 5)break;
+
+
+
+		};
+
+		time = abs(x / (v0*cos(flPitch)));
+
+		EnemyPosition.x = EnemyP.x + EnemyVelocity.x*time;
+		EnemyPosition.y = EnemyP.y + EnemyVelocity.y*time;
+		EnemyPosition.z = EnemyP.z + EnemyVelocity.z*time;
+
+		Driection = EnemyPosition - MyPosition;
 		//max 0x40002f55
 		//min 
+	
+		if (flPitch > 1.4830 || flPitch < -1.221||_isnan(flPitch))return 0x2;
+			
+		//if (flPitch > 1.48350 || flPitch < -1.02200)return 0x2;
 
-		if (flPitch >= 1.48350f)flPitch = 1.48350f;
-		else if (flPitch <= -1.2217f)flPitch = -1.2216f;
-		
 		flYaw = -atan2(Driection.x, Driection.z);  //y
 
 
+
+
+		if (flYaw < 0)flYaw = flYaw + 2 * M_PI;
+
+	if(flYaw> 2 * M_PI|| flYaw < 0 || _isnan(flYaw) )return 0x3;
 		
-
-		if (flYaw < 0)flYaw = flYaw +6.2831f;
-
-
 
 
 		out->x = flPitch;
-		out->y = flYaw;
-		out->z = 0;
 
-		return out;
+		out->y = flYaw;
+		
+
+		return 0x0;
 	}
 	catch (int) {
-		return nullptr;
+		return 0x4;
 	}
 }
 
@@ -485,23 +520,25 @@ void _stdcall Bulletesp()
 	}
 }
 
-double DistanceToCrosshair(fb::Vec3 MyPosition,  fb::Vec3 EnemyPosition,const fb::ClientSoldierAimingSimulation* aimer) {
-	
-	double fYawDifference , flPitchDifference;
+double DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb::ClientSoldierAimingSimulation* aimer) {
+
+	double fYawDifference, flPitchDifference;
 
 	fb::Vec3 vDir = EnemyPosition - MyPosition;
 
+	double dist = vDir.VectorLength();
 
-	
 
-	fYawDifference = -atan2(vDir.x, vDir.z);  
 
-	if (fYawDifference  < 0)fYawDifference = fYawDifference + 6.2831;
+	fYawDifference = -atan2(vDir.x, vDir.z);
 
-	fYawDifference=fabs( fYawDifference - aimer->m_fpsAimer->m_yaw);
+	if (fYawDifference < 0)fYawDifference = fYawDifference + 6.2831;
 
-	
-	if (fYawDifference > 3.1415)return -1; //if behind
+	fYawDifference = abs(fYawDifference - aimer->m_fpsAimer->m_yaw);
+
+	if (dist < 10 && fYawDifference < 3.0f)return 0.001;
+
+	else if (fYawDifference > 0.125)return -1;
 
 
 
@@ -509,9 +546,9 @@ double DistanceToCrosshair(fb::Vec3 MyPosition,  fb::Vec3 EnemyPosition,const fb
 	if (flPitchDifference >= 1.48350f)return -1;
 	else if (flPitchDifference <= -1.2217f)return -1;
 
-	
 
-	flPitchDifference= fabs(flPitchDifference - aimer->m_fpsAimer->m_pitch);
 
-	return fabs(vDir.VectorLength()*cos(flPitchDifference)*sin(fYawDifference));
+	flPitchDifference = abs(flPitchDifference - aimer->m_fpsAimer->m_pitch);
+
+	return abs(dist*cos(flPitchDifference)*sin(fYawDifference));
 }

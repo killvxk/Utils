@@ -945,11 +945,11 @@ public:
 		MFPenetrable = 0x8
 	};
 	UINT32 m_flagsAndIndex;
-	__forceinline bool isPenetrable()
+	__forceinline UINT32 isPenetrable()
 	{
 		return (m_flagsAndIndex & MFPenetrable);
 	};
-	__forceinline bool isSeeThrough()
+	__forceinline UINT32 isSeeThrough()
 	{
 		return (m_flagsAndIndex & MFSeeThrough);
 	};

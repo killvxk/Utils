@@ -1,5 +1,9 @@
-#ifndef _MESSAGELISTENER_H
-#define _MESSAGELISTENER_H
+#ifndef _MaterialContainerPair_H
+#define _MaterialContainerPair_H
+
+#include "FB SDK/Frostbite_Classes.h"
+
+
 
 namespace fb
 {
@@ -11,36 +15,36 @@ namespace fb
 		char m_physicsPropertyIndex;	// 0x0C
 		char m_physicsMaterialIndex;	// 0x0D
 		PAD(0x2);						// 0x0E
-		__forceinline bool isPenetrable()
+		__forceinline BOOL isPenetrable()
 		{
 			return m_flagsAndIndex & 0x80000000;
 		};
 
-		__forceinline bool isSeeTrough()
+		__forceinline BOOL isSeeTrough()
 		{
-			return m_flagsAndIndex & 0x20000000;
+			return m_flagsAndIndex & 0x20000000 ;
 		};
 
 
-		__forceinline bool isClientDestructible()
+		__forceinline BOOL isClientDestructible()
 		{
 			return m_flagsAndIndex & 0x40000000;
 		};
 
-		__forceinline bool isBashable(void)
+		__forceinline BOOL isBashable(void)
 		{
 			return m_flagsAndIndex & MfBashable;
 		};
 
 
-	    __forceinline bool NoCollisionResponse(void)
+	    __forceinline BOOL NoCollisionResponse(void)
 		{
-			return m_flagsAndIndex & MfNoCollisionResponse;
+			return m_flagsAndIndex & MfNoCollisionResponse ;
 		};
 
-		__forceinline bool NoCollisionResponseCombined(void)
+		__forceinline BOOL NoCollisionResponseCombined(void)
 		{
-			return m_flagsAndIndex & MfNoCollisionResponseCombined;
+			return m_flagsAndIndex & MfNoCollisionResponseCombined ;
 		}
 		
 	}; // 0x10
