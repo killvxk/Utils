@@ -5,6 +5,7 @@
 #define OFFSET_GAMERENDERER         0x1424ad330
 #define OFFSET_ANGLES				0x1421caee0
 #define OFFSET_WORLDRENDERSETTINGS  0x1424ad460
+#define OFFSET_SYNCEDBFSETTINGS 0x1421AC5A0
 #define OFFSET_MAIN 0x14219ff68
 #define OFFSET_FIRSTTYPEINFO 0x0
 #define OFFSET_SYBCEDBFSETTINGS		 0x1421AC5A0
@@ -400,7 +401,8 @@ class AimingSimulationModifier;
 class ZeroingModifier;
 class WeaponSway;
 class GunSwayData;
-
+class SoldierAimingSimulationData;
+class ClientSoldierAimingEnvironment;
 class DxRenderer
 {
 public:
@@ -1222,16 +1224,17 @@ public:
 	HealthComponent* m_pHealthComp; //0x0140 
 };//Size=0x0148
 
-class ClientSoldierEntity : public ClientControllableEntity
+class ClientSoldierEntity
 {
-public:
-	char _0x0148[160];
-	AntAnimatableComponent* m_pAnimatable; //0x01E8 
-	AntAnimatableComponent* m_pAnimatable2; //0x01F0 
-	char _0x01F8[760];
-	__int32 m_PoseType; //0x04F0 
-	__int32 m_EngineChams; //0x04F4 
-	char _0x04F8[120];
+public:   
+	char _paddddddddp[0x570];
+	//char _0x0148[160];
+	//AntAnimatableComponent* m_pAnimatable; //0x01E8 
+	//AntAnimatableComponent* m_pAnimatable2; //0x01F0 
+	//char _0x01F8[760];
+	//__int32 m_PoseType; //0x04F0 
+	//__int32 m_EngineChams; //0x04F4 
+	//char _0x04F8[120];
 	SoldierWeaponComponent* m_pWeaponComponent; //0x0570 
 	ClientSoldierBodyComponent* m_pBodyComponent; //0x0578 
 	RagdollComponent* m_pRagdollComponent; //0x0580 
@@ -1322,18 +1325,17 @@ class SoldierWeapon
 {
 public:
 	char _0x0000[18824];
-	SoldierAimingSimulation* m_pAuthoritativeAiming; //0x4988 
+	SoldierAimingSimulation* m_authorativeAiming; //0x4988 
 	char _0x4990[24];
 	ClientWeapon* m_pWeapon; //0x49A8 
 	char _0x49B0[16];
 	WeaponFiring* m_pPrimary; //0x49C0 
 	char _0x49C8[696];
 };//Size=0x4C80
-
-class SoldierAimingSimulation
-{
+class SoldierAimingSimulation{
 public:
-	char _0x0000[16];
+	SoldierAimingSimulationData* m_data;//0x0000 
+	ClientSoldierAimingEnvironment* m_environment; //0x0008 
 	AimAssist* m_pFPSAimer; //0x0010 
 	float m_Yaw; //0x0018 
 	float m_Pitch; //0x001C 
@@ -1343,7 +1345,8 @@ public:
 	float m_DeltaTime; //0x0030 
 	char _0x0034[8];
 	SM::Vector2 m_ViewDelta; //0x003C 
-	char _0x0044[44];
+	char _0x0044[40];
+	float m_zoomLevel; //0x0068 
 	SM::Matrix m_Transform; //0x0070 
 	SM::Vector4 m_Position; //0x00B0 
 	SM::Vector4 m_View; //0x00C0 
@@ -1355,6 +1358,8 @@ public:
 	SM::Vector4 m_RayHitPoint; //0x0160 
 	__int32 m_RayLength; //0x0170 
 };//Size=0x0174
+
+
 
 class AimAssist
 {
@@ -2091,7 +2096,192 @@ public:
 	float m_FirstShotRecoilMultiplier; //0x0444 
 	__int64 m_CamerRecoilData; //0x0448 
 };//Size=0x0450
+class ClientSpottingTargetComponent
+{
+public:
 
+	enum SpotType
+	{
+		SpotType_None,
+		SpotType_Active,
+		SpotType_Passive,
+		SpotType_Radar,
+		SpotType_Unspottable
+		//....
+	};
+
+	class SpottingTargetComponentData
+	{
+	public:
+		char pad_0x0[0x70];
+		float m_ActiveSpottedTime; //+0x70
+		float m_PassiveSpottedTime; //+0x74
+		float m_ActiveSpottedTimeMultiplier; //+0x78
+		float m_PassiveSpottedTimeMultiplier;//+0x7C
+		float m_SpotOnFireMultiplier; //+0x80
+		float m_RadarSpottedSpeedThresholdOverride; //+0x84
+		bool m_TargetBoundingBoxCenter; //+0x88
+		bool m_CalculateAngleOutsideBoundingSphere; //+0x89
+	};
+
+	char _0x0[0x10];
+	SpottingTargetComponentData* m_spottingTargetData; //0x10 
+	char _0x18[0x38];
+	SpotType activeSpotType; //0x50
+};
+
+class ClientSoldierAimingEnvironment
+{
+public:
+	char _0x0000[8];
+	ClientSoldierEntity* m_soldier; //0x0008 
+};//Size=0x0010
+class FOVTransitionData
+{
+public:
+	enum FOVTransitionType
+	{
+		FOVTransitionType_Linear = 0,
+		FOVTransitionType_Smooth = 1,
+		FOVTransitionType_Count = 2,
+	};
+
+	char aDataContainer[16]; //+0x00 Inherited
+	FOVTransitionType m_TransitionType; //+0x10
+	float m_Shape; //+0x14
+	float m_StartDelay; //+0x18
+	float m_StartJump; //+0x1C    
+	float m_EndEarly; //+0x20
+	bool m_Invert; //+0x24
+};
+class ZoomLevelData
+{
+public:
+	enum ZoomLevelActivateEventType
+	{
+		ZoomLevelActivateEventType_Disable = 0,
+		ZoomLevelActivateEventType_Enable = 1,
+		ZoomLevelActivateEventType_ToggleOnLightSwitch = 2,
+	};
+	char aDataContainer[16]; //+0x00 Inherited
+	float m_FieldOfView; //+0x10
+	float m_FieldOfViewSP; //+0x14
+	FOVTransitionData m_FieldOfViewTransition; //+0x18
+	float m_LookSpeedMultiplier; //+0x20
+	float m_SprintLookSpeedMultiplier; //+0x24
+	float m_MoveSpeedMultiplier; //+0x28
+	float m_SwayPitchMagnitude; //+0x2C
+	float m_SwayYawMagnitude; //+0x30
+	float m_SupportedSwayPitchMagnitude; //+0x34
+	float m_SupportedSwayYawMagnitude; //+0x38
+	float m_SuppressedSwayPitchMagnitude; //+0x3C
+	float m_SuppressedSwayYawMagnitude; //+0x40
+	float m_SuppressedSwayMinFactor; //+0x44
+	float m_TimePitchMultiplier; //+0x48
+	float m_TimeYawMultiplier; //+0x4C
+	float m_DispersionMultiplier; //+0x50
+	float m_DispersionRotation; //+0x54
+	float m_RecoilMultiplier; //+0x58
+	float m_RecoilFovMultiplier; //+0x5C
+	float m_CameraImpulseMultiplier; //+0x60
+	float m_StartFadeToBlackAtTime; //+0x64
+	float m_FadeToBlackDuration; //+0x68
+	float m_StartFadeFromBlackAtTime; //+0x6C
+	float m_FadeFromBlackDuration; //+0x70
+	float m_ScreenExposureAreaScale; //+0x74
+	ZoomLevelActivateEventType m_OnActivateEventType; //+0x78
+	float m_AttractYawStrength; //+0x7C
+	float m_AttractPitchStrength; //+0x80
+	bool m_AllowFieldOfViewScaling; //+0x84
+	bool m_FadeToBlackInZoomTransition; //+0x85
+	bool m_UseFovSpecialisation; //+0x86
+	bool m_UseWeaponMeshZoom1p; //+0x87
+};
+
+class AimingPoseData
+{
+public:
+	float m_MinimumPitch; //+0x0
+	float m_MaximumPitch; //+0x4
+	float m_TargetingFov; //+0x8
+	float m_AimSteadiness; //+0xC
+	float m_SpeedMultiplier; //+0x10
+	float m_RecoilMultiplier; //+0x14
+};
+
+class SoldierAimAssistData
+{
+public:
+	char pad_0x00[0x10]; //+0x00
+	__int64 m_InputPolynomial; //+0x10
+	__int64 m_ZoomedInputPolynomial; //+0x18
+	D3DXVECTOR3 m_StickyBoxScale; //+0x20
+	D3DXVECTOR3 m_StickyDistanceScale; //+0x30
+	D3DXVECTOR3 m_SnapBoxScale; //+0x40
+	D3DXVECTOR3 m_SnapDistanceScale; //+0x50
+	D3DXVECTOR3 m_EyePosOffset; //+0x60
+	float m_AccelerationInputThreshold; //+0x70
+	float m_AccelerationMultiplier; //+0x74
+	float m_AccelerationDamping; //+0x78
+	float m_AccelerationTimeThreshold; //+0x7C
+	float m_SquaredAcceleration; //+0x80
+	D3DXVECTOR2 m_MaxAcceleration; //+0x84
+	float m_YawSpeedStrength; //+0x8C
+	float m_PitchSpeedStrength; //+0x90
+	D3DXVECTOR2 m_AttractDistanceFallOffs; //+0x94
+	float m_AttractSoftZone; //+0x9C
+	float m_AttractUserInputMultiplier; //+0xA0
+	float m_AttractUserInputMultiplier_NoZoom; //+0xA4
+	float m_AttractOwnSpeedInfluence; //+0xA8
+	float m_AttractTargetSpeedInfluence; //+0xAC
+	float m_AttractOwnRequiredMovementForMaximumAttract; //+0xB0
+	float m_AttractStartInputThreshold; //+0xB4
+	float m_AttractMoveInputCap; //+0xB8
+	float m_AttractYawStrength; //+0xBC
+	float m_AttractPitchStrength; //+0xC0
+	float m_MaxToTargetAngle; //+0xC4
+	float m_MaxToTargetXZAngle; //+0xC8
+	float m_ViewObstructedKeepTime; //+0xCC
+	float m_SnapZoomLateralSpeedLimit; //+0xD0
+	float m_SnapZoomTime; //+0xD4
+	float m_SnapZoomPostTimeNoInput; //+0xD8
+	float m_SnapZoomPostTime; //+0xDC
+	unsigned __int32 m_SnapZoomReticlePointPriority; //+0xE0
+	float m_SnapZoomAutoEngageTime; //+0xE4
+	float m_SnapZoomBreakTimeAtMaxInput; //+0xE8
+	float m_SnapZoomBreakMaxInput; //+0xEC
+	float m_SnapZoomBreakMinAngle; //+0xF0
+	float m_SnapZoomSpamGuardTime; //+0xF4
+	__int64 m_SoldierBackupSkeletonCollisionData; //+0xF8
+	float m_CheckBoneCenterOnlyDistance; //+0x100
+	float m_DisableForcedTargetRecalcDistance; //+0x104
+	float m_OverrideAimingRange; //+0x108
+	float m_OverrideAimingRangeCrouch; //+0x10C
+	float m_OverrideAimingRangeProne; //+0x110
+	bool m_UseYawAcceleration; //+0x114
+	bool m_UsePitchAcceleration; //+0x115
+	bool m_SnapZoomUserShorterWeaponTime; //+0x116
+	bool m_SnapZoomPostTimeDynamicPoint; //+0x117
+	bool m_ForceSoldierBackupSkeletonCollisionUse; //+0x118
+};
+class SoldierAimingSimulationData
+{
+public:
+	char aGameDataContainer[16]; //+0x00 Inherited
+	ZoomLevelData** m_ZoomLevels; //+0x10
+	bool m_ReturnToZoomAfterReload; //+0x90
+	SoldierAimAssistData* m_AimAssist; //+0x18
+	AimingPoseData m_StandPose; //+0x20
+	AimingPoseData m_CrouchPose; //+0x38
+	AimingPoseData m_PronePose; //+0x50
+	float m_ZoomTransitionTime; //+0x68
+	float m_ZoomTransitionTimeArray; //+0x70
+	float m_FovDelayTime; //+0x78
+	float m_FovTransitionTime; //+0x7C
+	float m_AimingRange; //+0x80
+	float m_LockAimToTargetSpeed; //+0x84
+	float m_Modifiers; //+0x88
+};
 
 
 
