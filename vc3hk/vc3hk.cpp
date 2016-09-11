@@ -119,7 +119,7 @@ void _stdcall Aimbot()
 
 	if (!pMySoldier->IsAlive()) return;
 
-	int iWeaponID = GetWeaponID(pMySoldier);
+	//int iWeaponID = GetWeaponID(pMySoldier);
 
 
 	if (pMySoldier->isInVehicle())return;

@@ -536,9 +536,10 @@ double DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb
 
 	fYawDifference = abs(fYawDifference - aimer->m_fpsAimer->m_yaw);
 
-	if (dist < 10 && fYawDifference < 3.0f)return 0.001;
+	//if (dist < 10 && fYawDifference < 3.0f)return 0.001;else
 
-	else if (fYawDifference > 0.125)return -1;
+	
+		if (fYawDifference > 0.125)return -1;
 
 
 

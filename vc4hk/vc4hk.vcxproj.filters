@@ -27,6 +27,9 @@
     <ClInclude Include="DXTK\Inc\SimpleMath.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Functions4.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
