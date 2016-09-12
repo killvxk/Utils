@@ -350,12 +350,11 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
 		EnemyPosition.z = EnemyP.z + EnemyVelocity.z*time;
 
 		Driection = EnemyPosition - MyPosition;
-		//max 0x40002f55
-		//min 
 	
-		if (flPitch > 1.4830 || flPitch < -1.221||_isnan(flPitch))return 0x2;
+	
+		if (flPitch > 1.48350 || flPitch < -1.2217||_isnan(flPitch))return 0x2;
 			
-		//if (flPitch > 1.48350 || flPitch < -1.02200)return 0x2;
+		
 
 		flYaw = -atan2(Driection.x, Driection.z);  //y
 
@@ -525,10 +524,10 @@ double DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb
 	double fYawDifference, flPitchDifference;
 
 	fb::Vec3 vDir = EnemyPosition - MyPosition;
-
+	vDir.normalize();
 	double dist = vDir.VectorLength();
 
-
+	
 
 	fYawDifference = -atan2(vDir.x, vDir.z);
 
@@ -544,6 +543,7 @@ double DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb
 
 
 	flPitchDifference = atan2(vDir.y, vDir.VectorLength2());
+
 	if (flPitchDifference >= 1.48350f)return -1;
 	else if (flPitchDifference <= -1.2217f)return -1;
 

@@ -22,7 +22,24 @@
 
 namespace fb
 {
+	template <typename T>
+	class WeakPtr
+	{
+	private:
+		T** m_ptr;
 
+	public:
+		T* GetData()
+		{
+			if (m_ptr == NULL)
+				return NULL;
+
+			if (*m_ptr == NULL)
+				return NULL;
+
+			return (T*)((intptr_t)(*m_ptr) - offsetof(T, m_weakTokenHolder));
+		}
+	};
 	class Vec3
 	{
 	public:
@@ -2151,6 +2168,7 @@ public:
 	bool GetBone(const UpdatePoseResultData::BONES BoneId, Vec3* BoneOut)
 	{
 		UpdatePoseResultData PoseResult = this->m_PoseResultData;
+		
 		if (PoseResult.m_ValidTransforms)
 		{
 			QuatTransform* pQuat = PoseResult.m_ActiveWorldTransforms;
