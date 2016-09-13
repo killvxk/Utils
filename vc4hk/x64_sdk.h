@@ -37,7 +37,7 @@ namespace fb
 			if (*m_ptr == NULL)
 				return NULL;
 
-			return (T*)((intptr_t)(*m_ptr) - offsetof(T, m_weakTokenHolder));
+			return (T*)((intptr_t)(*m_ptr) - sizeof(intptr_t));
 		}
 	};
 	class Vec3
@@ -689,9 +689,12 @@ class AimingSimulationModifier;
 class ZeroingModifier;
 class WeaponSway;
 class GunSwayData;
+
 class SoldierAimingSimulationData;
 class ClientSoldierAimingEnvironment;
 class ClientSpottingTargetComponent;
+class ClientVehicleEntity;
+
 class DxRenderer
 {
 public:
@@ -1220,25 +1223,31 @@ public:
 	VeniceSoldierCustimizationAsset* m_pCustomization; //0x0948 
 	char _0x0950[2684];
 	__int32 m_TeamId; //0x13CC 
-	char _0x13D0[240];
-	ClientSoldierEntity* m_pAttachedControllable; //0x14C0 
+	char _0x13D0[0xd0];//0x13d0
+	void* m_soldier;
+	WeakPtr<ClientSoldierEntity> m_corpse;		//0x14A8
+	void*  m_character;	//0x14B0		
+	void* m_weakTokenHolder;//0x14B8
+	ClientControllableEntity* m_pAttachedControllable; //0x14C0 
 	__int64 m_EntryId; //0x14C8 
 	ClientSoldierEntity* m_pControlledControllable; //0x14D0 
 
 	ClientSoldierEntity* GetSoldierEntity()
 	{
 		if (this->InVehicle())
-			return (ClientSoldierEntity*)((DWORD_PTR)this->GetCharacterEntity() - 0x188);
+			return (ClientSoldierEntity*)((intptr_t)this->GetCharacterEntity() - 0x188);
 
 		if (m_pControlledControllable)
 			return m_pControlledControllable;
 
 		return nullptr;
+
+		
 	}
-	ClientControllableEntity* GetVehicleEntity()
+	ClientVehicleEntity* GetVehicleEntity()
 	{
 		if (this->InVehicle())
-			return (ClientControllableEntity*)m_pAttachedControllable;
+			return (ClientVehicleEntity*)m_pAttachedControllable;
 		return nullptr;
 	}
 };//Size=0x14D8
@@ -1314,16 +1323,16 @@ struct TransformAABBStruct {
 class BreathControlHandler
 {
 public:
-	char _0x0000[0x38];
-	float m_breathControlTimer; //0x0038  
-	float m_breathControlMultiplier; //0x003C  
-	float m_breathControlPenaltyTimer; //0x0040  
-	float m_breathControlPenaltyMultiplier; //0x0044  
-	float m_breathControlActive; //0x0048  
-	float m_breathControlInput; //0x004C  
-	bool m_breathActive; //0x0050  
-	char _0x0054[0x4];
-	bool m_Enabled; //0x0058  
+	char _0x0000[56];
+	float m_breathControlTimer; //0x0038 
+	float m_breathControlMultiplier; //0x003C 
+	float m_breathControlPenaltyTimer; //0x0040 
+	float m_breathControlpenaltyMultiplier; //0x0044 
+	float m_breathControlActive; //0x0048 
+	float m_breathControlInput; //0x004C 
+	float m_breathActive; //0x0050 
+	char _0x0054[4];
+	float m_Enabled; //0x0058 
 };
 class ClientControllableEntity
 {
@@ -1413,8 +1422,38 @@ public:
 	float m_Velocity; //0x0100 
 	char _0x0104[60];
 	HealthComponent* m_pHealthComp; //0x0140 
-};//Size=0x0148
 
+	
+};//Size=0x0148
+class ClientChassisComponent
+{
+public:
+	char _0x0000[448];
+	Vec3 m_Velocity; //0x01C0 
+	char _0x01D0[48];
+};//Size=0x0200
+
+class ClientVehicleEntity : public ClientControllableEntity
+{
+public:
+	char _0x0188[0XB0];
+	void* m_pPhysicsEntity;//0x238
+	float m_waterLevel; //0x0240 
+	float m_terrainLevel; //0x0244 
+	float m_waterLevelUpdateTimer; //0x0248 
+	float m_terrainLevelUpdateTime; //0x024C 
+	AxisAlignedBox m_childrenAABB; //0x0250 
+	char _0x0268[24];
+	Vec3 m_Velocity; //0x0280 
+	char _0x028C[4];
+	Vec3 m_prevVelocity; //0x0290 
+	char _0x029C[312];
+	ClientChassisComponent* m_Chassis; //0x03E0 
+	__forceinline Vec3* getVehicleSpeed()
+	{
+		return (Vec3*)(&this->m_Chassis->m_Velocity);
+	}
+};
 class ClientSoldierEntity 
 {
 public:
@@ -1505,7 +1544,7 @@ public:
 
 
 
-	char _paddddddddp[0x568];
+//	char _paddddddddp[0x568];
 	//char _0x0148[160];
 	//AntAnimatableComponent* m_pAnimatable; //0x01E8 
 	//AntAnimatableComponent* m_pAnimatable2; //0x01F0 
@@ -1514,13 +1553,12 @@ public:
 	//__int32 m_EngineChams; //0x04F4 
 	//char _0x04F8[120];
 
-
-	//PAD(0x98);                                               // 0x148
-	//ClientPlayer*                  m_pPlayer;                  // 0x1E0
-	//AntAnimatableComponent* m_pAnimatable; //0x01E8 
-	//AntAnimatableComponent* m_pAnimatable2; //0x01F0 
-	//PAD(0x380);
-
+    //vtb
+	char aa[0x1d8];                              //0x00                
+	ClientPlayer*                  m_pPlayer;                  // 0x1E0
+	AntAnimatableComponent* m_pAnimatable; //0x01E8 
+	AntAnimatableComponent* m_pAnimatable2; //0x01F0 
+	char sd[0x378];
 	SoldierWeaponComponent* m_pWeaponComponent; //0x0570 
 	ClientSoldierBodyComponent* m_pBodyComponent; //0x0578 
 	RagdollComponent* m_pRagdollComponent; //0x0580 
@@ -1531,7 +1569,7 @@ public:
 	__int32 padThis; //0x0588  + 20
 	float m_timeSinceLastSprinted; //0x058C  + 20
 	BYTE m_sprinting; //0x0590  + 20
-	BYTE m_Occluded; //0x0591  + 20
+	BYTE m_Occluded; //0x05b1
 
 	char N00001BCE[6]; //0x05B2 
 	char _0x05B8[1432];
@@ -1545,6 +1583,38 @@ public:
 	char _0x0C78[184];
 	VaultComponent* m_pVaultComp; //0x0D30 
 	char _0x0D38[1264];
+		
+	class trashclass
+	{
+	public:
+		ITypedObject* Object; //0x0000
+		char _0x0008[24];
+	};//Size=0x0020
+	
+	
+
+	ClientSpottingTargetComponent* GetClientSpottingTargetComponent()
+	
+	{
+		trashclass* trashclass1 = *((trashclass**)((intptr_t)this + 0x38));
+
+		int obj = 0;
+		while (POINTERCHK(trashclass1[obj].Object))
+		{
+			fb::ClassInfo* pType = (fb::ClassInfo*)trashclass1[obj].Object->GetType();
+
+			if (pType->m_ClassId == 366)
+				return (ClientSpottingTargetComponent*)trashclass1[obj].Object;
+
+			obj++;
+
+			
+		}
+
+	
+		return nullptr;
+	}
+
 
 };//Size=0x1228
 
@@ -1632,7 +1702,7 @@ public:
 	char _0x0034[8];
 	SM::Vector2 m_ViewDelta; //0x003C 
 	char _0x0044[40];
-	float m_zoomLevel; //0x0068 
+	int m_zoomLevel; //0x0068 
 	SM::Matrix m_Transform; //0x0070 
 	SM::Vector4 m_Position; //0x00B0 
 	SM::Vector4 m_View; //0x00C0 

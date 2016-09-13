@@ -3,9 +3,11 @@
 #define M_PI 3.14159265359f
 
 DWORD  AimCorrection2(fb::Vec3 MyPosition, 
-	const fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, float  v0, float Gravity, fb::Vec3* out)
+	const fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, fb::Vec3  v1, float Gravity, fb::Vec3* out)
 {
 	try {
+		float v0 = sqrt(v1.y*v1.y + v1.z*v1.z);
+			
 		Gravity = -Gravity;
 
 		fb::Vec3 Driection, EnemyPosition = EnemyP;
@@ -60,7 +62,7 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 		//max 0x40002f55
 		//min 
 
-	
+		flPitch = flPitch - atan2(v1.y,v1.z);
 
 		if (flPitch > 1.48350f || flPitch < -1.2217f || _isnanf(flPitch))return 0x2;
 
@@ -93,11 +95,11 @@ float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb:
 	float fYawDifference, flPitchDifference;
 
 	fb::Vec3 vDir = EnemyPosition - MyPosition;
-
+	float m_dist0 = vDir.len();
+	float x, y;
 	vDir.normalize();
 
-	float dist = vDir.len();
-
+	float m_dist1 = vDir.len();
 
 
 	fYawDifference = -atan2(vDir.x, vDir.z);
@@ -107,10 +109,10 @@ float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb:
 
 	fYawDifference = abs(fYawDifference - aimer->m_AimAngles.x);
 
-	//if (dist < 10 && fYawDifference < 3.0f)return 0.001;else
+	if (m_dist0 <= 5.f && fYawDifference < 3.0f)return 409600.f;else
 
 
-	if ( fYawDifference > 0.125f || _isnanf(fYawDifference))return -2.f;
+	if (fYawDifference < 0||fYawDifference > 0.125f || _isnanf(fYawDifference))return -2.f;
 
 
 
@@ -121,14 +123,28 @@ float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb:
 	flPitchDifference = abs(flPitchDifference - aimer->m_AimAngles.y);
 
 	if (flPitchDifference > 1.48350f || flPitchDifference < -1.2217f || _isnanf(flPitchDifference))return -2.f;
-
-	return abs(dist*cos(flPitchDifference)*sin(fYawDifference));//x dist
+	x = abs(m_dist1*cos(flPitchDifference)*sin(fYawDifference));
+    y= abs(m_dist1*sin(flPitchDifference));
+	return x*x + y*y;
 }
 
 
 
 
-
+fb::Vec3 getVehicleSpeed(fb::ClientSoldierEntity * soldier)
+{
+	fb::Vec3 tempvec;
+	if (soldier->m_pPlayer->m_pAttachedControllable)
+	{
+		tempvec = soldier->m_pPlayer->GetVehicleEntity()->GetVelocity();
+	}
+	else {
+		tempvec.x = 0.0f;
+		tempvec.y = 0.0f;
+		tempvec.z = 0.0f;
+	}
+	return tempvec;
+}
 
 
 
@@ -138,7 +154,7 @@ bool IsAlive(fb::ClientSoldierEntity* pPlayer)
 	fb::HealthComponent* pemeHealthComponent = *((fb::HealthComponent**)((intptr_t)pPlayer + 0x140));
 
 	if (POINTERCHK(pemeHealthComponent)) {
-		if ((pemeHealthComponent->m_Health > 0)) { return true; }
+		if ((pemeHealthComponent->m_Health > 0||_isnanf(pemeHealthComponent->m_Health))) { return true; }
 		else
 		{
 			return false;
