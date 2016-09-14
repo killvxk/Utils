@@ -14,7 +14,7 @@
 
 
 #define OFFSET_FIRSTTYPEINFO 0x0
-#define OFFSET_SYBCEDBFSETTINGS		 0x1421AC5A0
+
 
 #define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
 #define POINTERCHK(p)  ((p >= (PVOID)0x10000) && (p < _PTR_MAX_VALUE) && (p != nullptr))
@@ -202,7 +202,53 @@ namespace fb
 
 	};
 
-
+	class Vec3d
+	{
+	public:
+		union
+		{
+			struct
+			{
+				double x;
+				double y;
+				double z;
+				double w;
+			};
+			double data[4];
+		};
+		double len(void)
+		{
+			return sqrt(x*x + y*y + z*z);
+		}
+		void normalize(void)
+		{
+			double _l = len();
+			this->x /= _l;
+			this->y /= _l;
+			this->z /= _l;
+		}
+	
+		double DistanceToVector(Vec3d const &other)
+		{
+			Vec3d Distance;
+			Distance.x = other.x - this->x;
+			Distance.y = other.y - this->y;
+			Distance.z = other.z - this->z;
+			return sqrt((Distance.x * Distance.x) + (Distance.y * Distance.y) + (Distance.z * Distance.z));
+		}		
+		double VectorLength2()
+		{
+			return sqrt(((this->x)*(this->x)) + ((this->z)*(this->z)));
+		}
+		Vec3d operator - (Vec3d const &other)
+		{
+			Vec3d v;
+			v.x = this->x - other.x;
+			v.y = this->y - other.y;
+			v.z = this->z - other.z;
+			return v;
+		}
+	};
 
 };
 namespace SM = DirectX::SimpleMath;
@@ -1665,10 +1711,10 @@ public:
 		if (!POINTERCHK(m_Handler))
 			return nullptr;
 
-		if (m_CurrentWeaponIndex == 0 || m_CurrentWeaponIndex == 1)
+		else   if(m_CurrentWeaponIndex<=7)
 			return m_Handler->m_pWeaponList[m_CurrentWeaponIndex];
-		else
-			return nullptr;
+		else return nullptr;
+			
 	};
 	int GetSlot()
 	{

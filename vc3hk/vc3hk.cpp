@@ -99,7 +99,7 @@ DWORD WINAPI PBSSThread(LPVOID a)
 void _stdcall Aimbot()
 {
 	float flBulletGrav;
-	float flbulletspeed;
+	fb::Vec3 flbulletspeed;
 	fb::ClientSoldierAimingSimulation* aimer;
 	fb::ClientGameContext* g_pGameContext = fb::ClientGameContext::Singleton();
 	if (!POINTERCHK(g_pGameContext))
@@ -155,12 +155,12 @@ void _stdcall Aimbot()
 	if (POINTERCHK(MyCSW)
 		&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponShotModifier)	)
 	{
-		flbulletspeed = MyCSW->m_weaponModifier.m_weaponShotModifier->m_initialSpeed.z;
+		flbulletspeed = MyCSW->m_weaponModifier.m_weaponShotModifier->m_initialSpeed;
 		
 	
 	}
 	else{
-		flbulletspeed = pFFD->m_shot.m_initialSpeed.z;
+		flbulletspeed = pFFD->m_shot.m_initialSpeed;
 	}
 		
 
@@ -267,11 +267,7 @@ void _stdcall Aimbot()
 				index = i;
 			}
 		}
-		if (!POINTERCHK(ClosestClient))
-			return;
-
-		if (!POINTERCHK(ClosestSold))
-			return;
+	
 
 	}
 	else {
@@ -311,15 +307,18 @@ void _stdcall Aimbot()
 
 		ClosestSold = pEnemySoldier;
 		EnemyAimVec = Enemyvectmp;
-		if (!POINTERCHK(ClosestSold))
-			return;
+
 	}
 
 
 
 
 
+	if (!POINTERCHK(ClosestClient))
+		return;
 
+	if (!POINTERCHK(ClosestSold))
+		return;
 
 
 	fb::Vec3 * vDir = new fb::Vec3;
@@ -331,20 +330,18 @@ void _stdcall Aimbot()
 		fb::Vec3 myspeed = pMySoldier->linearVelocity();
 		fb::Vec3 enemyspeed = getVehicleSpeed(ClosestSold);
 
-		rc = AimCorrection2(Origin, myspeed, EnemyAimVec, enemyspeed, flbulletspeed, flBulletGrav, vDir);
+		rc = AimCorrection2(Origin,  EnemyAimVec, enemyspeed, flbulletspeed, flBulletGrav, vDir);
 	}
 	else
 	{
 		fb::Vec3 myspeed = pMySoldier->linearVelocity();
 		fb::Vec3 enemyspeed = ClosestSold->linearVelocity();
 
-		rc = AimCorrection2(Origin, myspeed, EnemyAimVec, enemyspeed, flbulletspeed, flBulletGrav, vDir);
+		rc = AimCorrection2(Origin, EnemyAimVec, enemyspeed, flbulletspeed, flBulletGrav, vDir);
 	}
 
 	if (!POINTERCHK(vDir)) return;
 	if (rc != 0x0)return;
-
-	//	if (!pMySoldier->isInVehicle()) { 
 
 
 
@@ -355,7 +352,7 @@ void _stdcall Aimbot()
 
 	LockOnEme = true;
 	LockOn_pEnemySoldier = ClosestSold;
-	//	}
+
 }
 
 
@@ -955,9 +952,13 @@ int WINAPI hkPreFrame(float DeltaTime)
 	_asm pushad
 	int returnval = oPreFrameUpdate(DeltaTime);
 
-	if (GetAsyncKeyState(VK_RMENU) & 0x8000) {
-		bAimHead = !bAimHead;
+	if ((GetKeyState(VK_CAPITAL) & 0x0001) != 0)
+	{
+		bAimHead = true;
 
+	}
+	else {
+		bAimHead = false;
 	};
 	if (GetAsyncKeyState(VK_LMENU) & 0x8000) {
 		AimKeyPressed = true;

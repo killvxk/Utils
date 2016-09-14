@@ -300,10 +300,11 @@ fb::Vec3*  AimCorrection(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
 
 	return out;
 }
-DWORD  AimCorrection2(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
-	const fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, float  v0, float Gravity, fb::Vec3* out)
+DWORD  AimCorrection2(fb::Vec3 MyPosition,
+	const fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, fb::Vec3  v1, float Gravity, fb::Vec3* out)
 {
 	try {
+		double v0 = sqrt(v1.y*v1.y + v1.z*v1.z);
 		Gravity = -Gravity;
 
 		fb::Vec3 Driection, EnemyPosition = EnemyP;
@@ -351,7 +352,7 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
 
 		Driection = EnemyPosition - MyPosition;
 	
-	
+		flPitch = flPitch - atan2(v1.y, v1.z);
 		if (flPitch > 1.48350 || flPitch < -1.2217||_isnan(flPitch))return 0x2;
 			
 		
@@ -367,9 +368,9 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition, fb::Vec3 MyVelocity,
 		
 
 
-		out->x = flPitch;
+		out->x = (float)flPitch;
 
-		out->y = flYaw;
+		out->y = (float)flYaw;
 		
 
 		return 0x0;
@@ -519,37 +520,41 @@ void _stdcall Bulletesp()
 	}
 }
 
-double DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb::ClientSoldierAimingSimulation* aimer) {
+float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb::ClientSoldierAimingSimulation* aimer) {
 
 	double fYawDifference, flPitchDifference;
 
 	fb::Vec3 vDir = EnemyPosition - MyPosition;
+	double m_dist0 = vDir.len();
+	double x, y;
 	vDir.normalize();
-	double dist = vDir.VectorLength();
 
-	
+	float m_dist1 = vDir.len();
+
 
 	fYawDifference = -atan2(vDir.x, vDir.z);
 
-	if (fYawDifference < 0)fYawDifference = fYawDifference + 6.2831;
+	if (fYawDifference < 0)fYawDifference = fYawDifference + 6.2831f;
+
 
 	fYawDifference = abs(fYawDifference - aimer->m_fpsAimer->m_yaw);
 
-	//if (dist < 10 && fYawDifference < 3.0f)return 0.001;else
+	if (m_dist0 <= 5.f && fYawDifference < 3.0f)return 409600.f; else
 
-	
-		if (fYawDifference > 0.125)return -1;
+
+		if (fYawDifference < 0 || fYawDifference > 0.125f )return -2.f;
 
 
 
 	flPitchDifference = atan2(vDir.y, vDir.VectorLength2());
 
-	if (flPitchDifference >= 1.48350f)return -1;
-	else if (flPitchDifference <= -1.2217f)return -1;
-
-
+	
 
 	flPitchDifference = abs(flPitchDifference - aimer->m_fpsAimer->m_pitch);
 
-	return abs(dist*cos(flPitchDifference)*sin(fYawDifference));
+	if (flPitchDifference > 1.48350f || flPitchDifference < -1.2217f )return -2.f;
+	x = abs(m_dist1*cos(flPitchDifference)*sin(fYawDifference));
+	y = abs(m_dist1*sin(flPitchDifference));
+
+	return(float)(x*x + y*y);
 }

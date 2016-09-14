@@ -1,18 +1,57 @@
 #pragma once
 
 #define M_PI 3.14159265359f
+float TimeToHit(fb::Vec3 p, fb::Vec3 v, float s)
+{
+	float a = v.Dot(v) - s*s;
+	float b = 2 * p.Dot(v);
+	float c = p.Dot(p);
 
+
+	float t1 = 0, t2 = 0;
+
+
+	float de = b*b - 4 * a*c;
+
+
+
+	if (de >= 0)
+	{
+		t1 = (-b + sqrt(de)) / (2 * a);
+
+		t2 = (-b - sqrt(de)) / (2 * a);
+	}
+	else
+	{
+		return -2.0f;
+	}
+
+	if (t1 <= 0 && t2 <= 0)return -4.f;
+
+	if (t1 <= 0)return t2;
+
+	if (t2 <= 0)return t1;
+
+	return t1 < t2 ? t1 : t2;
+
+}
 DWORD  AimCorrection2(fb::Vec3 MyPosition, 
 	const fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, fb::Vec3  v1, float Gravity, fb::Vec3* out)
 {
-	try {
-		float v0 = sqrt(v1.y*v1.y + v1.z*v1.z);
-			
+
+
+	float x, tmp, flPitch, flYaw, time, v0 = sqrt(v1.y*v1.y + v1.z*v1.z);
+	fb::Vec3 Driection, EnemyPosition ;
+
+	if(Gravity!=0.f) {
+		
+		EnemyPosition = EnemyP;
 		Gravity = -Gravity;
 
-		fb::Vec3 Driection, EnemyPosition = EnemyP;
-		float x, tmp, flPitch, flYaw, time;
+		
+	
 		int i = 0;
+
 		flPitch = 0;
 		x = MyPosition.DistanceToVector(EnemyPosition);
 
@@ -59,36 +98,60 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 		EnemyPosition.z = EnemyP.z + EnemyVelocity.z*time;
 
 		Driection = EnemyPosition - MyPosition;
-		//max 0x40002f55
-		//min 
+	
 
-		flPitch = flPitch - atan2(v1.y,v1.z);
-
-		if (flPitch > 1.48350f || flPitch < -1.2217f || _isnanf(flPitch))return 0x2;
-
+		
+	}
+	else {
 
 
-		flYaw = -atan2(Driection.x, Driection.z);  //y
 	
 
 
-		if (flYaw < 0)flYaw = flYaw + 6.2831f;
+	time = TimeToHit(EnemyP, EnemyVelocity, v0);
+	if (time < 0)return 0x1;
+
+	fb::Vec3 EnemyPosition, Driection;
+
+	EnemyPosition.x = EnemyP.x + EnemyVelocity.x*time;
+	EnemyPosition.y = EnemyP.y + EnemyVelocity.y*time;
+	EnemyPosition.z = EnemyP.z + EnemyVelocity.z*time;
+
+	Driection = EnemyPosition - MyPosition;
 
 
-		if (flYaw < 0|| flYaw >6.2831f||_isnanf(flYaw))return 0x3;
 
+	flPitch= atan2(Driection.y, Driection.VectorLength2());
 
-
-		out->x = flYaw;
-
-		out->y = flPitch;
-
-
-		return 0x0;
 	}
-	catch (int) {
-		return 0x4;
-	}
+	
+
+
+
+
+	flPitch = flPitch - atan2(v1.y, v1.z);
+
+	if (flPitch > 1.48350f || flPitch < -1.2217f || _isnanf(flPitch))return 0x2;
+
+
+
+	flYaw = -atan2(Driection.x, Driection.z);  //y
+
+
+
+	if (flYaw < 0)flYaw = flYaw + 6.2831f;
+
+
+	if (flYaw < 0 || flYaw >6.2831f || _isnanf(flYaw))return 0x3;
+
+
+
+	out->x = flYaw;
+
+	out->y = flPitch;
+
+
+	return 0x0;
 }
 float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb::AimAssist* aimer) {
 
@@ -124,7 +187,7 @@ float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb:
 
 	if (flPitchDifference > 1.48350f || flPitchDifference < -1.2217f || _isnanf(flPitchDifference))return -2.f;
 	x = abs(m_dist1*cos(flPitchDifference)*sin(fYawDifference));
-    y= abs(m_dist1*sin(flPitchDifference));
+	y= abs(m_dist1*sin(flPitchDifference));
 	return x*x + y*y;
 }
 
