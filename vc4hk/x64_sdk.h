@@ -1,356 +1,8 @@
-#pragma once
-
-#define OFFSET_CLIENTGAMECONTEXT    0x1424abd20
-#define OFFSET_DXRENDERER           0x142572fa0 
-#define OFFSET_GAMERENDERER         0x1424ad330
-#define OFFSET_ANGLES				0x1421caee0
-#define OFFSET_WORLDRENDERSETTINGS  0x1424ad460
-
-//up to date
-#define OFFSET_PPCURRENTWEAPONFIRING  0x1421CAEE8
-#define OFFSET_SYNCEDBFSETTINGS 0x1421AC5A0
-#define OFFSET_BORDERINPUTNODE 0x1424acf70
-#define OFFSET_MAIN  0x14219ff68
-
-
-#define OFFSET_FIRSTTYPEINFO 0x0
-
-
-#define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
-#define POINTERCHK(p)  ((p >= (PVOID)0x10000) && (p < _PTR_MAX_VALUE) && (p != nullptr))
-#define PAD(SIZE) char __##SIZE[SIZE]
-
-namespace fb
-{
-	template <typename T>
-	class WeakPtr
-	{
-	private:
-		T** m_ptr;
-
-	public:
-		T* GetData()
-		{
-			if (m_ptr == NULL)
-				return NULL;
-
-			if (*m_ptr == NULL)
-				return NULL;
-
-			return (T*)((intptr_t)(*m_ptr) - sizeof(intptr_t));
-		}
-	};
-	class Vec3
-	{
-	public:
-		union
-		{
-			struct
-			{
-				FLOAT x;
-				FLOAT y;
-				FLOAT z;
-				FLOAT w;
-			};
-			FLOAT data[4];
-		};
-		void print(char* pthis)
-		{
-			//LOG.Write("%s Vec3 at 0x%.8X: (%5.1f|%5.1f|%5.1f)\n",pthis,this,x,y,z);
-		}
-		float len(void)
-		{
-			return sqrt(x*x + y*y + z*z);
-		}
-		void normalize(void)
-		{
-			float _l = len();
-			this->x /= _l;
-			this->y /= _l;
-			this->z /= _l;
-		}
-		void initialize(void)
-		{
-
-			this->x /= 1;
-			this->y /= 1;
-			this->z = 1;
-		}
-		Vec3 operator * (float const &other)
-		{
-			this->x *= other;
-			this->y *= other;
-			this->z *= other;
-			return *this;
-		}
-		Vec3 operator + (Vec3 const &other)
-		{
-			Vec3 v;
-			v.x = this->x + other.x;
-			v.y = this->y + other.y;
-			v.z = this->z + other.z;
-			return v;
-		}
-		Vec3 operator - (Vec3 const &other)
-		{
-			Vec3 v;
-			v.x = this->x - other.x;
-			v.y = this->y - other.y;
-			v.z = this->z - other.z;
-			return v;
-		}
-		Vec3 operator += (Vec3 const &other)
-		{
-			this->x += other.x;
-			this->y += other.y;
-			this->z += other.z;
-			return *this;
-		}
-		//new from me 
-		Vec3 operator -= (Vec3 const &other)
-		{
-			this->x -= other.x;
-			this->y -= other.y;
-			this->z -= other.z;
-			return *this;
-		}
-		bool operator ==(Vec3 const &other)
-		{
-			if (this->x == other.x)
-			{
-				if (this->y == other.y)
-				{
-					if (this->z == other.z)
-					{
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-		//new from me Calculate Dotproduct
-		float Dot(Vec3 Vec)
-		{
-			return this->x * Vec.x + this->y * Vec.y + this->z * Vec.z;
-		}
-
-		// new from me get VecLength
-		float VectorLength()
-		{
-			return sqrt(((this->x)*(this->x)) + ((this->y)*(this->y)) + ((this->z)*(this->z)));
-		}
-		float VectorLength2()
-		{
-			return sqrt(((this->x)*(this->x)) + ((this->z)*(this->z)));
-		}
-		//new from me get distance to vec
-		float DistanceToVector(Vec3 const &other)
-		{
-			Vec3 Distance;
-			Distance.x = other.x - this->x;
-			Distance.y = other.y - this->y;
-			Distance.z = other.z - this->z;
-			return sqrt((Distance.x * Distance.x) + (Distance.y * Distance.y) + (Distance.z * Distance.z));
-		}
-		float DistanceFrom(Vec3 & point)
-		{
-			float x2 = (point.x - x) * (point.x - x);
-			float y2 = (point.y - y) * (point.y - y);
-			float z2 = (point.z - z) * (point.z - z);
-
-			float dist = sqrt(x2 + y2 + z2);
-
-			return dist;
-		}
-
-
-		Vec3 TransferFromD3DXVECTOR3(D3DXVECTOR3 const &other)
-		{
-			this->x = other.x;
-			this->y = other.y;
-			this->z = other.z;
-			return *this;
-		}
-
-		D3DXVECTOR3 TransfertoD3DXVECTOR3(Vec3  const &other)
-		{
-			D3DXVECTOR3 D3D;
-			D3D.x = other.x;
-			D3D.y = other.y;
-			D3D.z = other.z;
-			return D3D;
-		}
-
-		//new from me calc Veccrossize
-		Vec3 VectorCrossSize(CONST Vec3 *pV1, CONST Vec3 *pV2)
-		{
-			this->x = pV1->y * pV2->z - pV1->z * pV2->y;
-			this->y = pV1->z * pV2->x - pV1->x * pV2->z;
-			this->z = pV1->x * pV2->y - pV1->y * pV2->x;
-			return *this;
-		}
+#include "defind.h"
+#include "enums.h"
 
 
 
-		float Vec3::AimFloat(Vec3 &delta, const float &FOV)
-		{
-			return asinf(this->Dot(delta)) / FOV;
-		}
-
-
-
-
-	};
-
-	class Vec3d
-	{
-	public:
-		union
-		{
-			struct
-			{
-				double x;
-				double y;
-				double z;
-				double w;
-			};
-			double data[4];
-		};
-		double len(void)
-		{
-			return sqrt(x*x + y*y + z*z);
-		}
-		void normalize(void)
-		{
-			double _l = len();
-			this->x /= _l;
-			this->y /= _l;
-			this->z /= _l;
-		}
-	
-		double DistanceToVector(Vec3d const &other)
-		{
-			Vec3d Distance;
-			Distance.x = other.x - this->x;
-			Distance.y = other.y - this->y;
-			Distance.z = other.z - this->z;
-			return sqrt((Distance.x * Distance.x) + (Distance.y * Distance.y) + (Distance.z * Distance.z));
-		}		
-		double VectorLength2()
-		{
-			return sqrt(((this->x)*(this->x)) + ((this->z)*(this->z)));
-		}
-		Vec3d operator - (Vec3d const &other)
-		{
-			Vec3d v;
-			v.x = this->x - other.x;
-			v.y = this->y - other.y;
-			v.z = this->z - other.z;
-			return v;
-		}
-	};
-
-};
-namespace SM = DirectX::SimpleMath;
-namespace eastl
-{
-	class allocator
-	{
-	public:
-		__forceinline allocator()
-		{
-		}
-
-		__forceinline allocator(eastl::allocator *__formal)
-		{
-		}
-
-		__forceinline void set_name(const char *__formal)
-		{
-		}
-
-		__forceinline const char* get_name()
-		{
-			return "EASTL";
-		}
-
-		__forceinline void* allocate(unsigned int n, int flags)
-		{
-			return malloc(n);
-		}
-
-		__forceinline void deallocate(void *p, unsigned int __formal)
-		{
-			free(p);
-		}
-	};
-
-	template <class T>
-	class vector
-	{
-	private:
-		T* m_firstElement;
-		T* m_lastElement;
-		T* m_arrayBound;
-		void* vftable;
-	public:
-		size_t size()
-		{
-			return (((intptr_t)m_lastElement - (intptr_t)m_firstElement) / sizeof(void*));
-		}
-
-		T at(int nIndex)
-		{
-			return *(T*)((intptr_t)m_firstElement + (nIndex * sizeof(T)));
-		}
-		T operator [](int index)
-		{
-			return At(index);
-		}
-	};
-
-	template <class T, INT Count, INT PadSize>
-	class fixed_vector
-	{
-	private:
-		T* m_firstElement;
-		T* m_lastElement;
-		T* m_arrayBound;
-		//LPVOID m_pad[PadSize];
-		T m_data[Count];
-
-	public:
-		fixed_vector() {
-			m_firstElement = (T *)m_data;
-			m_lastElement = (T *)m_data;
-			m_arrayBound = (T *)&m_data[Count];
-		}
-
-		void push_back(T *const value) {
-			if (m_lastElement > m_arrayBound) {
-
-				return;
-			}
-			*m_lastElement = *value;
-			m_lastElement = m_lastElement + 1;
-		};
-
-		void clear() {
-			m_firstElement = m_data;
-			m_lastElement = m_data;
-		}
-
-		UINT Size() {
-			return m_lastElement - m_firstElement;
-		}
-
-		T At(INT nIndex) {
-			return m_firstElement[nIndex];
-		}
-
-		T operator [](INT index) { return At(index); }
-	};
-}
 namespace fb{
 class TestList
 {
@@ -398,7 +50,7 @@ enum BasicTypesEnum
 	kTypeCode_Uint32,
 	kTypeCode_Int64,
 	kTypeCode_Uint64,
-	kTypeCode_Float32,
+	kTypeCode_FLOAT,
 	kTypeCode_Float64,
 	kTypeCode_Guid,
 	kTypeCode_SHA1,
@@ -459,7 +111,7 @@ std::string MemberInfo::GetTypeName()
 	case kTypeCode_Uint32: return "Uint32";
 	case kTypeCode_Int64: return "Int64";
 	case kTypeCode_Uint64: return "Uint64";
-	case kTypeCode_Float32: return "Float32";
+	case kTypeCode_FLOAT: return "FLOAT";
 	case kTypeCode_Float64: return "Float64";
 	case kTypeCode_Guid: return "Guid";
 	case kTypeCode_SHA1: return "SHA1";
@@ -648,98 +300,7 @@ public:
 	virtual TypeInfo* GetType();
 };//Size=0x0008
 // Generated using ReClass 2014
-class DxRenderer;
-class Screen;
-class DxDisplaySettings;
-class GameRenderer;
-class GameRenderSettings;
-class RenderView;
-class BorderInputNode;
-class InputCache;
-class UnneededClass;
-class Keyboard;
-class KeyboardDevice;
-class Mouse;
-class MouseDevice;
-class MouseState;
-class Main;
-class Server;
-class GameSettings;
-class ServerSettings;
-class Client;
-class ClientSettings;
-class FileSystem;
-class GameTimer;
-class GameTimeSettings;
-class ServerJobData;
-class ClientGameContext;
-class GameView;
-class Online;
-class InterpolationManager;
-class PlayerManager;
-class GameTime;
-class Level;
-class HavokPhysicsManager;
-class TerrainPhysicsEntity;
-class Physics;
-class PhysicsSettings;
-class PhysicsRenderSettings;
-class IPhysicsRayCaster;
-class HavokManager;
-class LevelData;
-class Connection;
-class ClientPlayer;
-class VeniceSoldierCustimizationAsset;
-class CustomizationTable;
-class Customization;
-class ClientSoldierEntity;
-class AntAnimatableComponent;
-class GameAnimatable;
-class SoldierWeaponComponent;
-class AnimatedSoldierWeaponHandler;
-class SoldierWeapon;
-class SoldierAimingSimulation;
-class AimAssist;
-class TypeInfo;
-class ClientWeapon;
-class PrimaryFire;
-class FiringFunctionData;
-class ShotConfigData;
-class BulletEntityData;
-class ProjectileEntityData;
-class WeaponSuppressionData;
-class MessProjectileEntityData;
-class SoundAsset;
-class SoundScopeData;
-class SoundScopeStrategyData;
-class OverheatData;
-class WeaponModifier;
-class WeaponFiring;
-class ClientSoldierBodyComponent;
-class RagdollComponent;
-class UpdatePoseResultData;
-class QuatTransform;
-class ParachuteComponent;
-class SpottingComponent;
-class SpottingTargetComponent;
-class VaultComponent;
-class SoldierSuppressionComponent;
-class ClientControllableEntity;
-class HealthComponent;
-class WeaponShotModifier;
-class SoundModifier;
-class FiringEffectsModifier;
-class FiringDataModifier;
-class ProjectileModifier;
-class AimingSimulationModifier;
-class ZeroingModifier;
-class WeaponSway;
-class GunSwayData;
 
-class SoldierAimingSimulationData;
-class ClientSoldierAimingEnvironment;
-class ClientSpottingTargetComponent;
-class ClientVehicleEntity;
 
 class DxRenderer
 {
@@ -1069,7 +630,16 @@ public:
 	char _0x0080[960];
 
 };//Size=0x0440
+class DataContainer
+{
+public:
 
+	static __inline unsigned int ClassId()
+	{
+		return 1398;
+	}
+	char _0x0000[16];
+};//Size=0x0010
 class GameView
 {
 public:
@@ -1091,8 +661,201 @@ public:
 	char _0x0000[64];
 
 };//Size=0x0040
+class GameDataContainer : public DataContainer
+{
+public:
+	
+	static __inline unsigned int ClassId()
+	{
+		return 2154;
+	}
+};//Size=0x0010
+class DataBusPeer : public GameDataContainer
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 2156;
+	}
+	__int32 m_Flags; //0x0010
+	char _0x0014[4];
+};//Size=0x0018
+
+class Asset : public DataContainer
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 1469;
+	}
+	char* m_Name; //0x0010
+};//Size=0x0018
+
+class DataContainerPolicyAsset : public Asset
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 1786;
+	}
+};//Size=0x0018
 
 
+class DataBusData : public Asset
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 1823;
+	}
+	Array<void*> m_PropertyConnections; //0x0018
+	Array<void*> m_LinkConnections; //0x0020
+	void* m_Interface; //0x0028
+	__int16 m_Flags; //0x0030
+	char _0x0032[6];
+};//Size=0x0038
+class EntityBusData : public DataBusData
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 1824;
+	}
+	Array<void*> m_EventConnections; //0x0038
+};//Size=0x0040
+
+class Blueprint : public EntityBusData
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 1825;
+	}
+};//Size=0x0040
+
+class GameObjectData : public DataBusPeer
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 2157;
+	}
+};//Size=0x0018
+class EntityData : public GameObjectData
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 2190;
+	}
+};//Size=0x0018
+
+class ObjectBlueprint : public Blueprint
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 1833;
+	}
+	GameObjectData* m_Object; //0x0040
+};//Size=0x0048
+  
+
+
+
+
+class EffectBlueprint : public ObjectBlueprint
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 1845;
+	}
+};//Size=0x0048
+class CharacterBlueprint : public ObjectBlueprint
+{
+public:
+	
+	static __inline unsigned int ClassId()
+	{
+		return 1839;
+	}
+};//Size=0x0048
+
+class VehicleCustomizationAsset : public DataContainerPolicyAsset
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 1813;
+	}
+	CustomizationTable* m_Customization; //0x0018
+};//Size=0x0020
+
+class CharacterCustomizationAsset : public DataContainerPolicyAsset
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 1816;
+	}
+	UIHudIcon m_UIHudIcon; //0x0018
+	char _0x001C[4];
+	char* m_UIKitIconName; //0x0020
+	char* m_LabelSid; //0x0028
+	CustomizationTable* m_VisualTable; //0x0030
+	CustomizationTable* m_SpecializationTable; //0x0038
+	Array<void*> m_VoiceOverLabels; //0x0040
+};//Size=0x0048
+class TeamAsset : public DataContainerPolicyAsset
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 1811;
+	}
+};//Size=0x0018
+
+class TeamData : public TeamAsset
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 1812;
+	}
+	CharacterBlueprint* m_Soldier; //0x0018
+	FactionId m_Faction; //0x0020
+	char _0x0024[4];
+	Array<CharacterCustomizationAsset*> m_SoldierCustomization; //0x0028
+	Array<VehicleCustomizationAsset*> m_VehicleCustomization; //0x0030
+};//Size=0x0038
+
+class TeamEntityData : public EntityData
+{
+public:
+
+	static __inline unsigned int ClassId()
+	{
+		return 2550;
+	}
+	TeamData* m_Team; //0x0018
+	TeamId m_Id; //0x0020
+	char _0x0024[4];
+};//Size=0x0028
 
 class PlayerManager
 {
@@ -1351,8 +1114,8 @@ public:
 class AxisAlignedBox
 {
 public:
-	SM::Vector4 m_Min; //0x0000 
-	SM::Vector4 m_Max; //0x0010 
+	Vec3 m_Min; //0x0000 
+	Vec3 m_Max; //0x0010 
 
 	AxisAlignedBox()
 	{}
@@ -1482,7 +1245,7 @@ public:
 class ClientVehicleEntity : public ClientControllableEntity
 {
 public:
-	char _0x0188[0XB0];
+	char _0x0188[0XF0];//0x148
 	void* m_pPhysicsEntity;//0x238
 	float m_waterLevel; //0x0240 
 	float m_terrainLevel; //0x0244 
@@ -1495,12 +1258,12 @@ public:
 	Vec3 m_prevVelocity; //0x0290 
 	char _0x029C[312];
 	ClientChassisComponent* m_Chassis; //0x03E0 
-	__forceinline Vec3* getVehicleSpeed()
+	__forceinline Vec3* getVehicleSpeed_ClientChassisComponent()
 	{
 		return (Vec3*)(&this->m_Chassis->m_Velocity);
 	}
-};
-class ClientSoldierEntity 
+};//Size=0x0520
+class ClientSoldierEntity : public ClientControllableEntity
 {
 public:
 	enum ePoseType
@@ -1510,82 +1273,7 @@ public:
 		Pose_Prone
 	};
 
-public:
-	virtual TypeInfo* GetType();
-	virtual void Function1(); //
-	virtual void Function2(); //
-	virtual void Function3(); //
-	virtual void Function4(); //
-	virtual void Function5(); //
-	virtual void Function6(); //
-	virtual void Function7(); //
-	virtual void Function8(); //
-	virtual void Function9(); //
-	virtual void Function10(); //
-	virtual void Function11(); //
-	virtual void Function12(); //
-	virtual void Function13(); //
-	virtual void Function14(); //
-	virtual void Function15(); //
-	virtual void Function16(); //
-	virtual void Function17(); //
-	virtual void Function18(); //
-	virtual void Function19(); //
-	virtual void Function20(); //
-	virtual void Function21(); //
-	virtual void GetAABB(TransformAABBStruct* pAABB);
-	virtual void GetTransform(SM::Matrix* mTransform);
-	virtual void Function24(); //
-	virtual void Function25(); //
-	virtual void Function26(); //
-	virtual void Function27();
-	virtual void Function28(); //
-	virtual void Function29(); //
-	virtual void Function30(); //
-	virtual void Function31(); //
-	virtual void Function32(); //
-	virtual void Function33(); //
-	virtual void Function34(); //
-	virtual void Function35(); //
-	virtual void Function36(); //
-	virtual void Function37(); //
-	virtual void Function38(); //
-	virtual void Function39(); //
-	virtual void Function40(); //
-	virtual void Function41(); //
-	virtual void Function42(); //
-	virtual void Function43(); //
-	virtual void Function44(); //
-	virtual void Function45(); //
-	virtual void Function46(); //
-	virtual void Function47(); //
-	virtual void Function48(); //
-	virtual void Function49(); //
-	virtual void Function50(); //
-	virtual void Function51(); //
-	virtual void Function52(); //
-	virtual void Function53(); //
-	virtual void Function54(); //
-	virtual void Function55(); //
-	virtual void Function56(); //
-	virtual void Function57(); //
-	virtual void Function58(); //
-	virtual void Function59(); //
-	virtual void* GetPhysiscsEntity(); //physics
-	virtual const Vec3 & GetVelocity(); //velocity
-	virtual void Function62(); //
-	virtual void Function63(); //
-	virtual void Function64(); //
-	virtual void Function65(); //
-	virtual void Function66(); //
-	virtual void Function67(); //
-	virtual void Function68(); //
-	virtual void Function69(); //
-	virtual void Function70(); //
-	virtual void Function71(); //
-	virtual void Function72(); //
-	virtual void Function73(); //
-	virtual void Function74(); //
+
 
 
 
@@ -1600,7 +1288,7 @@ public:
 	//char _0x04F8[120];
 
     //vtb
-	char aa[0x1d8];                              //0x00                
+	char aa[0x98];                              //0x00                
 	ClientPlayer*                  m_pPlayer;                  // 0x1E0
 	AntAnimatableComponent* m_pAnimatable; //0x01E8 
 	AntAnimatableComponent* m_pAnimatable2; //0x01F0 
@@ -1809,14 +1497,19 @@ public:
 	float m_OverheatThreshold; //0x005C 
 };//Size=0x0060
 
+
 class ShotConfigData
 {
 public:
-	SM::Vector4 m_PositionOffset; //0x0000 
-	SM::Vector4 m_Direction; //0x0010 
-	SM::Vector4 m_Speed; //0x0020 
-	char _0x0030[32];
-	BulletEntityData* m_ProjectileData; //0x0050 
+	Vec3 m_InitialPosition; //0x0000
+	Vec3 m_InitialDirection; //0x0010
+	Vec3 m_InitialSpeed; //0x0020
+	Array<void*> m_InitialDirectionScaleByPitch; //0x0030
+	Array<void*> m_InitialSpeedScaleByPitch; //0x0038
+	Float32 m_InheritWeaponSpeedAmount; //0x0040
+	char _0x0044[4];
+	void* m_MuzzleExplosion; //0x0048
+	ProjectileEntityData* m_ProjectileData; //0x0050
 	char _0x0058[24];
 	float m_SpawnDelay; //0x0070 
 	__int32 m_BulletsPerShell; //0x0074 
@@ -2395,9 +2088,9 @@ class WeaponShotModifier
 {
 public:
 	char _0x0000[24];
-	__int32 m_NumberOfBulletsPerShell; //0x0018 
+	__int32 m_NumberOfBulletsPerShell; //0x0018
 	char _0x001C[4];
-	SM::Vector3 m_InitialSpeed; //0x0020 
+	Vec3 m_InitialSpeed; //0x0020
 
 };//Size=0x002C
 
@@ -2491,15 +2184,7 @@ public:
 	float m_FirstShotRecoilMultiplier; //0x0444 
 	__int64 m_CamerRecoilData; //0x0448 
 };//Size=0x0450
-enum SpotType
-{
-	SpotType_None = 0,
-	SpotType_Active,
-	SpotType_Passive,
-	SpotType_Radar,
-	SpotType_Unspottable
-	//....
-};
+
 class ClientSpottingTargetComponent
 {
 public:
@@ -2665,7 +2350,7 @@ class SoldierAimingSimulationData
 public:
 	char aGameDataContainer[16]; //+0x00 Inherited
 	ZoomLevelData** m_ZoomLevels; //+0x10
-	bool m_ReturnToZoomAfterReload; //+0x90
+	
 	SoldierAimAssistData* m_AimAssist; //+0x18
 	AimingPoseData m_StandPose; //+0x20
 	AimingPoseData m_CrouchPose; //+0x38
@@ -2677,29 +2362,80 @@ public:
 	float m_AimingRange; //+0x80
 	float m_LockAimToTargetSpeed; //+0x84
 	float m_Modifiers; //+0x88
+	bool m_ReturnToZoomAfterReload; //+0x90
+	char _0x0091[7];
 };
-
-
-
-}
-
-fb::ClientPlayer* GetLocalPlayer()
+class LockingControllerData
 {
-	fb::Main* pMain = fb::Main::GetInstance();
-	if (!POINTERCHK(pMain))
-		return nullptr;
+public:
+	char  a0111[0x10];
+	void* m_ZoomLevelLock; //0x0010
+	FLOAT m_LockTime; //0x0018
+	FLOAT m_UnLockTime; //0x001C
+	FLOAT m_ReleaseTime; //0x0020
+	FLOAT m_ReleaseOnNewTargetTime; //0x0024
+	FLOAT m_SampleRate; //0x0028
+	FLOAT m_HoldStillThreshold; //0x002C
+	FLOAT m_CheckVisibilityLength; //0x0030
+	FLOAT m_RayLength; //0x0034
+	FLOAT m_AcceptanceAngle; //0x0038
+	FLOAT m_AngleConstant; //0x003C
+	FLOAT m_DistanceConstant; //0x0040
+	FLOAT m_Sensitivity; //0x0044
+	FLOAT m_MinimumLockTime; //0x0048
+	char m_LockingWeaponData[0xc]; //0x004C
+	BYTE m_LockOnVisibleTargetsOnly; //0x0058
+	BYTE m_RequireAmmoToLock; //0x0059
+	BYTE m_PositionOnly; //0x005A
+	BYTE m_LockOnWorldSpacePos; //0x005B
+	BYTE m_LockOnEmptyVehicles; //0x005C
+	BYTE m_LockOnCharacters; //0x005D
+	BYTE m_IgnoreHeigthLockDistance; //0x005E
+	BYTE m_LockInCombatAreaOnly; //0x005F
+};//Size=0x0060
+class MissileEntityData
+{
+public:
+	
 
-	fb::Client* pClient = pMain->m_pClient;
-	if (!POINTERCHK(pClient))
-		return nullptr;
+	char a[0x130];
+	void* m_EngineEffect; //0x0130
+	void* m_DudExplosion; //0x0138
+	SoundAsset* m_FlyBySound; //0x0140
+	FLOAT m_EngineStrength; //0x0148
+	FLOAT m_MaxSpeed; //0x014C
+	FLOAT m_EngineTimeToIgnition; //0x0150
+	FLOAT m_EngineTimeToLive; //0x0154
+	FLOAT m_TimeToActivateGuidingSystem; //0x0158
+	FLOAT m_TimeToArm; //0x015C
+	FLOAT m_MaxTurnAngle; //0x0160
+	FLOAT m_MinTurnAngle; //0x0164
+	FLOAT m_TurnAngleMultiplier; //0x0168
+	FLOAT m_Drag; //0x016C
+	FLOAT m_Gravity; //0x0170
+	FLOAT m_FlyBySoundRadius; //0x0174
+	FLOAT m_FlyBySoundSpeed; //0x0178
+	FLOAT m_ImpactImpulse; //0x017C
+	FLOAT m_Damage; //0x0180
+	FLOAT m_DefaultTeam; //0x0184
+	FLOAT m_WarnTarget; //0x0188
+	char _0x018C[4];
+	LockingControllerData* m_LockingController; //0x0190
+	char m_LockableInfo[8]; //0x0198
+	char m_UnguidedData[0x14]; //0x01A0
+	char m_NearTargetDetonation[0x10]; //0x01B4
+	FLOAT m_MaxBankAngle; //0x01C4
+	FLOAT m_BankingSpeed; //0x01C8
+	char _0x01CC[4];
+	void* m_Icon; //0x01D0
+	void* m_TargetIcon; //0x01D8
+	void* m_TargetIconEnemy; //0x01E0
+	FLOAT m_MinGhostFrequency; //0x01E8
+	BYTE m_ApplyGravityWhenGuided; //0x01EC
+	BYTE m_WarnOnPointingMissile; //0x01ED
+	BYTE m_EnableBanking; //0x01EE
+	char _0x01EF[1];
+};//Size=0x01F0
 
-	fb::ClientGameContext* pGameContext = pClient->m_pGameContext;
-	if (!POINTERCHK(pGameContext))
-		return nullptr;
-
-	fb::PlayerManager* pPlayerMngr = pGameContext->m_pPlayerManager;
-	if (!POINTERCHK(pPlayerMngr))
-		return nullptr;
-
-	return pPlayerMngr->m_pLocalPlayer;
 }
+

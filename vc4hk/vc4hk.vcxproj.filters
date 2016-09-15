@@ -30,6 +30,15 @@
     <ClInclude Include="Functions4.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="defind.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="enums.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="structs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -35,21 +35,21 @@ float TimeToHit(fb::Vec3 p, fb::Vec3 v, float s)
 	return t1 < t2 ? t1 : t2;
 
 }
-DWORD  AimCorrection2(fb::Vec3 MyPosition, 
+DWORD  AimCorrection2(fb::Vec3 MyPosition,
 	const fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, fb::Vec3  v1, float Gravity, fb::Vec3* out)
 {
 
 
 	float x, tmp, flPitch, flYaw, time, v0 = sqrt(v1.y*v1.y + v1.z*v1.z);
-	fb::Vec3 Driection, EnemyPosition ;
+	fb::Vec3 Driection, EnemyPosition;
 
-	if(Gravity!=0.f) {
-		
+	if (Gravity != 0.f) {
+
 		EnemyPosition = EnemyP;
 		Gravity = -Gravity;
 
-		
-	
+
+
 		int i = 0;
 
 		flPitch = 0;
@@ -98,33 +98,33 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 		EnemyPosition.z = EnemyP.z + EnemyVelocity.z*time;
 
 		Driection = EnemyPosition - MyPosition;
-	
 
-		
+
+
 	}
 	else {
 
 
-	
-
-
-	time = TimeToHit(EnemyP, EnemyVelocity, v0);
-	if (time < 0)return 0x1;
-
-	fb::Vec3 EnemyPosition, Driection;
-
-	EnemyPosition.x = EnemyP.x + EnemyVelocity.x*time;
-	EnemyPosition.y = EnemyP.y + EnemyVelocity.y*time;
-	EnemyPosition.z = EnemyP.z + EnemyVelocity.z*time;
-
-	Driection = EnemyPosition - MyPosition;
 
 
 
-	flPitch= atan2(Driection.y, Driection.VectorLength2());
+		time = TimeToHit(EnemyP, EnemyVelocity, v0);
+		if (time < 0)return 0x1;
+
+
+
+		EnemyPosition.x = EnemyP.x + EnemyVelocity.x*time;
+		EnemyPosition.y = EnemyP.y + EnemyVelocity.y*time;
+		EnemyPosition.z = EnemyP.z + EnemyVelocity.z*time;
+
+		Driection = EnemyPosition - MyPosition;
+
+
+
+		flPitch = atan2(Driection.y, Driection.VectorLength2());
 
 	}
-	
+
 
 
 
@@ -153,6 +153,28 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 
 	return 0x0;
 }
+
+fb::ClientPlayer* GetLocalPlayer()
+{
+	fb::Main* pMain = fb::Main::GetInstance();
+	if (!POINTERCHK(pMain))
+		return nullptr;
+
+	fb::Client* pClient = pMain->m_pClient;
+	if (!POINTERCHK(pClient))
+		return nullptr;
+
+	fb::ClientGameContext* pGameContext = pClient->m_pGameContext;
+	if (!POINTERCHK(pGameContext))
+		return nullptr;
+
+	fb::PlayerManager* pPlayerMngr = pGameContext->m_pPlayerManager;
+	if (!POINTERCHK(pPlayerMngr))
+		return nullptr;
+
+	return pPlayerMngr->m_pLocalPlayer;
+}
+
 float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb::AimAssist* aimer) {
 
 	float fYawDifference, flPitchDifference;
@@ -168,14 +190,14 @@ float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb:
 	fYawDifference = -atan2(vDir.x, vDir.z);
 
 	if (fYawDifference < 0)fYawDifference = fYawDifference + 6.2831f;
-	
+
 
 	fYawDifference = abs(fYawDifference - aimer->m_AimAngles.x);
 
-	if (m_dist0 <= 5.f && fYawDifference < 3.0f)return 409600.f;else
+	if (m_dist0 <= 5.f && fYawDifference < 3.0f)return 0.00025f; else
 
 
-	if (fYawDifference < 0||fYawDifference > 0.125f || _isnanf(fYawDifference))return -2.f;
+		if (fYawDifference < 0 || fYawDifference > 0.125f || _isnanf(fYawDifference))return -2.f;
 
 
 
@@ -187,7 +209,7 @@ float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb:
 
 	if (flPitchDifference > 1.48350f || flPitchDifference < -1.2217f || _isnanf(flPitchDifference))return -2.f;
 	x = abs(m_dist1*cos(flPitchDifference)*sin(fYawDifference));
-	y= abs(m_dist1*sin(flPitchDifference));
+	y = abs(m_dist1*sin(flPitchDifference));
 	return x*x + y*y;
 }
 
@@ -217,7 +239,7 @@ bool IsAlive(fb::ClientSoldierEntity* pPlayer)
 	fb::HealthComponent* pemeHealthComponent = *((fb::HealthComponent**)((intptr_t)pPlayer + 0x140));
 
 	if (POINTERCHK(pemeHealthComponent)) {
-		if ((pemeHealthComponent->m_Health > 0||_isnanf(pemeHealthComponent->m_Health))) { return true; }
+		if ((pemeHealthComponent->m_Health > 0 || _isnanf(pemeHealthComponent->m_Health))) { return true; }
 		else
 		{
 			return false;
@@ -227,3 +249,35 @@ bool IsAlive(fb::ClientSoldierEntity* pPlayer)
 	return false;
 }
 
+DWORD GetVectorFromeVehicle(fb::ClientPlayer* pLocalPlayer,fb::Vec3* vector) {
+	
+	SM::Matrix* mTransform = nullptr;
+	fb::Vec3  tmp;
+
+	fb::ClientVehicleEntity *veh = pLocalPlayer->GetVehicleEntity();
+	if (!POINTERCHK(veh))return 0x1;
+	veh->GetTransform(mTransform);
+	if (!POINTERCHK(mTransform))return 0x1;
+
+	fb::AxisAlignedBox AABB = *(fb::AxisAlignedBox *) ((intptr_t)veh + 0x250);
+
+
+
+	
+	
+
+	
+	vector->x = mTransform->_41;
+	vector->y = mTransform->_42;
+	vector->z = mTransform->_43;
+	vector->w = 1;
+
+	tmp = (AABB.m_Max + AABB.m_Min)*0.5f;
+
+	vector->x = vector->x + tmp.x*mTransform->_11 + tmp.y*mTransform->_21 + tmp.z*mTransform->_31 + tmp.w*mTransform->_41;
+	vector->y = vector->y + tmp.x*mTransform->_12 + tmp.y*mTransform->_22 + tmp.z*mTransform->_32 + tmp.w*mTransform->_42;
+	vector->z = vector->z + tmp.x*mTransform->_13 + tmp.y*mTransform->_23 + tmp.z*mTransform->_33 + tmp.w*mTransform->_43;
+	
+
+	return 0x0;
+}
