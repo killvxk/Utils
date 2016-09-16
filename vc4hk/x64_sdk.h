@@ -430,7 +430,7 @@ class InputCache
 {
 public:
 	char _0x0000[4];
-	float m_Event[223]; //0x0004 
+	__int32 m_Event[223]; //0x0004 
 };//Size=0x0008
 
 class Keyboard
@@ -1399,9 +1399,9 @@ public:
 		if (!POINTERCHK(m_Handler))
 			return nullptr;
 
-		else   if(m_CurrentWeaponIndex<=7)
+		else   
 			return m_Handler->m_pWeaponList[m_CurrentWeaponIndex];
-		else return nullptr;
+		
 			
 	};
 	int GetSlot()
@@ -1475,7 +1475,7 @@ public:
 	char _0x029C[20];
 	__int32 m_ZoomLevel; //0x02B0 
 
-};//Size=0x02B4
+};//Size=0x0B70
 
 class PrimaryFire
 {
@@ -1552,7 +1552,7 @@ public:
 	WeaponSuppressionData* m_pSuppressionData; //0x00C0 
 	char* m_AmmunitionType; //0x00C8 
 	char _0x00D0[4];
-	__int32 m_HitReactionWeaponType; //0x00D4 
+	AntHitReactionWeaponType m_HitReactionWeaponType; //0x00D4
 	unsigned char m_DetonateOnTimeout; //0x00D8 
 	unsigned char m_ServerProjectileDisabled; //0x00D9 
 	char N0000197A[6]; //0x00DA 

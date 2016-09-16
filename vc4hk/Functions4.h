@@ -195,11 +195,12 @@ float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb:
 	fYawDifference = abs(fYawDifference - aimer->m_AimAngles.x);
 
 	if (m_dist0 <= 5.f && fYawDifference < 3.0f)return 0.00025f; else
+	{
+	
 
+	if (fYawDifference < 0 || fYawDifference > 0.125f || _isnanf(fYawDifference))return -2.f;
 
-		if (fYawDifference < 0 || fYawDifference > 0.125f || _isnanf(fYawDifference))return -2.f;
-
-
+}
 
 	flPitchDifference = atan2(vDir.y, vDir.VectorLength2());
 
@@ -208,8 +209,11 @@ float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb:
 	flPitchDifference = abs(flPitchDifference - aimer->m_AimAngles.y);
 
 	if (flPitchDifference > 1.48350f || flPitchDifference < -1.2217f || _isnanf(flPitchDifference))return -2.f;
+
 	x = abs(m_dist1*cos(flPitchDifference)*sin(fYawDifference));
+
 	y = abs(m_dist1*sin(flPitchDifference));
+
 	return x*x + y*y;
 }
 
@@ -251,12 +255,15 @@ bool IsAlive(fb::ClientSoldierEntity* pPlayer)
 
 DWORD GetVectorFromeVehicle(fb::ClientPlayer* pLocalPlayer,fb::Vec3* vector) {
 	
-	SM::Matrix* mTransform = nullptr;
+	SM::Matrix* mTransform =new SM::Matrix;
 	fb::Vec3  tmp;
 
 	fb::ClientVehicleEntity *veh = pLocalPlayer->GetVehicleEntity();
+
 	if (!POINTERCHK(veh))return 0x1;
+
 	veh->GetTransform(mTransform);
+
 	if (!POINTERCHK(mTransform))return 0x1;
 
 	fb::AxisAlignedBox AABB = *(fb::AxisAlignedBox *) ((intptr_t)veh + 0x250);
@@ -277,7 +284,7 @@ DWORD GetVectorFromeVehicle(fb::ClientPlayer* pLocalPlayer,fb::Vec3* vector) {
 	vector->x = vector->x + tmp.x*mTransform->_11 + tmp.y*mTransform->_21 + tmp.z*mTransform->_31 + tmp.w*mTransform->_41;
 	vector->y = vector->y + tmp.x*mTransform->_12 + tmp.y*mTransform->_22 + tmp.z*mTransform->_32 + tmp.w*mTransform->_42;
 	vector->z = vector->z + tmp.x*mTransform->_13 + tmp.y*mTransform->_23 + tmp.z*mTransform->_33 + tmp.w*mTransform->_43;
-	
+	//vector->w = vector->w + tmp.x*mTransform->_14 + tmp.y*mTransform->_24 + tmp.z*mTransform->_34 + tmp.w*mTransform->_44;
 
 	return 0x0;
 }
