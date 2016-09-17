@@ -39,12 +39,18 @@
     <ClInclude Include="structs.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="poly34.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="vc4hk.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="poly34.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
