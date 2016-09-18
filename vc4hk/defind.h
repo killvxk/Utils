@@ -4369,7 +4369,7 @@ namespace fb
 			if (m_firstElement == NULL)
 				return NULL;
 
-			return *(T*)((DWORD)m_firstElement + (nIndex * sizeof(T)));
+			return *(T*)((intptr_t)m_firstElement + (nIndex * sizeof(T)));
 		};
 
 		T operator [](INT index) { return At(index); }

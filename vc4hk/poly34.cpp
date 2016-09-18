@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 // poly.cpp : solution of cubic and quartic equation
 // (c) Khashin S.I. http://math.ivanovo.ac.ru/dalgebra/Khashin/index.html
 // khash2 (at) gmail.com
@@ -153,9 +153,9 @@ int   SolveP4De(double *x, double b, double c, double d)	// solve equation x^4 +
 		if( c>0 )	// sign = -1
 		{
 			x[0] = -sz3/2;					
-			x[1] = ( sz1 -sz2)/2;		// x[0]±i*x[1]
+			x[1] = ( sz1 -sz2)/2;		// x[0]çœŽ*x[1]
 			x[2] =  sz3/2;
-			x[3] = (-sz1 -sz2)/2;		// x[2]±i*x[3]
+			x[3] = (-sz1 -sz2)/2;		// x[2]çœŽ*x[3]
 			return 0;
 		}
 		// now: c<0 , sign = +1
@@ -167,7 +167,7 @@ int   SolveP4De(double *x, double b, double c, double d)	// solve equation x^4 +
 	} // if( res3>1 )	// 3 real roots, 
 	// now resoventa have 1 real and pair of compex roots
 	// x[0] - real root, and x[0]>0, 
-	// x[1]±i*x[2] - complex roots, 
+	// x[1]çœŽ*x[2] - complex roots, 
 	double sz1 = sqrt(x[0]);
 	double szr, szi;
 	CSqrt(x[1], x[2], szr, szi);  // (szr+i*szi)^2 = x[1]+i*x[2]
@@ -197,8 +197,8 @@ double N4Step(double x, double a,double b,double c,double d)	// one Newton step 
 //-----------------------------------------------------------------------------
 // x - array of size 4
 // return 4: 4 real roots x[0], x[1], x[2], x[3], possible multiple roots
-// return 2: 2 real roots x[0], x[1] and complex x[2]±i*x[3], 
-// return 0: two pair of complex roots: x[0]±i*x[1],  x[2]±i*x[3], 
+// return 2: 2 real roots x[0], x[1] and complex x[2]çœŽ*x[3], 
+// return 0: two pair of complex roots: x[0]çœŽ*x[1],  x[2]çœŽ*x[3], 
 int   SolveP4(double *x,double a,double b,double c,double d) {	// solve equation x^4 + a*x^3 + b*x^2 + c*x + d by Dekart-Euler method
 	// move to a=0:
 	double d1 = d + 0.25*a*( 0.25*b*a - 3./64*a*a*a - c);

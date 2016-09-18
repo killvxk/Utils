@@ -430,7 +430,7 @@ class InputCache
 {
 public:
 	char _0x0000[4];
-	__int32 m_Event[223]; //0x0004 
+	float m_Event[223]; //0x0004 
 };//Size=0x0008
 
 class Keyboard
@@ -619,7 +619,7 @@ public:
 class ClientGameContext
 {
 public:
-	char _0x0000[32];
+	char _0x0000[0x20];
 	GameTime* m_pGameTime; //0x0020 
 	Level* m_pLevel; //0x0028 
 	char _0x0030[48];
@@ -628,7 +628,10 @@ public:
 	GameView* m_pGameView; //0x0070 
 	InterpolationManager* m_pInterpolationManager; //0x0078 
 	char _0x0080[960];
-
+	static ClientGameContext* GetInstance()
+	{
+		return *(ClientGameContext**)OFFSET_CLIENTGAMECONTEXT;
+	}
 };//Size=0x0440
 class DataContainer
 {
@@ -840,7 +843,7 @@ public:
 	CharacterBlueprint* m_Soldier; //0x0018
 	FactionId m_Faction; //0x0020
 	char _0x0024[4];
-	Array<CharacterCustomizationAsset*> m_SoldierCustomization; //0x0028
+	Array<VeniceSoldierCustimizationAsset*> m_SoldierCustomization; //0x0028
 	Array<VehicleCustomizationAsset*> m_VehicleCustomization; //0x0030
 };//Size=0x0038
 
@@ -887,10 +890,11 @@ class Level
 public:
 	char _0x0000[56];
 	LevelData* m_pLevelData; //0x0038 
-	char _0x0040[224];
-	HavokPhysicsManager* m_pHavokPhysics; //0x0120 
+	Array<TeamEntityData *> m_TeamEntity;
+	char _0x0040[216];
+	HavokPhysicsManager* m_pHavokPhysics; 
 	char _0x0128[8];
-	__int64 m_pGameWorld; //0x0130 
+	__int64 m_pGameWorld; 
 
 };//Size=0x0138
 
@@ -1077,18 +1081,18 @@ class CustomizationTable
 {
 public:
 	char _0x0000[16];
-	Customization* m_ppList; //0x0010 
+ Array<	CustomizationUnlockParts*> m_ppList; //0x0010 
 	char _0x0018[40];
 
 };//Size=0x0040
 
-class Customization
+class CustomizationUnlockParts
 {
 public:
 	char _0x0000[16];
-	char* m_pSID; //0x0010 
+	char* m_UICategorySid;//ID_M_SOLDIER_GADGET1
 	char _0x0018[8];
-	__int64 m_ppUnlockParts; //0x0020 
+	intptr_t** m_SelectableUnlocks; //0x0020 
 	char _0x0028[16];
 
 };//Size=0x0038
@@ -1232,7 +1236,36 @@ public:
 	char _0x0104[60];
 	HealthComponent* m_pHealthComp; //0x0140 
 
-	
+	class trashclass
+	{
+	public:
+		ITypedObject* Object; //0x0000
+		char _0x0008[24];
+	};//Size=0x0020
+
+
+
+	ClientSpottingTargetComponent* GetClientSpottingTargetComponent()
+
+	{
+		trashclass* trashclass1 = *((trashclass**)((intptr_t)this + 0x38));
+
+		int obj = 0;
+		while (POINTERCHK(trashclass1[obj].Object))
+		{
+			fb::ClassInfo* pType = (fb::ClassInfo*)trashclass1[obj].Object->GetType();
+
+			if (pType->m_ClassId == 366)
+				return (ClientSpottingTargetComponent*)trashclass1[obj].Object;
+
+			obj++;
+
+
+		}
+
+
+		return nullptr;
+	}
 };//Size=0x0148
 class ClientChassisComponent
 {
@@ -1318,36 +1351,7 @@ public:
 	VaultComponent* m_pVaultComp; //0x0D30 
 	char _0x0D38[1264];
 		
-	class trashclass
-	{
-	public:
-		ITypedObject* Object; //0x0000
-		char _0x0008[24];
-	};//Size=0x0020
 	
-	
-
-	ClientSpottingTargetComponent* GetClientSpottingTargetComponent()
-	
-	{
-		trashclass* trashclass1 = *((trashclass**)((intptr_t)this + 0x38));
-
-		int obj = 0;
-		while (POINTERCHK(trashclass1[obj].Object))
-		{
-			fb::ClassInfo* pType = (fb::ClassInfo*)trashclass1[obj].Object->GetType();
-
-			if (pType->m_ClassId == 366)
-				return (ClientSpottingTargetComponent*)trashclass1[obj].Object;
-
-			obj++;
-
-			
-		}
-
-	
-		return nullptr;
-	}
 
 
 };//Size=0x1228
