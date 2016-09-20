@@ -882,7 +882,7 @@ void _stdcall SoldierWeaponUpgrade()
 
 
 
-	if (iWeaponID != -1 && pBED->m_endDamage > 2.00 && pFFD->m_shot.m_initialSpeed.z > 40.1f) {
+	if (iWeaponID != -1 && pBED->m_endDamage > 2.00f && pFFD->m_shot.m_initialSpeed.z > 40.1f) {
 
 
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#define M_PI 3.14159265359f
+#define M_PI 3.1415926535897932384626433832795f
 
 #include "poly34.h"
 
@@ -11,7 +11,7 @@ char *buffer = new char[0xff];
 std::ofstream log_file(
 	"E:\\log\\hk.log", std::ios_base::out | std::ios_base::trunc);
 
-double findmin(double a[2]) {
+double FindMinPos(double a[2]) {
 	if (a[0] <= 0 && a[1] <= 0)return 0.0;
 
 	else if (a[0] <= 0)return a[1];
@@ -26,22 +26,22 @@ void log(const std::string &text)
 
 	log_file << text << std::endl;
 }
-double findMinPos(double *a, int n) {
+double FindMinPosRoot(double *a, int n) {
 
 	if (n == 2) {
 
-		return findmin(a);
+		return FindMinPos(a);
 
 	}
 	else {
 
 		double tmp[2];
 
-		tmp[0] = findmin(a);
+		tmp[0] = FindMinPos(a);
 
-		tmp[1] = findmin(&(a[2]));
+		tmp[1] = FindMinPos(&(a[2]));
 
-		return findmin(tmp);
+		return FindMinPos(tmp);
 
 	}
 
@@ -50,14 +50,14 @@ double findMinPos(double *a, int n) {
 
 }
 
-double TimeToHit(fb::Vec3 p, fb::Vec3 v, double s)
+double TimeToHit(fb::Vec3 p, fb::Vec3 u, double v_pow2)
 {
-	double a = v.Dot(v) - s*s;
-	double b = 2 * p.Dot(v);
-	double c = p.Dot(p);
+	double a = v_pow2 - u.Dot(u) ;
+	double b = -2 * p.Dot(u);
+	double c =-1* p.Dot(p);
 
 
-	double t1 = 0, t2 = 0;
+	double t0[2] = { 0 };
 
 
 	double de = b*b - 4 * a*c;
@@ -66,22 +66,16 @@ double TimeToHit(fb::Vec3 p, fb::Vec3 v, double s)
 
 	if (de >= 0)
 	{
-		t1 = (-b + sqrt(de)) / (2 * a);
+		t0[0] = (-b + sqrt(de)) / (2 * a);
 
-		t2 = (-b - sqrt(de)) / (2 * a);
+		t0[1] = (-b - sqrt(de)) / (2 * a);
 	}
 	else
 	{
 		return -2.0f;
 	}
 
-	if (t1 <= 0 && t2 <= 0)return -4.f;
-
-	if (t1 <= 0)return t2;
-
-	if (t2 <= 0)return t1;
-
-	return t1 < t2 ? t1 : t2;
+	return FindMinPos(t0);
 
 }
 DWORD  AimCorrection2(fb::Vec3 MyPosition,
@@ -89,11 +83,11 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 {
 
 
-	float flPitch, flYaw, time, v0 = v1.y*v1.y + v1.z*v1.z; //x, tmp,
-	fb::Vec3 Driection, EnemyPosition;
+	float flPitch, flYaw, time, v0_pow2 = v1.y*v1.y + v1.z*v1.z; // x, tmp,
+	fb::Vec3 Driection ;
 
 
-	EnemyPosition = EnemyP;
+	
 
 
 	Driection = EnemyP - MyPosition;
@@ -106,7 +100,9 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 
 
 		GravityVec.x = 0;
-		GravityVec.y = -Gravity;
+
+		GravityVec.y = Gravity;
+
 		GravityVec.z = 0;
 
 
@@ -116,9 +112,11 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 
 		double mmm = 0.25*Gravity*Gravity;
 
-		double a = Driection.Dot(GravityVec) / mmm;
+		double a = -1*EnemyVelocity.Dot(GravityVec) / mmm;
 
-		double b = (Driection.Dot(GravityVec) + EnemyVelocity.Dot(EnemyVelocity) - v0) / mmm;
+		double b = (EnemyVelocity.Dot(EnemyVelocity)- Driection.Dot(GravityVec) - v0_pow2) / mmm;
+			
+			
 
 		double c = (2.0f*(Driection.Dot(EnemyVelocity))) / mmm;
 
@@ -134,7 +132,7 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 
 		else {
 			//sprintf_s(buffer, 0xff, "root:%f,%f,%f,%f", res[0], res[1], res[2], res[3]); log(buffer);
-			time = (float)findMinPos(res, res1);
+			time = (float)FindMinPosRoot(res, res1);
 			//sprintf_s(buffer, 0xff, "time:%f,", time); log(buffer);
 		}
 
@@ -145,13 +143,14 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 
 
 
-		EnemyPosition.x = Driection.x + EnemyVelocity.x*time;
-		EnemyPosition.y = Driection.y + EnemyVelocity.y*time  +0.5f*GravityVec.y*time*time;
-		EnemyPosition.z = Driection.z + EnemyVelocity.z*time;
+		Driection.x = Driection.x + EnemyVelocity.x*time;
+		Driection.y = Driection.y + EnemyVelocity.y*time;
+		Driection.z = Driection.z + EnemyVelocity.z*time;
 
-		Driection = EnemyPosition;
+		
 
-
+		
+		flPitch = asinf((Driection.y - 0.5f*Gravity*time*time) / (time*sqrt(v0_pow2)));
 
 
 		//int i = 0;
@@ -209,21 +208,18 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 	else {
 
 
-
-
-
-		time = (float)TimeToHit(EnemyP, EnemyVelocity, sqrt(v0));
+		time = (float)TimeToHit(Driection, EnemyVelocity, v0_pow2);
 		if (time < 0)return 0x1;
 
 
 
-		EnemyPosition.x = EnemyP.x + EnemyVelocity.x*time;
-		EnemyPosition.y = EnemyP.y + EnemyVelocity.y*time;
-		EnemyPosition.z = EnemyP.z + EnemyVelocity.z*time;
+		Driection.x = Driection.x + EnemyVelocity.x*time;
+		Driection.y = Driection.y + EnemyVelocity.y*time;
+		Driection.z = Driection.z + EnemyVelocity.z*time;
 
-		Driection = EnemyPosition - MyPosition;
+		
 
-
+		flPitch = atan2(Driection.y, Driection.VectorLength2());
 
 
 
@@ -231,9 +227,9 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 
 
 
-	flPitch = atan2(Driection.y, Driection.VectorLength2());
+	
 
-	flPitch = flPitch - atan2(v1.y, v1.z);
+	if(v1.y!=0)flPitch = flPitch - atan2(v1.y, v1.z);
 
 	if (flPitch > 1.48350f || flPitch < -1.2217f || _isnanf(flPitch))return 0x2;
 
@@ -243,10 +239,10 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 
 
 
-	if (flYaw < 0)flYaw = flYaw + 6.2831f;
+	if (flYaw < 0)flYaw = flYaw + 6.283185307179586476925286766559f;
 
 
-	if (flYaw < 0 || flYaw >6.2831f || _isnanf(flYaw))return 0x3;
+	if (flYaw < 0 || flYaw >6.283185307179586476925286766559f || _isnanf(flYaw))return 0x3;
 
 
 
@@ -379,7 +375,7 @@ DWORD GetVectorFromeVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec3* vector) {
 	vector->z = mTransform->_43;
 	vector->w = 1;
 
-	tmp = (AABB.m_Max + AABB.m_Min)*0.5f;
+	tmp = (AABB.m_Max + AABB.m_Min)*0.5f;//Ä£ÐÍ×ø±ê
 
 	vector->x = vector->x + tmp.x*mTransform->_11 + tmp.y*mTransform->_21 + tmp.z*mTransform->_31 + tmp.w*mTransform->_41;
 	vector->y = vector->y + tmp.x*mTransform->_12 + tmp.y*mTransform->_22 + tmp.z*mTransform->_32 + tmp.w*mTransform->_42;
