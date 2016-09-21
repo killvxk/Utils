@@ -237,7 +237,4 @@ _Pvt_Extensions
 
 *.db
 ipch/
-Debug/
 
-/proxydll_9/DEV
-/DEV
