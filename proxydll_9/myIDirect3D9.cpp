@@ -1,4 +1,6 @@
 #include"stdafx.h"
+#include "myIDirect3D9.h"
+#include "myIDirect3DDevice9.h"
 namespace MyInterface {
 #pragma warning(push)
 #define CINTERFACE                  // Windows SDK : BaseTypes.h

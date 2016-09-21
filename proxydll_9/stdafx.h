@@ -9,7 +9,6 @@
 #include <Shlobj.h>
 #include<D3D9.h>
 
-#include "myIDirect3D9.h"
-#include "myIDirect3DDevice9.h"
+
 
 

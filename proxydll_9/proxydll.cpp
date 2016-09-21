@@ -1,5 +1,7 @@
 // proxydll.cpp
 #include "stdafx.h"
+#include "myIDirect3D9.h"
+#include "myIDirect3DDevice9.h"
 #include "proxydll.h"
 // global variables
 #pragma data_seg (".d3d9_shared")
@@ -12,7 +14,7 @@ BYTE 					originalCode[5];
 BYTE* 					originalEP = 0;
 HMODULE dllModule;
 HINSTANCE hExecutableInstance;
-WCHAR *DllPath = new WCHAR[MAX_PATH],
+WCHAR* DllPath = new WCHAR[MAX_PATH],
 *szSystemPath = new WCHAR[MAX_PATH],
 *szSystemDllPath = new WCHAR[MAX_PATH];
 
@@ -48,7 +50,7 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 		hExecutableInstance = GetModuleHandle(NULL); // passing NULL should be safe even with the loader lock being held (according to ReactOS ldr.c)
 		GetModuleFileName(dllModule, DllPath, MAX_PATH);
 
-		WCHAR	*DllName = _tcsrchr(DllPath, '\\');
+		PWCHAR 	DllName = _tcsrchr(DllPath, '\\');
 
 		SHGetKnownFolderPath(FOLDERID_System, 0, NULL, &szSystemPath);
 
@@ -79,8 +81,8 @@ void Redirect(PWCHAR name)
 {
 	
 
-	_tcscpy(szSystemDllPath, szSystemPath);
-	_tcscat(szSystemDllPath, name);
+	wcscpy_s(szSystemDllPath, sizeof(szSystemDllPath),szSystemPath);
+	wcscat_s(szSystemDllPath, sizeof(szSystemDllPath), name);
 
 	//MessageBox(NULL, szSystemDllPath, L"Proxy Dll", MB_ICONWARNING);
 

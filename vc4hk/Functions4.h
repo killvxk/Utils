@@ -206,7 +206,7 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 
 	}
 	else {
-
+		return 0x1;
 
 		time = (float)TimeToHit(Driection, EnemyVelocity, v0_pow2);
 		if (time < 0)return 0x1;
