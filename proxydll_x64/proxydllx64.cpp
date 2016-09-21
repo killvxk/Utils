@@ -127,10 +127,108 @@ void _D3D11CoreCreateDevice() {
  void _EnableFeatureLevelUpgrade() { d3d11.EnableFeatureLevelUpgrade();}
  void _OpenAdapter10() { d3d11.OpenAdapter10();}
  void _OpenAdapter10_2() { d3d11.OpenAdapter10_2();}
+ HRESULT __stdcall mod_D3D11CreateDevice(
+	 _In_opt_        IDXGIAdapter        *pAdapter,
+	 D3D_DRIVER_TYPE     DriverType,
+	 HMODULE             Software,
+	 UINT                Flags,
+	 _In_opt_  D3D_FEATURE_LEVEL   *pFeatureLevels,
+	 UINT                FeatureLevels,
+	 UINT                SDKVersion,
+	 _Out_opt_       ID3D11Device        **ppDevice,
+	 _Out_opt_       D3D_FEATURE_LEVEL   *pFeatureLevel,
+	 _Out_opt_       ID3D11DeviceContext **ppImmediateContext
+ ) {
 
 
 
-void Redirect(PWCHAR);
+
+	 CreateD3D_fn ori_D3D11CreateDevice
+
+		 = (CreateD3D_fn)GetProcAddress(d3d11.dll, "D3D11CreateDevice");
+
+	 HRESULT hr =
+
+		 ori_D3D11CreateDevice(pAdapter, DriverType, Software,
+			 Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice
+			 , pFeatureLevel, ppImmediateContext);
+
+	 //*pFeatureLevel = { D3D_FEATURE_LEVEL_10_1 };
+
+	 return hr;
+	 //d3d11.D3D11CreateDevice = GetProcAddress(d3d11.dll, "D3D11CreateDevice")
+
+ }
+
+
+ void Redirect(PWCHAR name) {
+
+	 PWCHAR DllName = name;
+	 wcscpy_s(szSystemDllPath,sizeof(szSystemDllPath), szSystemPath);
+	 wcscat_s(szSystemDllPath, sizeof(szSystemDllPath), DllName);
+
+	 if (_tcsicmp(DllName + 1, L"d3d11.dll") == NULL) {
+		 d3d11.dll = LoadLibrary(szSystemDllPath);
+
+		 d3d11.D3D11CoreCreateDevice = GetProcAddress(d3d11.dll, "D3D11CoreCreateDevice");
+		 d3d11.D3D11CoreCreateLayeredDevice = GetProcAddress(d3d11.dll, "D3D11CoreCreateLayeredDevice");
+		 d3d11.D3D11CoreGetLayeredDeviceSize = GetProcAddress(d3d11.dll, "D3D11CoreGetLayeredDeviceSize");
+		 d3d11.D3D11CoreRegisterLayers = GetProcAddress(d3d11.dll, "D3D11CoreRegisterLayers");
+		 d3d11.D3D11CreateDevice = (FARPROC)mod_D3D11CreateDevice;
+		 //d3d11.D3D11CreateDevice = GetProcAddress(d3d11.dll, "D3D11CreateDevice");
+		 d3d11.D3D11CreateDeviceAndSwapChain = GetProcAddress(d3d11.dll, "D3D11CreateDeviceAndSwapChain");
+		 d3d11.D3DKMTCloseAdapter = GetProcAddress(d3d11.dll, "D3DKMTCloseAdapter");
+		 d3d11.D3DKMTCreateAllocation = GetProcAddress(d3d11.dll, "D3DKMTCreateAllocation");
+		 d3d11.D3DKMTCreateContext = GetProcAddress(d3d11.dll, "D3DKMTCreateContext");
+		 d3d11.D3DKMTCreateDevice = GetProcAddress(d3d11.dll, "D3DKMTCreateDevice");
+		 d3d11.D3DKMTCreateSynchronizationObject = GetProcAddress(d3d11.dll, "D3DKMTCreateSynchronizationObject");
+		 d3d11.D3DKMTDestroyAllocation = GetProcAddress(d3d11.dll, "D3DKMTDestroyAllocation");
+		 d3d11.D3DKMTDestroyContext = GetProcAddress(d3d11.dll, "D3DKMTDestroyContext");
+		 d3d11.D3DKMTDestroyDevice = GetProcAddress(d3d11.dll, "D3DKMTDestroyDevice");
+		 d3d11.D3DKMTDestroySynchronizationObject = GetProcAddress(d3d11.dll, "D3DKMTDestroySynchronizationObject");
+		 d3d11.D3DKMTEscape = GetProcAddress(d3d11.dll, "D3DKMTEscape");
+		 d3d11.D3DKMTGetContextSchedulingPriority = GetProcAddress(d3d11.dll, "D3DKMTGetContextSchedulingPriority");
+		 d3d11.D3DKMTGetDeviceState = GetProcAddress(d3d11.dll, "D3DKMTGetDeviceState");
+		 d3d11.D3DKMTGetDisplayModeList = GetProcAddress(d3d11.dll, "D3DKMTGetDisplayModeList");
+		 d3d11.D3DKMTGetMultisampleMethodList = GetProcAddress(d3d11.dll, "D3DKMTGetMultisampleMethodList");
+		 d3d11.D3DKMTGetRuntimeData = GetProcAddress(d3d11.dll, "D3DKMTGetRuntimeData");
+		 d3d11.D3DKMTGetSharedPrimaryHandle = GetProcAddress(d3d11.dll, "D3DKMTGetSharedPrimaryHandle");
+		 d3d11.D3DKMTLock = GetProcAddress(d3d11.dll, "D3DKMTLock");
+		 d3d11.D3DKMTOpenAdapterFromHdc = GetProcAddress(d3d11.dll, "D3DKMTOpenAdapterFromHdc");
+		 d3d11.D3DKMTOpenResource = GetProcAddress(d3d11.dll, "D3DKMTOpenResource");
+		 d3d11.D3DKMTPresent = GetProcAddress(d3d11.dll, "D3DKMTPresent");
+		 d3d11.D3DKMTQueryAdapterInfo = GetProcAddress(d3d11.dll, "D3DKMTQueryAdapterInfo");
+		 d3d11.D3DKMTQueryAllocationResidency = GetProcAddress(d3d11.dll, "D3DKMTQueryAllocationResidency");
+		 d3d11.D3DKMTQueryResourceInfo = GetProcAddress(d3d11.dll, "D3DKMTQueryResourceInfo");
+		 d3d11.D3DKMTRender = GetProcAddress(d3d11.dll, "D3DKMTRender");
+		 d3d11.D3DKMTSetAllocationPriority = GetProcAddress(d3d11.dll, "D3DKMTSetAllocationPriority");
+		 d3d11.D3DKMTSetContextSchedulingPriority = GetProcAddress(d3d11.dll, "D3DKMTSetContextSchedulingPriority");
+		 d3d11.D3DKMTSetDisplayMode = GetProcAddress(d3d11.dll, "D3DKMTSetDisplayMode");
+		 d3d11.D3DKMTSetDisplayPrivateDriverFormat = GetProcAddress(d3d11.dll, "D3DKMTSetDisplayPrivateDriverFormat");
+		 d3d11.D3DKMTSetGammaRamp = GetProcAddress(d3d11.dll, "D3DKMTSetGammaRamp");
+		 d3d11.D3DKMTSetVidPnSourceOwner = GetProcAddress(d3d11.dll, "D3DKMTSetVidPnSourceOwner");
+		 d3d11.D3DKMTSignalSynchronizationObject = GetProcAddress(d3d11.dll, "D3DKMTSignalSynchronizationObject");
+		 d3d11.D3DKMTUnlock = GetProcAddress(d3d11.dll, "D3DKMTUnlock");
+		 d3d11.D3DKMTWaitForSynchronizationObject = GetProcAddress(d3d11.dll, "D3DKMTWaitForSynchronizationObject");
+		 d3d11.D3DKMTWaitForVerticalBlankEvent = GetProcAddress(d3d11.dll, "D3DKMTWaitForVerticalBlankEvent");
+		 d3d11.D3DPerformance_BeginEvent = GetProcAddress(d3d11.dll, "D3DPerformance_BeginEvent");
+		 d3d11.D3DPerformance_EndEvent = GetProcAddress(d3d11.dll, "D3DPerformance_EndEvent");
+		 d3d11.D3DPerformance_GetStatus = GetProcAddress(d3d11.dll, "D3DPerformance_GetStatus");
+		 d3d11.D3DPerformance_SetMarker = GetProcAddress(d3d11.dll, "D3DPerformance_SetMarker");
+		 d3d11.EnableFeatureLevelUpgrade = GetProcAddress(d3d11.dll, "EnableFeatureLevelUpgrade");
+		 d3d11.OpenAdapter10 = GetProcAddress(d3d11.dll, "OpenAdapter10");
+		 d3d11.OpenAdapter10_2 = GetProcAddress(d3d11.dll, "OpenAdapter10_2");
+
+	 }
+	 else
+	 {
+		 MessageBox(0, L"This library isn't supported. Try to rename it to d3d8.dll, d3d9.dll, d3d11.dll, winmmbase.dll, msacm32.dll, dinput8.dll, dsound.dll, vorbisFile.dll or ddraw.dll.", L"ASI Loader", MB_ICONERROR);
+		 ExitProcess(0);
+	 }
+
+
+
+ }
 
 void LoadPlugins(PWCHAR dllname)
 {
@@ -173,105 +271,7 @@ BOOL APIENTRY DllMain( HMODULE hInst,
 	return TRUE;
 }
 
-HRESULT __stdcall mod_D3D11CreateDevice(
-	_In_opt_        IDXGIAdapter        *pAdapter,
-	D3D_DRIVER_TYPE     DriverType,
-	HMODULE             Software,
-	UINT                Flags,
-	_In_opt_  D3D_FEATURE_LEVEL   *pFeatureLevels,
-	UINT                FeatureLevels,
-	UINT                SDKVersion,
-	_Out_opt_       ID3D11Device        **ppDevice,
-	_Out_opt_       D3D_FEATURE_LEVEL   *pFeatureLevel,
-	_Out_opt_       ID3D11DeviceContext **ppImmediateContext
-) {
-	
 
 
-
-	CreateD3D_fn ori_D3D11CreateDevice
-
-		= (CreateD3D_fn)GetProcAddress(d3d11.dll, "D3D11CreateDevice");
-
-	HRESULT hr =
-
-		ori_D3D11CreateDevice(pAdapter, DriverType, Software,
-			Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice
-			, pFeatureLevel, ppImmediateContext);
-
-	//*pFeatureLevel = { D3D_FEATURE_LEVEL_10_1 };
-
-	return hr;
-	//d3d11.D3D11CreateDevice = GetProcAddress(d3d11.dll, "D3D11CreateDevice")
-
-}
-void Redirect(PWCHAR name) {
-
-	PWCHAR DllName = name;
-	_tcscpy(szSystemDllPath,szSystemPath);
-	_tcscat(szSystemDllPath,  DllName);
-
-	if (_tcsicmp(DllName + 1, L"d3d11.dll") == NULL) {
-		d3d11.dll = LoadLibrary(szSystemDllPath);
-
-		d3d11.D3D11CoreCreateDevice = GetProcAddress(d3d11.dll, "D3D11CoreCreateDevice");
-		d3d11.D3D11CoreCreateLayeredDevice = GetProcAddress(d3d11.dll, "D3D11CoreCreateLayeredDevice");
-		d3d11.D3D11CoreGetLayeredDeviceSize = GetProcAddress(d3d11.dll, "D3D11CoreGetLayeredDeviceSize");
-		d3d11.D3D11CoreRegisterLayers = GetProcAddress(d3d11.dll, "D3D11CoreRegisterLayers");
-		d3d11.D3D11CreateDevice = (FARPROC)mod_D3D11CreateDevice;
-		//d3d11.D3D11CreateDevice = GetProcAddress(d3d11.dll, "D3D11CreateDevice");
-		d3d11.D3D11CreateDeviceAndSwapChain = GetProcAddress(d3d11.dll, "D3D11CreateDeviceAndSwapChain");
-		d3d11.D3DKMTCloseAdapter = GetProcAddress(d3d11.dll, "D3DKMTCloseAdapter");
-		d3d11.D3DKMTCreateAllocation = GetProcAddress(d3d11.dll, "D3DKMTCreateAllocation");
-		d3d11.D3DKMTCreateContext = GetProcAddress(d3d11.dll, "D3DKMTCreateContext");
-		d3d11.D3DKMTCreateDevice = GetProcAddress(d3d11.dll, "D3DKMTCreateDevice");
-		d3d11.D3DKMTCreateSynchronizationObject = GetProcAddress(d3d11.dll, "D3DKMTCreateSynchronizationObject");
-		d3d11.D3DKMTDestroyAllocation = GetProcAddress(d3d11.dll, "D3DKMTDestroyAllocation");
-		d3d11.D3DKMTDestroyContext = GetProcAddress(d3d11.dll, "D3DKMTDestroyContext");
-		d3d11.D3DKMTDestroyDevice = GetProcAddress(d3d11.dll, "D3DKMTDestroyDevice");
-		d3d11.D3DKMTDestroySynchronizationObject = GetProcAddress(d3d11.dll, "D3DKMTDestroySynchronizationObject");
-		d3d11.D3DKMTEscape = GetProcAddress(d3d11.dll, "D3DKMTEscape");
-		d3d11.D3DKMTGetContextSchedulingPriority = GetProcAddress(d3d11.dll, "D3DKMTGetContextSchedulingPriority");
-		d3d11.D3DKMTGetDeviceState = GetProcAddress(d3d11.dll, "D3DKMTGetDeviceState");
-		d3d11.D3DKMTGetDisplayModeList = GetProcAddress(d3d11.dll, "D3DKMTGetDisplayModeList");
-		d3d11.D3DKMTGetMultisampleMethodList = GetProcAddress(d3d11.dll, "D3DKMTGetMultisampleMethodList");
-		d3d11.D3DKMTGetRuntimeData = GetProcAddress(d3d11.dll, "D3DKMTGetRuntimeData");
-		d3d11.D3DKMTGetSharedPrimaryHandle = GetProcAddress(d3d11.dll, "D3DKMTGetSharedPrimaryHandle");
-		d3d11.D3DKMTLock = GetProcAddress(d3d11.dll, "D3DKMTLock");
-		d3d11.D3DKMTOpenAdapterFromHdc = GetProcAddress(d3d11.dll, "D3DKMTOpenAdapterFromHdc");
-		d3d11.D3DKMTOpenResource = GetProcAddress(d3d11.dll, "D3DKMTOpenResource");
-		d3d11.D3DKMTPresent = GetProcAddress(d3d11.dll, "D3DKMTPresent");
-		d3d11.D3DKMTQueryAdapterInfo = GetProcAddress(d3d11.dll, "D3DKMTQueryAdapterInfo");
-		d3d11.D3DKMTQueryAllocationResidency = GetProcAddress(d3d11.dll, "D3DKMTQueryAllocationResidency");
-		d3d11.D3DKMTQueryResourceInfo = GetProcAddress(d3d11.dll, "D3DKMTQueryResourceInfo");
-		d3d11.D3DKMTRender = GetProcAddress(d3d11.dll, "D3DKMTRender");
-		d3d11.D3DKMTSetAllocationPriority = GetProcAddress(d3d11.dll, "D3DKMTSetAllocationPriority");
-		d3d11.D3DKMTSetContextSchedulingPriority = GetProcAddress(d3d11.dll, "D3DKMTSetContextSchedulingPriority");
-		d3d11.D3DKMTSetDisplayMode = GetProcAddress(d3d11.dll, "D3DKMTSetDisplayMode");
-		d3d11.D3DKMTSetDisplayPrivateDriverFormat = GetProcAddress(d3d11.dll, "D3DKMTSetDisplayPrivateDriverFormat");
-		d3d11.D3DKMTSetGammaRamp = GetProcAddress(d3d11.dll, "D3DKMTSetGammaRamp");
-		d3d11.D3DKMTSetVidPnSourceOwner = GetProcAddress(d3d11.dll, "D3DKMTSetVidPnSourceOwner");
-		d3d11.D3DKMTSignalSynchronizationObject = GetProcAddress(d3d11.dll, "D3DKMTSignalSynchronizationObject");
-		d3d11.D3DKMTUnlock = GetProcAddress(d3d11.dll, "D3DKMTUnlock");
-		d3d11.D3DKMTWaitForSynchronizationObject = GetProcAddress(d3d11.dll, "D3DKMTWaitForSynchronizationObject");
-		d3d11.D3DKMTWaitForVerticalBlankEvent = GetProcAddress(d3d11.dll, "D3DKMTWaitForVerticalBlankEvent");
-		d3d11.D3DPerformance_BeginEvent = GetProcAddress(d3d11.dll, "D3DPerformance_BeginEvent");
-		d3d11.D3DPerformance_EndEvent = GetProcAddress(d3d11.dll, "D3DPerformance_EndEvent");
-		d3d11.D3DPerformance_GetStatus = GetProcAddress(d3d11.dll, "D3DPerformance_GetStatus");
-		d3d11.D3DPerformance_SetMarker = GetProcAddress(d3d11.dll, "D3DPerformance_SetMarker");
-		d3d11.EnableFeatureLevelUpgrade = GetProcAddress(d3d11.dll, "EnableFeatureLevelUpgrade");
-		d3d11.OpenAdapter10 = GetProcAddress(d3d11.dll, "OpenAdapter10");
-		d3d11.OpenAdapter10_2 = GetProcAddress(d3d11.dll, "OpenAdapter10_2");
-
-	}
-	else
-	{
-		MessageBox(0, L"This library isn't supported. Try to rename it to d3d8.dll, d3d9.dll, d3d11.dll, winmmbase.dll, msacm32.dll, dinput8.dll, dsound.dll, vorbisFile.dll or ddraw.dll.", L"ASI Loader", MB_ICONERROR);
-		ExitProcess(0);
-	}
-
-
-
-}
 
 
