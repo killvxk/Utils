@@ -1469,7 +1469,7 @@ public:
 	PrimaryFire* m_pWeaponFiring; //0x0018 
 	WeaponModifier* m_pWeaponModifier; //0x0020 
 	char _0x0028[8];
-	SM::Vector4 m_MoveSpeed; //0x0030 
+	Vec3 m_MoveSpeed; //0x0030 
 	SM::Matrix m_ShootSpace; //0x0040 
 	SM::Matrix m_ShootSpaceIdentity; //0x0080 
 	char _0x00C0[464];

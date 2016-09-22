@@ -1,6 +1,8 @@
 #pragma once
 
 #define M_PI 3.1415926535897932384626433832795f
+#define Twice_PI  6.283185307179586476925286766559f
+#define DegToRad 0.01745329251994329576923690768489f
 
 #include "poly34.h"
 
@@ -83,7 +85,7 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 {
 
 
-	float flPitch, flYaw, time, v0_pow2 = v1.y*v1.y + v1.z*v1.z; // x, tmp,
+	float flPitch, flYaw, time, v0_pow2 =v1.z*v1.z+v1.y+v1.y; // x, tmp,
 	fb::Vec3 Driection ;
 
 
@@ -143,9 +145,8 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 
 
 
-		Driection.x = Driection.x + EnemyVelocity.x*time;
-		Driection.y = Driection.y + EnemyVelocity.y*time;
-		Driection.z = Driection.z + EnemyVelocity.z*time;
+		Driection = Driection + EnemyVelocity*time;
+	
 
 		
 
@@ -239,10 +240,10 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 
 
 
-	if (flYaw < 0)flYaw = flYaw + 6.283185307179586476925286766559f;
+	if (flYaw < 0)flYaw = flYaw + Twice_PI;
 
 
-	if (flYaw < 0 || flYaw >6.283185307179586476925286766559f || _isnanf(flYaw))return 0x3;
+	if (flYaw < 0 || flYaw >Twice_PI || _isnanf(flYaw))return 0x3;
 
 
 
@@ -275,7 +276,8 @@ fb::ClientPlayer* GetLocalPlayer()
 	return pPlayerMngr->m_pLocalPlayer;
 }
 
-float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb::AimAssist* aimer) {
+float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, 
+	const fb::Vec3 vAngle) {
 
 	float fYawDifference, flPitchDifference;
 
@@ -289,10 +291,10 @@ float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb:
 
 	fYawDifference = -atan2(vDir.x, vDir.z);
 
-	if (fYawDifference < 0)fYawDifference = fYawDifference + 6.2831f;
+	if (fYawDifference < 0)fYawDifference = fYawDifference + Twice_PI;
 
 
-	fYawDifference = abs(fYawDifference - aimer->m_AimAngles.x);
+	fYawDifference = abs(fYawDifference - vAngle.x);
 
 	if (m_dist0 <= 5.f && fYawDifference < 3.0f)return 0.00025f; else
 	{
@@ -306,7 +308,7 @@ float DistanceToCrosshair(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition, const fb:
 
 	if (_isnanf(flPitchDifference))return -2.f;
 
-	flPitchDifference = abs(flPitchDifference - aimer->m_AimAngles.y);
+	flPitchDifference = abs(flPitchDifference - vAngle.y);
 
 	if (flPitchDifference > 1.48350f || flPitchDifference < -1.2217f || _isnanf(flPitchDifference))return -2.f;
 
@@ -375,11 +377,11 @@ DWORD GetVectorFromeVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec3* vector) {
 	vector->z = mTransform->_43;
 	vector->w = 1;
 
-	tmp = (AABB.m_Max + AABB.m_Min)*0.5f;//Ä£ÐÍ×ø±ê
+	tmp = (AABB.m_Max + AABB.m_Min)*0.5f;//model martix
 
-	vector->x = vector->x + tmp.x*mTransform->_11 + tmp.y*mTransform->_21 + tmp.z*mTransform->_31 + tmp.w*mTransform->_41;
-	vector->y = vector->y + tmp.x*mTransform->_12 + tmp.y*mTransform->_22 + tmp.z*mTransform->_32 + tmp.w*mTransform->_42;
-	vector->z = vector->z + tmp.x*mTransform->_13 + tmp.y*mTransform->_23 + tmp.z*mTransform->_33 + tmp.w*mTransform->_43;
+	vector->x = vector->x + tmp.x*mTransform->_11 + tmp.y*mTransform->_21 + tmp.z*mTransform->_31  ;
+	vector->y = vector->y + tmp.x*mTransform->_12 + tmp.y*mTransform->_22 + tmp.z*mTransform->_32 ;
+	vector->z = vector->z + tmp.x*mTransform->_13 + tmp.y*mTransform->_23 + tmp.z*mTransform->_33;
 	//vector->w = vector->w + tmp.x*mTransform->_14 + tmp.y*mTransform->_24 + tmp.z*mTransform->_34 + tmp.w*mTransform->_44;
 
 	return 0x0;

@@ -4211,6 +4211,26 @@ namespace fb
 			};
 			FLOAT data[4];
 		};
+		Vec3() : x(0.f), y(0.f), z(0.f), w(0.f) {
+
+
+		}
+
+
+		Vec3(FLOAT x,
+			FLOAT y,
+			FLOAT z,
+			FLOAT w) : x(x),y(y),z(z), w(w) {
+
+
+		}
+
+		Vec3(FLOAT x,
+			FLOAT y,
+			FLOAT z) : x(x), y(y), z(z), w(0.f) {
+
+
+		}
 		void print(char* pthis)
 		{
 			//LOG.Write("%s Vec3 at 0x%.8X: (%5.1f|%5.1f|%5.1f)\n",pthis,this,x,y,z);
@@ -4246,6 +4266,14 @@ namespace fb
 			v.x = this->x + other.x;
 			v.y = this->y + other.y;
 			v.z = this->z + other.z;
+			return v;
+		}
+		Vec3 operator = (SM::Vector3 const &other)
+		{
+			Vec3 v;
+			v.x = other.x;
+			v.y =  other.y;
+			v.z =  other.z;
 			return v;
 		}
 		Vec3 operator - (Vec3 const &other)
