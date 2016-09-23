@@ -2440,6 +2440,36 @@ public:
 	BYTE m_EnableBanking; //0x01EE
 	char _0x01EF[1];
 };//Size=0x01F0
+class CUR_turrent
+{
+public:
+	float m_float_1;                                  //+0x0  (= 500.f)  
+	char a0x41[0x4];                            //+0x4  
+	Vec3 m_playerPos;                          //+0x8  
+	float m_float_2;                                  //+0x18 (= 200.f)  
+	char a0x412[0x4];                                      //+0x1C  
+	float m_body_yaw;                                 //+0x20 ? (Vehicles only)  
+	float m_turret_yaw;                               //+0x24 ? (Vehicles only)  
+	ClientPlayer*                    pPlayer;         //+0x28  
+	ClientSoldierEntity*             pSoldier;        //+0x30  
+	ClientVehicleEntity*             pVehicleEntry;   //+0x38 Only in vehicles at any seat, no gadgets  
+	ClientSoldierWeaponsComponent*   pWeaponComp;     //+0x40  
+	ClientSoldierWeapon*             pCSWeapon;       //+0x48 Current soldier ClientSoldierWeapon
+	WeaponFiring*                    pWeaponFiring;   //+0x50 Current WeaponFiring, NULL in passenger seat.  
+	ClientPlayerEntryComponent*      pEntryComp;      //+0x58 Current soldier\vehicle ClientPlayerEntryComponent  
+	ClientCameraComponent*           pCurVehicleCam;  //+0x60 (Vehicles\Gadgets only, and not in passenger seat with weapon)  
+	void*                            pSomeCameraInfo; //+0x68 (Vehicles\Gadgets only, and not in passenger seat with weapon)  
+	char a418[0x8];                                          //+0x70  
+		SM::Matrix  m_turretTransform;                    //+0x78 ? (Update in vehicles only)  
+		SM::Matrix  m_cameraTransform;                    //+0xB8 ?   
+	Vec3 m_curBodyDegree;                      //+0xF8 (x,y,z [0-360.f]);  
+	bool m_bInitialized;                              //+0x108 (= 1 if we spawned on map at least once)  
 
+public:
+	static CUR_turrent* Singleton()
+	{
+		return (CUR_turrent*)(OFFSET_TURRENT);
+	}
+};
 }
 

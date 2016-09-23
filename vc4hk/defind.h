@@ -16,7 +16,7 @@
 #define OFFSET_CLIENTGAMECONTEXT    0x1424abd20
 #define OFFSET_GAMERENDERER         0x1424ad330
 #define OFFSET_ANTVTABLE 0x141BE80E0
-
+#define OFFSET_TURRENT 0x1421CAE98
 
 
 #define CLASSINFO_CLIENTGRENADEENTITY        0x1428693B0 
@@ -32,7 +32,10 @@
 
 #define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
 #define POINTERCHK(p)  ((p >= (PVOID)0x10000) && (p < _PTR_MAX_VALUE) && (p != nullptr))
-#define PAD(SIZE) char __##SIZE[SIZE]
+
+
+
+
 
 #define Float32 float
 #define Boolean BYTE
@@ -4404,6 +4407,8 @@ namespace fb
 
 		T operator [](INT index) { return At(index); }
 	};
+
+
 
 
 };
