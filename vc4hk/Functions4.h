@@ -86,6 +86,7 @@ DWORD  AimCorrection2(fb::Vec3 MyPosition,
 
 
 	float flPitch, flYaw, time, v0_pow2 =v1.z*v1.z+v1.y+v1.y; // x, tmp,
+
 	fb::Vec3 Driection ;
 
 
