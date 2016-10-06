@@ -8,6 +8,7 @@
 myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
 myIDirect3D9*       gl_pmyIDirect3D9;
 HINSTANCE           gl_hThisInstance;
+HRESULT(WINAPI *o_IDirect3DDevice9_Reset)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 #pragma data_seg ()
 
 BYTE 					originalCode[5];
@@ -22,11 +23,6 @@ WCHAR* DllPath = new WCHAR[MAX_PATH],
 
 void Redirect(PWCHAR);
 BOOL CALLBACK FindHwndFromPID(HWND hwnd, LPARAM lParam);
-void LoadPlugins(PWCHAR dllname)
-{
-	Redirect(dllname);
-}
-
 void InitInstance(HANDLE hModule)
 {
 //	OutputDebugString("PROXYDLL: InitInstance called.\r\n");
@@ -46,21 +42,21 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 	if (reason == DLL_PROCESS_ATTACH)
 	{
 		dllModule = hInst;
+
 		InitInstance(hInst);
+
 		hExecutableInstance = GetModuleHandle(NULL); // passing NULL should be safe even with the loader lock being held (according to ReactOS ldr.c)
+
 		GetModuleFileName(dllModule, DllPath, MAX_PATH);
 
-		PWCHAR 	DllName = _tcsrchr(DllPath, '\\');
+		PWCHAR 	DllName = _tcsrchr(DllPath,'\\');
+		DllName++;
+		
+		
+		GetSystemDirectory(szSystemPath, MAX_PATH);
+	
 
-		SHGetKnownFolderPath(FOLDERID_System, 0, NULL, &szSystemPath);
-
-		//_tcscat(szSystemPath, DllName);
-	//	_tcscat(szSystemDllPath,L"d3d11.dll");
-
-		//int nForceEPHook = GetPrivateProfileInt("globalsets", "forceentrypointhook", 
-		//	FALSE, "scripts\\global.ini");
-
-		LoadPlugins(DllName);
+		Redirect(DllName);
 	}
 	else if (reason == DLL_PROCESS_DETACH)
 	{
@@ -81,12 +77,14 @@ void Redirect(PWCHAR name)
 {
 	
 
-	wcscpy_s(szSystemDllPath, sizeof(szSystemDllPath),szSystemPath);
-	wcscat_s(szSystemDllPath, sizeof(szSystemDllPath), name);
+	wcscpy_s(szSystemDllPath, MAX_PATH,szSystemPath);
 
-	//MessageBox(NULL, szSystemDllPath, L"Proxy Dll", MB_ICONWARNING);
+	wcscat_s(szSystemDllPath, MAX_PATH, L"\\");
 
-	PWCHAR DllName = name+sizeof('\\');
+	wcscat_s(szSystemDllPath, MAX_PATH, name);
+	
+
+	PWCHAR DllName = name;
 
 	if (_tcsicmp(DllName , L"dsound.dll") == NULL) {
 		dsound.dll = LoadLibrary(szSystemDllPath);
@@ -489,17 +487,11 @@ IDirect3D9* WINAPI mod_Direct3DCreate9(UINT SDKVersion)
 	 // looking for the "right d3d9.dll"
 //	MessageBox(NULL, L"OK", L"mod_Direct3DCreate9", MB_ICONWARNING);
 											 // Hooking IDirect3D Object from Original Library
-	typedef IDirect3D9 *(WINAPI* D3D9_Type)(UINT );
+	typedef IDirect3D9 *(WINAPI *D3D9_Type)(UINT );
 
 	D3D9_Type D3DCreate9_fn = (D3D9_Type)GetProcAddress(d3d9.dll, "Direct3DCreate9");
 
-	// Debug
-//	if (!D3DCreate9_fn)
-//{
-	//	::ExitProcess(0); // exit the hard way
-	//}
 
-	// Request pointer from Original Dll. 
 	IDirect3D9 *pIDirect3D9_orig = D3DCreate9_fn(SDKVersion);
 
 	// Create my IDirect3D8 object and store pointer to original object there.
