@@ -65,7 +65,6 @@
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <ImportLibrary>$(OutDir)proxydll.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>

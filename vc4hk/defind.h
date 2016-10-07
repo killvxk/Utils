@@ -33,7 +33,7 @@
 #define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
 #define POINTERCHK(p)  ((p >= (PVOID)0x10000) && (p < _PTR_MAX_VALUE) && (p != nullptr))
 
-
+#define one_pi 0x141A0D8D8
 
 
 

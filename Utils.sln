@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "proxydll", "proxydll\proxyd
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "proxydll_x64", "proxydll_x64\proxydll_x64.vcxproj", "{7435A69C-D696-4CA5-B14B-B316623D7BE5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,18 @@ Global
 		{7435A69C-D696-4CA5-B14B-B316623D7BE5}.Release|x64.ActiveCfg = Release|x64
 		{7435A69C-D696-4CA5-B14B-B316623D7BE5}.Release|x64.Build.0 = Release|x64
 		{7435A69C-D696-4CA5-B14B-B316623D7BE5}.Release|x86.ActiveCfg = Release|x64
+		{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}.Debug|ARM.ActiveCfg = Debug|Win32
+		{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}.Debug|x64.ActiveCfg = Debug|x64
+		{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}.Debug|x64.Build.0 = Debug|x64
+		{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}.Debug|x86.ActiveCfg = Debug|Win32
+		{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}.Debug|x86.Build.0 = Debug|Win32
+		{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}.Release|Any CPU.ActiveCfg = Release|Win32
+		{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}.Release|ARM.ActiveCfg = Release|Win32
+		{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}.Release|x64.ActiveCfg = Release|x64
+		{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}.Release|x64.Build.0 = Release|x64
+		{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}.Release|x86.ActiveCfg = Release|Win32
+		{0F51EBC5-C317-44A2-9B27-883F5B56CBCB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

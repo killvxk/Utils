@@ -19,10 +19,10 @@ namespace MyInterface {
 } 
 
 
+typedef  HRESULT(WINAPI  *_Reset_type)(D3DPRESENT_PARAMETERS*);
+_Reset_type o_Reset;
 
 
-
-extern HRESULT(WINAPI *o_IDirect3DDevice9_Reset)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 
 
 HRESULT(WINAPI *o_IDirect3DDevice9_Present)( const RECT    *pSourceRect,
@@ -38,7 +38,7 @@ HRESULT WINAPI my_IDirect3DDevice9_Present( const RECT    *pSourceRect,
 
 	return o_IDirect3DDevice9_Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 }
-HRESULT WINAPI my_IDirect3DDevice9_Reset(IDirect3DDevice9* p, D3DPRESENT_PARAMETERS* pPresentationParameters) {
+HRESULT WINAPI my_IDirect3DDevice9_Reset( D3DPRESENT_PARAMETERS* pPresentationParameters) {
 
 	
 	//pPresentationParameters->SwapEffect = D3DSWAPEFFECT_FLIP;
@@ -49,7 +49,7 @@ HRESULT WINAPI my_IDirect3DDevice9_Reset(IDirect3DDevice9* p, D3DPRESENT_PARAMET
 
 	
 
-	return o_IDirect3DDevice9_Reset(p,pPresentationParameters);
+	return o_Reset(pPresentationParameters);
 
 
 	
@@ -164,11 +164,7 @@ HRESULT __stdcall myIDirect3D9::GetDeviceCaps(UINT Adapter,D3DDEVTYPE DeviceType
 {
     return(m_pIDirect3D9->GetDeviceCaps(Adapter,DeviceType,pCaps));
 }
-class AbstractClass {
-public:
-	virtual int f() = 0;
-	virtual int g() = 0;
-};
+
 
 
 HMONITOR __stdcall myIDirect3D9::GetAdapterMonitor(UINT Adapter)
@@ -202,11 +198,20 @@ HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter,
 
 	gl_pmyIDirect3DDevice9 = new myIDirect3DDevice9(*ppReturnedDeviceInterface);
 
-	// store our pointer (the fake one) for returning it to the calling progam
+	
 	*ppReturnedDeviceInterface = gl_pmyIDirect3DDevice9;
 	
 
+	//HRESULT(WINAPI IDirect3DDevice9::*o_IDirect3DDevice9_Reset)(D3DPRESENT_PARAMETERS*);
 
+	//o_IDirect3DDevice9_Reset = &IDirect3DDevice9::Reset;
+
+	//void* pReset= reinterpret_cast<void*>(&o_IDirect3DDevice9_Reset);
+
+	//o_Reset = *(_Reset_type)pReset;
+
+	//*(int*)pReset = (int)my_IDirect3DDevice9_Reset;
+	
 	return(hres);
 
 }

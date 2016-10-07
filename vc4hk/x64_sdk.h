@@ -1042,9 +1042,10 @@ public:
 	void*  m_character;	//0x14B0		
 	void* m_weakTokenHolder;//0x14B8
 	ClientControllableEntity* m_pAttachedControllable; //0x14C0 
-	__int64 m_EntryId; //0x14C8 
+	__int32 AttachedEntryId; //0x14C8
+	float wha;
 	ClientSoldierEntity* m_pControlledControllable; //0x14D0 
-
+	__int32 pControlled; //0x14d8
 	ClientSoldierEntity* GetSoldierEntity()
 	{
 		if (this->InVehicle())
@@ -1326,7 +1327,7 @@ public:
 	AntAnimatableComponent* m_pAnimatable; //0x01E8 
 	AntAnimatableComponent* m_pAnimatable2; //0x01F0 
 	char sd[0x378];
-	SoldierWeaponComponent* m_pWeaponComponent; //0x0570 
+	ClientSoldierWeaponsComponent* m_pWeaponComponent; //0x0570 
 	ClientSoldierBodyComponent* m_pBodyComponent; //0x0578 
 	RagdollComponent* m_pRagdollComponent; //0x0580 
 	
@@ -1377,10 +1378,10 @@ public:
 class AnimatedSoldierWeaponHandler
 {
 public:
-	SoldierWeapon* m_pWeaponList[7]; //0x0000 
+	ClientSoldierWeapon* m_pWeaponList[7]; //0x0000 
 };//Size=0x0040
 
-class SoldierWeaponComponent
+class ClientSoldierWeaponsComponent
 {
 public:
 	char _0x0000[208];
@@ -1398,7 +1399,7 @@ public:
 	__int32 m_ZoomLevelMax; //0x0AC4 
 	__int32 m_ZeroingDistanceLevel; //0x0AC8 
 
-	SoldierWeapon* GetActiveSoldierWeapon()
+	ClientSoldierWeapon* GetActiveSoldierWeapon()
 	{
 		if (!POINTERCHK(m_Handler))
 			return nullptr;
@@ -1415,7 +1416,7 @@ public:
 	}
 };//Size=0x0ACC
 
-class SoldierWeapon
+class ClientSoldierWeapon
 {
 public:
 	char _0x0000[18824];
@@ -1466,7 +1467,7 @@ class ClientWeapon
 {
 public:
 	char N000018B4[24]; //0x0000 
-	PrimaryFire* m_pWeaponFiring; //0x0018 
+	WeaponFiringData* m_pWeaponFiring; //0x0018 
 	WeaponModifier* m_pWeaponModifier; //0x0020 
 	char _0x0028[8];
 	Vec3 m_MoveSpeed; //0x0030 
@@ -1481,7 +1482,7 @@ public:
 
 };//Size=0x0B70
 
-class PrimaryFire
+class WeaponFiringData
 {
 public:
 	char _0x0000[16];
@@ -1672,7 +1673,7 @@ public:
 	char _0x0000[120];
 	WeaponSway* m_Sway; //0x0078 
 	char _0x0080[168];
-	PrimaryFire* m_pPrimaryFire; //0x0128 
+	WeaponFiringData* m_pPrimaryFire; //0x0128 
 	char _0x0130[24];
 	__int32 m_WeaponState; //0x0148 
 	__int32 m_LastWeaponState; //0x014C 
@@ -2462,7 +2463,7 @@ public:
 	char a418[0x8];                                          //+0x70  
 		SM::Matrix  m_turretTransform;                    //+0x78 ? (Update in vehicles only)  
 		SM::Matrix  m_cameraTransform;                    //+0xB8 ?   
-	Vec3 m_curBodyDegree;                      //+0xF8 (x,y,z [0-360.f]);  
+	Vec3 m_cameraBodyDegree;                      //+0xF8 (x,y,z [0-360.f]);  
 	bool m_bInitialized;                              //+0x108 (= 1 if we spawned on map at least once)  
 
 public:

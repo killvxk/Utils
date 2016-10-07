@@ -8,7 +8,7 @@
 myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
 myIDirect3D9*       gl_pmyIDirect3D9;
 HINSTANCE           gl_hThisInstance;
-HRESULT(WINAPI *o_IDirect3DDevice9_Reset)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
+
 #pragma data_seg ()
 
 BYTE 					originalCode[5];
@@ -462,8 +462,7 @@ HRESULT WINAPI mod_D3D11CreateDevice(
 		D3D_FEATURE_LEVEL   *,
 		ID3D11DeviceContext **);
 
-	//D3D_FEATURE_LEVEL
-	//	d3d10_1 = { D3D_FEATURE_LEVEL_11_0 };
+
 
 	
 
@@ -475,7 +474,7 @@ HRESULT WINAPI mod_D3D11CreateDevice(
 		Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice
 		, pFeatureLevel, ppImmediateContext);
 
-	//*pFeatureLevel = { D3D_FEATURE_LEVEL_10_1 };
+	
 
 	return hr;
 	//d3d11.D3D11CreateDevice = GetProcAddress(d3d11.dll, "D3D11CreateDevice")

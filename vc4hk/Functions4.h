@@ -10,8 +10,6 @@
 
 
 char *buffer = new char[0xff];
-std::ofstream log_file(
-	"E:\\log\\hk.log", std::ios_base::out | std::ios_base::trunc);
 
 double FindMinPos(double a[2]) {
 	if (a[0] <= 0 && a[1] <= 0)return 0.0;
@@ -23,11 +21,7 @@ double FindMinPos(double a[2]) {
 	else return a[0] < a[1] ? a[0] : a[1];
 }
 
-void log(const std::string &text)
-{
 
-	log_file << text << std::endl;
-}
 double FindMinPosRoot(double *a, int n) {
 
 	if (n == 2) {
