@@ -115,6 +115,10 @@ void logxxx(const std::string &text)
 }
 int main()
 {
-	sprintf_s(buffer, 0xff, "Hook"); logxxx(buffer);
-	log_file.close();
+	LPOSVERSIONINFO mod_lpVersionInfo = new OSVERSIONINFO;
+
+	GetVersionEx(mod_lpVersionInfo);
+	printf_s("dwOSVersionInfoSize=%x\ndwBuildNumber=%x\ndwPlatformId:%x\nszCSDVersion:%ls\n",mod_lpVersionInfo->dwOSVersionInfoSize
+	, mod_lpVersionInfo->dwBuildNumber,
+		mod_lpVersionInfo->dwPlatformId,mod_lpVersionInfo->szCSDVersion);
 }

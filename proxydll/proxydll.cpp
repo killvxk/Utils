@@ -1,5 +1,7 @@
 // proxydll.cpp
 #include "stdafx.h"
+#include <iomanip>
+#include <sstream>
 #include "myIDirect3D9.h"
 #include "myIDirect3DDevice9.h"
 #include "proxydll.h"
@@ -8,7 +10,7 @@
 myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
 myIDirect3D9*       gl_pmyIDirect3D9;
 HINSTANCE           gl_hThisInstance;
-
+LPOSVERSIONINFO mod_lpVersionInfo = new OSVERSIONINFO;
 #pragma data_seg ()
 
 BYTE 					originalCode[5];
@@ -37,41 +39,7 @@ void InitInstance(HANDLE hModule)
 }
 
 
-BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
-{
-	if (reason == DLL_PROCESS_ATTACH)
-	{
-		dllModule = hInst;
 
-		InitInstance(hInst);
-
-		hExecutableInstance = GetModuleHandle(NULL); // passing NULL should be safe even with the loader lock being held (according to ReactOS ldr.c)
-
-		GetModuleFileName(dllModule, DllPath, MAX_PATH);
-
-		PWCHAR 	DllName = _tcsrchr(DllPath,'\\');
-		DllName++;
-		
-		
-		GetSystemDirectory(szSystemPath, MAX_PATH);
-	
-
-		Redirect(DllName);
-	}
-	else if (reason == DLL_PROCESS_DETACH)
-	{
-		FreeLibrary(dsound.dll);
-		FreeLibrary(dinput8.dll);
-		FreeLibrary(ddraw.dll);
-		FreeLibrary(d3d8.dll);
-		FreeLibrary(d3d9.dll);
-		FreeLibrary(d3d11.dll);
-		FreeLibrary(winmmbase.dll);
-		FreeLibrary(msacm32.dll);
-	}
-
-	return TRUE;
-}
 
 void Redirect(PWCHAR name)
 {
@@ -427,7 +395,7 @@ void Redirect(PWCHAR name)
 								else
 								{
 									MessageBox(0, L"This library isn't supported. Try to rename it to d3d8.dll, d3d9.dll, d3d11.dll, winmmbase.dll, msacm32.dll, dinput8.dll, dsound.dll, vorbisFile.dll or ddraw.dll.",
-										L"ASI Loader", MB_ICONERROR);
+										L"ASI Loader", MB_ICONINFORMATION);
 									ExitProcess(0);
 								}
 
@@ -559,5 +527,109 @@ IDirect3D9* WINAPI mod_Direct3DCreate9(UINT SDKVersion)
 //	if (!gl_hOriginalDll)
 //	{
 //
+ BOOL WINAPI hkGetVersionEx(
+	 LPOSVERSIONINFO lpVersionInfo
+) {
+	lpVersionInfo->dwOSVersionInfoSize = mod_lpVersionInfo->dwOSVersionInfoSize;
+	lpVersionInfo->dwMajorVersion = mod_lpVersionInfo->dwMajorVersion;
+
+	lpVersionInfo->dwMinorVersion = mod_lpVersionInfo->dwMinorVersion;
+
+	lpVersionInfo->dwBuildNumber = mod_lpVersionInfo->dwBuildNumber;
+	lpVersionInfo->dwPlatformId = mod_lpVersionInfo->dwPlatformId;
+	for (int i = 0; i < 128; i++) {
+		lpVersionInfo->szCSDVersion[i] = mod_lpVersionInfo->szCSDVersion[i];
+}
+	return TRUE;
+};
 
 
+BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
+{
+	if (reason == DLL_PROCESS_ATTACH)
+	{
+		dllModule = hInst;
+
+		InitInstance(hInst);
+
+		hExecutableInstance = GetModuleHandle(NULL); // passing NULL should be safe even with the loader lock being held (according to ReactOS ldr.c)
+
+		GetModuleFileName(dllModule, DllPath, MAX_PATH);
+
+		PWCHAR 	DllName = _tcsrchr(DllPath, '\\');
+		DllName++;
+
+
+		GetSystemDirectory(szSystemPath, MAX_PATH);
+
+
+		Redirect(DllName);
+
+		////
+		//
+		//	LPVOID IcmpCreateFile = (LPVOID)GetModuleHandle(L"conviction_game.exe");
+
+		////	char Hijack_spoof_1[13] = { '\xb8','\x11','\x00','\x00','\x00','\x89' ,'\x43','\x08' ,'\xe9' ,'\x74' ,'\xff','\xff' ,'\xff' };
+		////	char Hijack_spoof_2[6] = { '\xe9','\x80','\x00','\x00' ,'\x00','\x90'};
+		//
+		////	if (IcmpCreateFile)break;
+		//
+		////ping spoof
+		//	GetVersionExW(mod_lpVersionInfo);
+
+		//if (IcmpCreateFile) {
+
+
+		// IcmpCreateFile = (LPVOID)(GetProcAddress(GetModuleHandleW(L"Kernel32.dll"), "GetVersionExW") );
+
+		// 
+
+		// if (IcmpCreateFile) {
+		//	 DWORD dwOld, dwRelAddr;
+
+		//	
+		//	 BYTE *pAddress = (BYTE *)IcmpCreateFile;
+		//	 dwRelAddr = (DWORD)((DWORD)&hkGetVersionEx - (DWORD)pAddress) - 5;
+
+		//	 VirtualProtect(pAddress, 13, PAGE_EXECUTE_READWRITE, &dwOld);
+		//	 *pAddress = 0xe9;
+		//	 *((DWORD *)(pAddress + 0x1)) = dwRelAddr;
+		//	 //memset((LPVOID)IcmpCreateFile, 0xeb, 1);
+
+		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 1), 0x11, 1);//ping ms
+
+		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 2), 0x00, 3);//
+
+
+
+		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 5), 0x89, 1);
+		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 6), 0x43, 1);
+		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 7), 0x08, 1);
+
+
+		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 8), 0xe9, 1);
+		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 9), 0x74, 1);
+		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 10), 0xff, 3);
+
+
+		//	 VirtualProtect(pAddress, 13, dwOld, NULL);
+		//	 MessageBox(0, L"Hook", L"", NULL);
+		// }
+
+
+		//};
+	}
+	else if (reason == DLL_PROCESS_DETACH)
+	{
+		FreeLibrary(dsound.dll);
+		FreeLibrary(dinput8.dll);
+		FreeLibrary(ddraw.dll);
+		FreeLibrary(d3d8.dll);
+		FreeLibrary(d3d9.dll);
+		FreeLibrary(d3d11.dll);
+		FreeLibrary(winmmbase.dll);
+		FreeLibrary(msacm32.dll);
+	}
+
+	return TRUE;
+}
