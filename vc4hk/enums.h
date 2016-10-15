@@ -1,3 +1,6 @@
+#pragma once
+#ifndef __ENUMS_DEFINE_H__
+#define __ENUMS_DEFINE_H__
 namespace fb {
 
 ////////////////////////////////////////
@@ -8926,3 +8929,4 @@ enum Moments
 
 }
 
+#endif

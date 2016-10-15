@@ -1,6 +1,10 @@
-#include "defind.h"
+#pragma once
+#ifndef __X64_SDK_H__
+#define __X64_SDK_H__
+#include "define.h"
 #include "enums.h"
-
+#include <stdio.h>
+#include <string>
 
 
 namespace fb{
@@ -78,7 +82,7 @@ public:
 
 };//Size=0x0008
 
-BasicTypesEnum MemberInfo::GetTypeCode()
+ inline BasicTypesEnum MemberInfo::GetTypeCode()
 {
 	MemberInfo::MemberInfoData* memberInfoData = GetMemberInfoData();
 	if (memberInfoData)
@@ -88,7 +92,7 @@ BasicTypesEnum MemberInfo::GetTypeCode()
 	return kTypeCode_BasicTypeCount;
 }
 
-std::string MemberInfo::GetTypeName()
+inline std::string MemberInfo::GetTypeName()
 {
 	switch (GetTypeCode())
 	{
@@ -123,7 +127,7 @@ std::string MemberInfo::GetTypeName()
 	}
 }
 
-MemberInfo::MemberInfoData* MemberInfo::GetMemberInfoData()
+inline MemberInfo::MemberInfoData* MemberInfo::GetMemberInfoData()
 {
 	return ((MemberInfoData*)m_InfoData);
 }
@@ -162,7 +166,7 @@ public:
 	}
 };//Size=0x0018
 
-TypeInfo::TypeInfoData* TypeInfo::GetTypeInfoData()
+inline TypeInfo::TypeInfoData* TypeInfo::GetTypeInfoData()
 {
 	return ((TypeInfoData*)m_InfoData);
 }
@@ -194,7 +198,7 @@ public:
 
 };//Size=0x0020
 
-FieldInfo::FieldInfoData* FieldInfo::GetFieldInfoData()
+inline FieldInfo::FieldInfoData* FieldInfo::GetFieldInfoData()
 {
 	return ((FieldInfoData*)m_InfoData);
 }
@@ -229,7 +233,7 @@ public:
 
 };//Size=0x0050
 
-ClassInfo::ClassInfoData* ClassInfo::GetClassInfoData()
+inline ClassInfo::ClassInfoData* ClassInfo::GetClassInfoData()
 {
 	return ((ClassInfoData*)m_InfoData);
 }
@@ -247,7 +251,7 @@ public:
 
 };//Size=0x0018
 
-ArrayTypeInfo::ArrayTypeInfoData* ArrayTypeInfo::GetArrayTypeInfoData()
+inline ArrayTypeInfo::ArrayTypeInfoData* ArrayTypeInfo::GetArrayTypeInfoData()
 {
 	return ((ArrayTypeInfoData*)m_InfoData);
 }
@@ -267,7 +271,7 @@ public:
 
 };//Size=0x0020
 
-EnumFieldInfo::EnumFieldInfoData* EnumFieldInfo::GetEnumInfoData()
+inline EnumFieldInfo::EnumFieldInfoData* EnumFieldInfo::GetEnumInfoData()
 {
 	return ((EnumFieldInfoData*)m_InfoData);
 }
@@ -289,7 +293,7 @@ public:
 
 };//Size=0x0020
 
-ValueTypeInfo::ValueTypeInfoData* ValueTypeInfo::GetValueInfoData()
+inline ValueTypeInfo::ValueTypeInfoData* ValueTypeInfo::GetValueInfoData()
 {
 	return ((ValueTypeInfoData*)m_InfoData);
 }
@@ -2474,3 +2478,4 @@ public:
 };
 }
 
+#endif

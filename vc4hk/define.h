@@ -1,5 +1,6 @@
 #pragma once
-
+#ifndef __CLASS_DEFINE_H__
+#define __CLASS_DEFINE_H__
 
 #define OFFSET_DXRENDERER           0x142572fa0 
 
@@ -31,11 +32,15 @@
 #define DEPLOYED                            0x1421D842E  
 
 #define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
-#define POINTERCHK(p)  ((p >= (PVOID)0x10000) && (p < _PTR_MAX_VALUE) && (p != nullptr))
+#define POINTERCHK(p)  ((p >= (void*)0x10000) && (p < _PTR_MAX_VALUE) && (p != nullptr))
 
 #define one_pi 0x141A0D8D8
 
 
+
+#define M_PI 3.1415926535897932384626433832795f
+#define Twice_PI  6.283185307179586476925286766559f
+#define DegToRad 0.01745329251994329576923690768489f
 
 #define Float32 float
 #define Boolean BYTE
@@ -4040,7 +4045,7 @@ namespace fb {
 	class TypeInfo;
 	class ClientWeapon;
 	class PrimaryFire;
-	class FiringFunctionData;
+
 	class ShotConfigData;
 	class BulletEntityData;
 	class ProjectileEntityData;
@@ -4412,3 +4417,5 @@ namespace fb
 
 
 };
+
+#endif

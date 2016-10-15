@@ -17,25 +17,25 @@
     <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="x64_sdk.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="DXTK\Inc\SimpleMath.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Functions4.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="defind.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="enums.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="structs.h">
+    <ClInclude Include="poly34.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="poly34.h">
+    <ClInclude Include="hkheader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Aimbot.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="define.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="x64_sdk.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,6 +47,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="poly34.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Aimbot.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="hkheader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
