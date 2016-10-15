@@ -15,18 +15,31 @@ Aimbot::Aimbot()
 }
 
 fb::Vec3 * Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer ,fb::ClientWeapon* MyCSW, fb::FiringFunctionData* pFFD,void* pCurVehicleCam) {
+	if (this->v_curAngle == nullptr) {
+
+		v_curAngle = new fb::Vec3;
+
+	}
+
+
+	if (this->vOrigin == nullptr) {
+
+		this->vOrigin = new fb::Vec3;
+
+	}
+
 	if (pLocalPlayer->InVehicle() && POINTERCHK(pCurVehicleCam)) {
 		SM::Vector3 tmp;
 		CUR_turrent* turrent = CUR_turrent::Singleton();
 
 		SM::Matrix mTransform = turrent->m_turretTransform;
 
-		this->v_curAngle.x = -atan2(mTransform._31, mTransform._33);
+		this->v_curAngle->x = -atan2(mTransform._31, mTransform._33);
 
-		if (this->v_curAngle.x < 0) { this->v_curAngle.x = this->v_curAngle.x + Twice_PI; }
+		if (this->v_curAngle->x < 0) { this->v_curAngle->x = this->v_curAngle->x + Twice_PI; }
 
 		tmp = mTransform.Backward();
-		this->v_curAngle.y = atan2(tmp.y, sqrt(tmp.x*tmp.x + tmp.z*tmp.z));
+		this->v_curAngle->y = atan2(tmp.y, sqrt(tmp.x*tmp.x + tmp.z*tmp.z));
 		this->vOrigin->x = mTransform.Translation().x + pFFD->m_ShotConfigData.m_InitialPosition.x;
 		this->vOrigin->y = mTransform.Translation().y + pFFD->m_ShotConfigData.m_InitialPosition.y;
 		this->vOrigin->z = mTransform.Translation().z + pFFD->m_ShotConfigData.m_InitialPosition.z;
@@ -34,11 +47,11 @@ fb::Vec3 * Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer
 	else {
 		SM::Matrix ShootSpaceMat = MyCSW->m_ShootSpace;
 
-		this->v_curAngle.x = -atan2(ShootSpaceMat._31, ShootSpaceMat._33);
+		this->v_curAngle->x = -atan2(ShootSpaceMat._31, ShootSpaceMat._33);
 
-		if (this->v_curAngle.x < 0) { this->v_curAngle.x = this->v_curAngle.x + Twice_PI; }
+		if (this->v_curAngle->x < 0) { this->v_curAngle->x = this->v_curAngle->x + Twice_PI; }
 
-		this->v_curAngle.y = atan2(ShootSpaceMat._32, sqrt(ShootSpaceMat._33* ShootSpaceMat._33 + ShootSpaceMat._31* ShootSpaceMat._31));
+		this->v_curAngle->y = atan2(ShootSpaceMat._32, sqrt(ShootSpaceMat._33* ShootSpaceMat._33 + ShootSpaceMat._31* ShootSpaceMat._31));
 
 		this->vOrigin->x = ShootSpaceMat.Translation().x + pFFD->m_ShotConfigData.m_InitialPosition.x;
 		this->vOrigin->y = ShootSpaceMat.Translation().y + pFFD->m_ShotConfigData.m_InitialPosition.y;
@@ -124,7 +137,7 @@ fb::Vec3 *  Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP , 
 
 			if (!POINTERCHK(Enemyvectmp))continue;
 
-			flScreenDistance = DistanceToAimRay(*vOrigin, *Enemyvectmp, v_curAngle);
+			flScreenDistance = DistanceToAimRay(*vOrigin, *Enemyvectmp, *v_curAngle);
 
 
 			if (flScreenDistance < 0)continue;
