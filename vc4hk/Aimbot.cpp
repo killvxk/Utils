@@ -17,7 +17,7 @@ Aimbot::Aimbot()
 fb::Vec3 * Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer ,fb::ClientWeapon* MyCSW, fb::FiringFunctionData* pFFD,void* pCurVehicleCam) {
 	if (this->v_curAngle == nullptr) {
 
-		v_curAngle = new fb::Vec3;
+		this->v_curAngle = new fb::Vec3;
 
 	}
 
@@ -229,6 +229,8 @@ fb::Vec3 *  Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP , 
 }
 
 void Aimbot::NullTmpVar() {
+	delete ClosestSoldier;
+	delete VecOfClosestSoldier;
 
 	ClosestSoldier = nullptr;
 	VecOfClosestSoldier = nullptr;

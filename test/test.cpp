@@ -107,6 +107,14 @@ char *buffer = new char[0xff];
 std::ofstream log_file(
 	"E:\\log\\hk.log");
 
+extern "C" {
+	void print__ff() {
+
+		printf_s("Call C")
+			;
+	}
+}
+
 
 void logxxx(const std::string &text)
 {
@@ -115,10 +123,5 @@ void logxxx(const std::string &text)
 }
 int main()
 {
-	LPOSVERSIONINFO mod_lpVersionInfo = new OSVERSIONINFO;
-
-	GetVersionEx(mod_lpVersionInfo);
-	printf_s("dwOSVersionInfoSize=%x\ndwBuildNumber=%x\ndwPlatformId:%x\nszCSDVersion:%ls\n",mod_lpVersionInfo->dwOSVersionInfoSize
-	, mod_lpVersionInfo->dwBuildNumber,
-		mod_lpVersionInfo->dwPlatformId,mod_lpVersionInfo->szCSDVersion);
+	print__ff();
 }

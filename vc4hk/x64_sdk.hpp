@@ -1043,13 +1043,20 @@ public:
 	char _0x13D0[0xd0];//0x13d0
 	void* m_soldier;
 	WeakPtr<ClientSoldierEntity> m_corpse;		//0x14A8
-	void*  m_character;	//0x14B0		
+	WeakPtr<ClientSoldierEntity>  m_character;	//0x14B0		
 	void* m_weakTokenHolder;//0x14B8
 	ClientControllableEntity* m_pAttachedControllable; //0x14C0 
 	__int32 AttachedEntryId; //0x14C8
 	float wha;
 	ClientSoldierEntity* m_pControlledControllable; //0x14D0 
-	__int32 pControlled; //0x14d8
+	__int32 pControlledId; //0x14d8
+	char _0x14BC[44];
+	__int64 m_EntryComponent; //0x14E8 fb::ClientPlayerEntryComponent
+	__int64 m_PlayerManager; //0x14F0 
+	void* m_ownPlayerView; //0x14F8 
+	void* m_PlayerView; //0x1500 
+	char _0x1508[24];
+	__int64 m_InputConfiguration; //0x1520 
 	ClientSoldierEntity* GetSoldierEntity()
 	{
 		if (this->InVehicle())
@@ -1238,7 +1245,10 @@ public:
 	__int64 m_Data; //0x0030 
 	char _0x0038[200];
 	float m_Velocity; //0x0100 
-	char _0x0104[60];
+	char _0x104[0xc];//0x0104
+	void * m_entryComponent;//0x110
+		char _0x108[0x38];
+	
 	HealthComponent* m_pHealthComp; //0x0140 
 
 	class trashclass
@@ -1249,8 +1259,8 @@ public:
 	};//Size=0x0020
 
 
-
-	ClientSpottingTargetComponent* GetClientSpottingTargetComponent()
+	template <typename T> 
+	T* GetClientComponentByID(int Id)
 
 	{
 		trashclass* trashclass1 = *((trashclass**)((intptr_t)this + 0x38));
@@ -1260,8 +1270,8 @@ public:
 		{
 			fb::ClassInfo* pType = (fb::ClassInfo*)trashclass1[obj].Object->GetType();
 
-			if (pType->m_ClassId == 366)
-				return (ClientSpottingTargetComponent*)trashclass1[obj].Object;
+			if (pType->m_ClassId == Id)
+				return (T*)trashclass1[obj].Object;
 
 			obj++;
 
@@ -2445,6 +2455,93 @@ public:
 	BYTE m_EnableBanking; //0x01EE
 	char _0x01EF[1];
 };//Size=0x01F0
+class PlayerEntryComponentData
+{
+public:
+	class AntEnumeration
+	{
+	public:
+		char _0x000[0x24];
+		int m_Value; //+0x24
+	};
+	char aEntryComponentData[240]; //+0x00 Inherited
+	Vec3 m_AnimationAccelerationMultiplier; //+0xF0
+	char* m_AntEntryIDStr; //+0x100
+	AntEntryIdEnum m_AntEntryId; //+0x108
+	AntEnumeration m_AntEntryEnumeration; //+0x110
+};
+class ClientPlayerEntryComponent
+{
+public:
+	char _0x000[0x008];
+	intptr_t m_pSomeComponentList;//0x008
+	PlayerEntryComponentData* m_pPlayerEntryComponentData;//0x010;
+	char _0x018[0x270 - 0x018];
+	ClientPlayer* m_pClientPlayer; //0x270
+};//0x640
+class WeaponInfo
+{
+	virtual void WorldTransfrom(D3DXMATRIX&);
+	virtual void GetState(int&);
+	virtual void AddWeaponFiringCallbcks(void*);
+	virtual void RemoveWeaponFiringCallbcks(void*);
+	virtual WeaponFiring* GetWeaponFiring();
+	virtual ClientWeapon* GetWeapon();
+	virtual bool ActiveInStance(int);
+	virtual void* GetWeaponComponent();
+
+	ClientWeaponComponent* m_pWeaponComponent; //0x0008
+
+};
+
+class ClientWeaponComponent
+{
+public:
+	char _0x0000[0x10];
+	WeaponComponentData* m_pComponentData; //0x0010
+	char _0x0018[0x8];
+	ClientPlayerEntryComponent* m_pPlayerEntry; //0x0020
+	char _0x0028[0x28];
+	DynamicPhysicsEntity* m_physicsEntity; //0x0050 Start of WeaponComponent
+	char _0x0008[0x30];
+	void* m_interpolationObject; //0x0088
+	ClientWeapon* m_pWeapon; //0x0090
+	void* m_pController; //0x0098 ClientWeaponComponentSimulation
+	void* m_pReplicatedWeapon; //0x00A0 ClientWeaponComponentReplication
+	void* m_pPredictedWeapon; //0x00A8 ClientWeaponComponentPrediction
+	void* m_pLockingController; //0x00B0 ClientLockingController null
+	void* m_pSecondaryLockingController; //0x00B8 ClientLockingController null
+	ClientPlayer* m_pPlayer; //0x00C0
+	WeaponInfo* m_pWeaponInfo; //0x00C8
+	void** m_pWeaponFiringCallback; //0x00D0
+	void* m_pWeaponMeshModel; //0x00D8 MeshModel null
+	void* m_pFiringEntry; //0x00E0 ClientPlayerEntryComponent
+	char _0x0098[0x18];
+}; //0x00B0
+
+class WeaponComponentData
+{
+public:
+	char _0x0000[0x70];
+	Vec3 m_ProjectileSpawnOffset; //0x0070
+	Vec3 m_TargetPositionOverride; //0x0080
+	void* m_WeaponMesh; //0x0090
+	WeaponFiringData* m_WeaponFiring; //0x0098
+	char* m_pDamageGiverName; //0x00A0
+	void* m_AIData; //0x00A8
+	void* m_CustomWeaponType; //0x00B0
+	float m_ImpulseStrength; //0x00B8
+	DWORD m_Classification; //0x00BC
+	float m_ReloadTimeMultiplier; //0x00C0
+	float m_DamageMultiplier; //0x00C4
+	float m_ExplosionDamageMultiplier; //0x00C8
+	float m_OverheatDropPerSecondMultiplier; //0x00CC
+	float m_LockTimeMultiplier; //0x00D0
+	float m_LockingAcceptanceAngleMultiplier; //0x00D4
+	DWORD m_WeaponItemHash; //0x00D8
+	bool m_SequentialFiring; //0x00DC
+	char _0x00DD[0x3];
+}; //0x00E0
 class CUR_turrent
 {
 public:
