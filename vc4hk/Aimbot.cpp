@@ -3,9 +3,9 @@
 
 #include "Aimbot.h"
 #include "poly34.h"
-#include "x64_sdk.hpp"
+
 #include "hkheader.h"
-using namespace fb;
+
 Aimbot::Aimbot()
 {
 	this->ClosestSoldier = nullptr;
@@ -30,7 +30,7 @@ fb::Vec3 * Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer
 
 	if (pLocalPlayer->InVehicle() && POINTERCHK(pCurVehicleCam)) {
 		SM::Vector3 tmp;
-		CUR_turrent* turrent = CUR_turrent::Singleton();
+		fb::CUR_turrent* turrent = fb::CUR_turrent::Singleton();
 
 		SM::Matrix mTransform = turrent->m_turretTransform;
 

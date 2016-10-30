@@ -1,8 +1,8 @@
 #pragma once
 #ifndef __AIMBOT_H__
 #define __AIMBOT_H__
-#include "x64_sdk.hpp"
-using namespace fb;
+#include "FB_SDK\Frostbite.h"
+
 
 
 

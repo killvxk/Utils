@@ -9,6 +9,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="FB_SDK">
+      <UniqueIdentifier>{25904f8d-a36c-48b7-879b-a214f9b69630}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -32,11 +35,65 @@
     <ClInclude Include="Aimbot.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="define.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="FB_SDK\ClassT.h">
+      <Filter>FB_SDK</Filter>
     </ClInclude>
-    <ClInclude Include="x64_sdk.hpp">
-      <Filter>头文件</Filter>
+    <ClInclude Include="FB_SDK\Client.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\ClientControllableEntity.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\ClientGameContext.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\ClientPlayer.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\DataContainer.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Enumerations.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Frostbite.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Frostbite_Classes.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Includes.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\ITypedObject.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Main.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Mat4.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Offsets.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Server.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Vec2.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Vec3.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Vec3Transform.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Vec4.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\x64_sdk.hpp">
+      <Filter>FB_SDK</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

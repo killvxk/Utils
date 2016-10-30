@@ -1,7 +1,7 @@
 #pragma once
 #ifndef __HK_HEAD_H__
 #define __HK_HEAD_H__
-#include "x64_sdk.hpp"
+#include "FB_SDK\Frostbite.h"
 
 double FindMinPos(double a[2]);
 double FindMinPosRoot(double *a, int n);double TimeToHit(fb::Vec3 p, fb::Vec3 u, double v_pow2);

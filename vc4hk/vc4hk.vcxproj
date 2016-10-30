@@ -46,6 +46,8 @@
       <EnableEnhancedInstructionSet>
       </EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -56,14 +58,32 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Aimbot.h" />
+    <ClInclude Include="FB_SDK\ClassT.h" />
+    <ClInclude Include="FB_SDK\Client.h" />
+    <ClInclude Include="FB_SDK\ClientControllableEntity.h" />
+    <ClInclude Include="FB_SDK\ClientGameContext.h" />
+    <ClInclude Include="FB_SDK\ClientPlayer.h" />
+    <ClInclude Include="FB_SDK\DataContainer.h" />
+    <ClInclude Include="FB_SDK\Enumerations.h" />
+    <ClInclude Include="FB_SDK\Frostbite.h" />
+    <ClInclude Include="FB_SDK\Frostbite_Classes.h" />
+    <ClInclude Include="FB_SDK\Includes.h" />
+    <ClInclude Include="FB_SDK\ITypedObject.h" />
+    <ClInclude Include="FB_SDK\Main.h" />
+    <ClInclude Include="FB_SDK\Mat4.h" />
+    <ClInclude Include="FB_SDK\Offsets.h" />
+    <ClInclude Include="FB_SDK\Server.h" />
+    <ClInclude Include="FB_SDK\Vec2.h" />
+    <ClInclude Include="FB_SDK\Vec3.h" />
+    <ClInclude Include="FB_SDK\Vec3Transform.h" />
+    <ClInclude Include="FB_SDK\Vec4.h" />
+    <ClInclude Include="FB_SDK\x64_sdk.hpp" />
     <ClInclude Include="hkheader.h" />
-    <ClInclude Include="define.h" />
     <ClInclude Include="DXTK\Inc\SimpleMath.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="poly34.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="x64_sdk.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Aimbot.cpp" />
