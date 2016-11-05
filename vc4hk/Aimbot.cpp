@@ -36,7 +36,10 @@ fb::Vec3 * Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer
 
 		this->v_curAngle->x = -atan2(mTransform._31, mTransform._33);
 
-		if (this->v_curAngle->x < 0) { this->v_curAngle->x = this->v_curAngle->x + Twice_PI; }
+		if (this->v_curAngle->x < 0) 
+		{
+			this->v_curAngle->x = this->v_curAngle->x + Twice_PI;
+		}
 
 		tmp = mTransform.Backward();
 		this->v_curAngle->y = atan2(tmp.y, sqrt(tmp.x*tmp.x + tmp.z*tmp.z));
@@ -229,11 +232,10 @@ fb::Vec3 *  Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP , 
 }
 
 void Aimbot::NullTmpVar() {
-	delete ClosestSoldier;
-	delete VecOfClosestSoldier;
-
 	ClosestSoldier = nullptr;
-	VecOfClosestSoldier = nullptr;
+	 VecOfClosestSoldier = nullptr;
+
+	
 };
 DWORD  Aimbot::AimCorrection2(fb::Vec3 MyPosition,
 	fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, fb::Vec3  v1, float Gravity, fb::Vec3* out) {

@@ -68,7 +68,7 @@ namespace fb
 		virtual void Function58(); //
 		virtual void Function59(); //
 		virtual void* GetPhysiscsEntity(); //physics
-		virtual const Vec3 & GetVelocity(); //velocity
+		virtual const Vec3 * GetVelocity(); //velocity
 		virtual void Function62(); //
 		virtual void Function63(); //
 		virtual void Function64(); //
@@ -100,34 +100,46 @@ namespace fb
 		{
 		public:
 			ITypedObject* Object; //0x0000
-			char _0x0008[24];
+			BYTE size;//0x8
+			char a[0x17];//0x9
+			
 		};//Size=0x0020
 
 
-		template <typename T>
-		std::vector<T*>* GetClientComponentByID(int Id)
+	
+		std::vector<void*>* GetClientComponentByID(int Id)
 
 		{
 			trashclass* trashclass1 = *((trashclass**)((intptr_t)this + 0x38));
 
-			int obj_index = 0;
-			std::vector<T*>* vector = new std::vector<T*>;
+			
+			std::vector<void*>* vector = new std::vector<void*>;
 
-			while (POINTERCHK(trashclass1[obj_index].Object))
+			for (int obj_index = 0; obj_index <= trashclass1[0].size;obj_index++) 
+
 			{
+				
+
 				fb::ClassInfo* pType = (fb::ClassInfo*)trashclass1[obj_index].Object->GetType();
+
+				if (POINTERCHK(pType)) {
+
 
 				if (pType->m_ClassId == Id) {
 
-					vector->push_back((T*)trashclass1[obj_index].Object);
+					vector->push_back((void*)(trashclass1[obj_index].Object));
 
 
 				}
-				obj_index++;
+			}
+
+				
+			
 
 
 			}
-			if (POINTERCHK(vector->front())) {
+
+			if (vector->size()>0) {
 				return	vector;
 			}
 			else {

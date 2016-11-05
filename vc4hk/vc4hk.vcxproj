@@ -60,6 +60,8 @@
     <ClInclude Include="Aimbot.h" />
     <ClInclude Include="FB_SDK\ClassT.h" />
     <ClInclude Include="FB_SDK\Client.h" />
+    <ClInclude Include="FB_SDK\ClientChildBarrelComponent.h" />
+    <ClInclude Include="FB_SDK\ClientChildComponent.h" />
     <ClInclude Include="FB_SDK\ClientControllableEntity.h" />
     <ClInclude Include="FB_SDK\ClientGameContext.h" />
     <ClInclude Include="FB_SDK\ClientPlayer.h" />

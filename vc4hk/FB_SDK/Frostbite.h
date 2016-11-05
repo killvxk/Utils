@@ -157,6 +157,8 @@
 //#include "FB_SDK/ClientPlayerView.h"
 //#include "FB_SDK/ClientCameraContext.h"
 //#include "FB_SDK/ClientGameEntity.h"
+#include "FB_SDK/ClientChildBarrelComponent.h"
+#include "FB_SDK/ClientChildComponent.h"
 #include "FB_SDK/ClientPlayer.h"
 //#include "FB_SDK/ClientPhysicsEntity.h"
 #include "FB_SDK/ClientControllableEntity.h"

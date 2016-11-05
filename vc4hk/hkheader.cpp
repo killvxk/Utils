@@ -121,10 +121,10 @@ DWORD GetVectorFromeVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec3* vector) {
 bool IsAlive(fb::ClientControllableEntity* pPlayer)
 {
 
-	fb::HealthComponent* pemeHealthComponent = *((fb::HealthComponent**)((intptr_t)pPlayer + 0x140));
+	fb::HealthComponent* pEmeHealthComponent = *((fb::HealthComponent**)((intptr_t)pPlayer + 0x140));
 
-	if (POINTERCHK(pemeHealthComponent)) {
-		if ((pemeHealthComponent->m_Health > 0 || _isnanf(pemeHealthComponent->m_Health))) { return true; }
+	if (POINTERCHK(pEmeHealthComponent)) {
+		if (pEmeHealthComponent->m_Health > 0 ) { return true; }
 		else
 		{
 			return false;
@@ -139,15 +139,15 @@ bool IsAlive(fb::ClientControllableEntity* pPlayer)
 fb::Vec3 getVehicleSpeed(fb::ClientSoldierEntity * soldier)
 {
 	fb::Vec3 tempvec;
-	if (soldier->m_pPlayer->m_pAttachedControllable)
+	tempvec.x = 0.0f;
+	tempvec.y = 0.0f;
+	tempvec.z = 0.0f;
+	if (POINTERCHK(soldier->m_pPlayer->GetVehicleEntity()))
 	{
-		tempvec = soldier->m_pPlayer->GetVehicleEntity()->GetVelocity();
+		if (POINTERCHK(soldier->m_pPlayer->GetVehicleEntity()->GetVelocity()))
+			tempvec = *soldier->m_pPlayer->GetVehicleEntity()->GetVelocity();
 	}
-	else {
-		tempvec.x = 0.0f;
-		tempvec.y = 0.0f;
-		tempvec.z = 0.0f;
-	}
+	
 	return tempvec;
 }
 float DistanceToAimRay(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition,

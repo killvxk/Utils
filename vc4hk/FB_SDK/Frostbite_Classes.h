@@ -4042,6 +4042,10 @@ namespace fb {
 	class ClientVehicleEntity;
 	class EffectBlueprint;
 
+	class ClassInfo;
+	class TypeInfo;
+	class MemberInfo;
+
 };
 
 
