@@ -764,7 +764,8 @@ namespace fb {
 		ClientChassisComponent* m_Chassis; //0x03E0 
 		__forceinline Vec3 getVehicleSpeed()
 		{
-			return (Vec3)(this->m_Velocity);
+			if (POINTERCHK(this->m_Chassis))return this->m_Chassis->m_Velocity;
+			else	return (this->m_Velocity);
 		}
 	};//Size=0x0520
 	class ClientSoldierEntity : public ClientControllableEntity

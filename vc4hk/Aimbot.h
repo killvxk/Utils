@@ -26,7 +26,8 @@ public:
 	bool bAimHead;
 	fb::ClientSoldierEntity* LockOn_pEnemySoldier;
 	int LockOnEnemyFlags;
-	fb::ClientSoldierEntity* ClosestSoldier;
+	fb::ClientSoldierEntity* mp_ClosestSoldier;
+	fb::ClientPlayer* mp_ClosestPlayer;
 	fb::Vec3 * VecOfClosestSoldier;
 
 private:

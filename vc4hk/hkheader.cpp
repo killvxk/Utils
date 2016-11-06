@@ -142,10 +142,18 @@ fb::Vec3 getVehicleSpeed(fb::ClientSoldierEntity * soldier)
 	tempvec.x = 0.0f;
 	tempvec.y = 0.0f;
 	tempvec.z = 0.0f;
-	if (POINTERCHK(soldier->m_pPlayer->GetVehicleEntity()))
+	fb::ClientPlayer* p_ClientPlayer = soldier->m_pPlayer;
+	if (POINTERCHK(p_ClientPlayer))
 	{
-		if (POINTERCHK(soldier->m_pPlayer->GetVehicleEntity()->GetVelocity()))
-			tempvec = *soldier->m_pPlayer->GetVehicleEntity()->GetVelocity();
+		fb::ClientVehicleEntity* p_veh = (fb::ClientVehicleEntity*)soldier->m_pPlayer ->m_pAttachedControllable;
+
+
+		if (POINTERCHK(p_veh)) {
+			tempvec = p_veh->getVehicleSpeed();
+		
+
+	}
+
 	}
 	
 	return tempvec;

@@ -8,7 +8,7 @@
 
 Aimbot::Aimbot()
 {
-	this->ClosestSoldier = nullptr;
+	this->mp_ClosestSoldier = nullptr;
 	this->bAimHead = false;
 	this->LockOnEnemyFlags = 0;
 	this->LockOn_pEnemySoldier = nullptr;
@@ -151,8 +151,8 @@ fb::Vec3 *  Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP , 
 			if (flScreenDistance < closestdistance)
 			{
 				closestdistance = flScreenDistance;
-				ClosestSoldier = pEnemySoldier;
-			
+				mp_ClosestSoldier = pEnemySoldier;
+				mp_ClosestPlayer = pClientPlayer;
 				VecOfClosestSoldier = Enemyvectmp;
 
 			}
@@ -217,8 +217,8 @@ fb::Vec3 *  Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP , 
 		}
 
 		if (!POINTERCHK(Enemyvectmp))	return nullptr;
-
-		ClosestSoldier = pEnemySoldier;
+		mp_ClosestPlayer = pClientPlayer;
+		mp_ClosestSoldier = pEnemySoldier;
 		VecOfClosestSoldier = Enemyvectmp;
 
 	}
@@ -232,9 +232,9 @@ fb::Vec3 *  Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP , 
 }
 
 void Aimbot::NullTmpVar() {
-	delete ClosestSoldier;
-	delete VecOfClosestSoldier;
-	ClosestSoldier = nullptr;
+
+	mp_ClosestPlayer = nullptr;
+	mp_ClosestSoldier = nullptr;
 	 VecOfClosestSoldier = nullptr;
 
 	

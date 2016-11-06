@@ -68,7 +68,7 @@ namespace fb
 		virtual void Function58(); //
 		virtual void Function59(); //
 		virtual void* GetPhysiscsEntity(); //physics
-		virtual const Vec3 * GetVelocity(); //velocity
+		virtual Vec3 * GetVelocity(); //velocity
 		virtual void Function62(); //
 		virtual void Function63(); //
 		virtual void Function64(); //
@@ -110,7 +110,7 @@ namespace fb
 
 
 	
-		std::vector<void*>* GetClientComponentByID(int Id)
+		std::vector<void*>* GetClientComponentByID(int Id,bool CheckUnderUsing)
 
 		{
 			void* offset = *((void**)((intptr_t)this + 0x38));
@@ -122,15 +122,16 @@ namespace fb
 
 			std::vector<void*>* vector = new std::vector<void*>;
 
-			for (int obj_index = 0; obj_index <size;obj_index++) 
+			for (int obj_index = 0; obj_index < size; obj_index++)
 
 			{
+				if (CheckUnderUsing	) {
 				__int32 flag = trashclass1[obj_index].flags >> 0xA;
 
 				flag = flag & trashclass1[obj_index].flags;
 
-				if (!(flag&0x2))continue;
-
+				if (!(flag & 0x2))continue;
+			}
 				fb::ClassInfo* pType = (fb::ClassInfo*)trashclass1[obj_index].Object->GetType();
 
 				if (POINTERCHK(pType)) {
