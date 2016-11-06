@@ -2014,68 +2014,11 @@ namespace fb {
 		char _0x00DD[0x3];
 	}; //0x00E0
 
-	class MovingBodyData : public DataContainer
-	{
-		//public:
-		//    static __inline MovingBodyData* DefaultInstance()
-		//    {
-		//        return (MovingBodyData*) 0x0000000069AEDB30;
-		//    }
-		//    static __inline unsigned int ClassId()
-		//    {
-		//        return 2008;
-		//    }
-		Float32 m_Mass; //0x0010
-		Float32 m_Inertia; //0x0014
-	};//Size=0x0018
 
-	class ExtendedConstraintsData : public DataContainer
-	{
-		//public:
-		//    static __inline ExtendedConstraintsData* DefaultInstance()
-		//    {
-		//        return (ExtendedConstraintsData*) 0x0000000069B27880;
-		//    }
-		//    static __inline unsigned int ClassId()
-		//    {
-		//        return 3810;
-		//    }
-		Float32 m_Heading; //0x0010
-		Float32 m_Width; //0x0014
-		Float32 m_Falloff; //0x0018
-		Float32 m_AngularConstraintMin; //0x001C
-		Float32 m_AngularConstraintMax; //0x0020
-		char _0x0024[4];
-	};//Size=0x0028
 
-	class RotationBodyData : public MovingBodyData
-	{
-		//public:
-		//    static __inline RotationBodyData* DefaultInstance()
-		//    {
-		//        return (RotationBodyData*) 0x0000000069AEDC80;
-		//    }
-		//    static __inline unsigned int ClassId()
-		//    {
-		//        return 2011;
-		//    }
-		Float32 m_AngularMomentumMultiplier; //0x0018
-		Float32 m_AngularMomentumThreshold; //0x001C
-		Float32 m_AngularMomentumDamping; //0x0020
-		Float32 m_AngularMomentumDampingAcc; //0x0024
-		Float32 m_AngularMomentumDampingDeacc; //0x0028
-		Float32 m_AngularConstraintMin; //0x002C
-		Float32 m_AngularConstraintMax; //0x0030
-		Int32 m_RotationAxis; //0x0034
-		ExtendedConstraintsData* m_ExtendedConstraints; //0x0038
-		Boolean m_UsePostSatisfyConstraints; //0x0040
-		Boolean m_UseAngularMomentumThreshold; //0x0041
-		Boolean m_UseAngularMomentumDamping; //0x0042
-		Boolean m_UseAngularConstraint; //0x0043
-		char _0x0044[4];
-	};//Size=0x0048
+	
 
-	class CUR_turrent
+	class MainVarPtr
 	{
 	public:
 		float m_float_1;                                  //+0x0  (= 500.f)  
@@ -2101,9 +2044,9 @@ namespace fb {
 		bool m_bInitialized;                              //+0x108 (= 1 if we spawned on map at least once)  
 
 	public:
-		static CUR_turrent* Singleton()
+		static MainVarPtr* Singleton()
 		{
-			return (CUR_turrent*)(OFFSET_TURRENT);
+			return (MainVarPtr*)(OFFSET_TURRENT);
 		}
 	};
 }

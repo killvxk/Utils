@@ -30,7 +30,7 @@ fb::Vec3 * Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer
 
 	if (pLocalPlayer->InVehicle() && POINTERCHK(pCurVehicleCam)) {
 		SM::Vector3 tmp;
-		fb::CUR_turrent* turrent = fb::CUR_turrent::Singleton();
+		fb::MainVarPtr* turrent = fb::MainVarPtr::Singleton();
 
 		SM::Matrix mTransform = turrent->m_turretTransform;
 
@@ -232,6 +232,8 @@ fb::Vec3 *  Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP , 
 }
 
 void Aimbot::NullTmpVar() {
+	delete ClosestSoldier;
+	delete VecOfClosestSoldier;
 	ClosestSoldier = nullptr;
 	 VecOfClosestSoldier = nullptr;
 

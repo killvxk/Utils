@@ -96,12 +96,15 @@ namespace fb
 
 		HealthComponent* m_pHealthComp; //0x0140 
 
-		class trashclass
+		class CompTuple
 		{
 		public:
+			__int64 a;
+			__int32 flags;
+			__int32 cc;
 			ITypedObject* Object; //0x0000
-			BYTE size;//0x8
-			char a[0x17];//0x9
+			char b[0x8];
+			
 			
 		};//Size=0x0020
 
@@ -110,15 +113,23 @@ namespace fb
 		std::vector<void*>* GetClientComponentByID(int Id)
 
 		{
-			trashclass* trashclass1 = *((trashclass**)((intptr_t)this + 0x38));
+			void* offset = *((void**)((intptr_t)this + 0x38));
 
-			
+
+			int size = *(BYTE*)((intptr_t)offset + 0x8);
+
+				CompTuple* trashclass1 = (CompTuple*)((intptr_t)offset + 0x10);
+
 			std::vector<void*>* vector = new std::vector<void*>;
 
-			for (int obj_index = 0; obj_index <= trashclass1[0].size;obj_index++) 
+			for (int obj_index = 0; obj_index <size;obj_index++) 
 
 			{
-				
+				__int32 flag = trashclass1[obj_index].flags >> 0xA;
+
+				flag = flag & trashclass1[obj_index].flags;
+
+				if (!(flag&0x2))continue;
 
 				fb::ClassInfo* pType = (fb::ClassInfo*)trashclass1[obj_index].Object->GetType();
 
