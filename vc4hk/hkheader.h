@@ -14,14 +14,14 @@ struct VehcileAimingData {
 
 
 double FindMinPos(double a[2]);
-double FindMinPosRoot(double *a, int n);double TimeToHit(fb::Vec3 p, fb::Vec3 u, double v_pow2);
+double FindMinPosRoot(double *a, int n);double TimeToHit(fb::Vec4 p, fb::Vec4 u, double v_pow2);
 bool MinRealRootOfQuarticFunction(double a, double b, double c, double d, double e, double& root);
 
 
 
-float DistanceToAimRay(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition,
-	const fb::Vec3 vAngle);
-fb::Vec3 getVehicleSpeed(fb::ClientSoldierEntity * soldier);
+float DistanceToAimRay(fb::Vec4 MyPosition, fb::Vec4 EnemyPosition,
+	const fb::Vec4 vAngle);
+fb::Vec4 getVehicleSpeed(fb::ClientSoldierEntity * soldier);
 bool IsAlive(fb::ClientControllableEntity* pPlayer);
-DWORD GetVectorFromeVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec3* vector);
+DWORD GetVectorFromVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec4* vector);
 #endif 

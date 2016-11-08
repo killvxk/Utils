@@ -39,7 +39,7 @@ double FindMinPosRoot(double *a, int n) {
 
 }
 
-double TimeToHit(fb::Vec3 p, fb::Vec3 u, double v_pow2)
+double TimeToHit(fb::Vec4 p, fb::Vec4 u, double v_pow2)
 {
 	double a = v_pow2 - u.Dot(u);
 	double b = -2 * p.Dot(u);
@@ -85,10 +85,10 @@ bool MinRealRootOfQuarticFunction(double a, double b, double c, double d, double
 
 }
 
-DWORD GetVectorFromeVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec3* vector) {
+DWORD GetVectorFromVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec4* vector) {
 
 	SM::Matrix* mTransform = new SM::Matrix;
-	fb::Vec3  tmp;
+	fb::Vec4  tmp;
 
 	fb::ClientVehicleEntity *veh = pLocalPlayer->GetVehicleEntity();
 
@@ -105,7 +105,7 @@ DWORD GetVectorFromeVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec3* vector) {
 	vector->x = mTransform->_41;
 	vector->y = mTransform->_42;
 	vector->z = mTransform->_43;
-	vector->w = 1;
+	vector->w = 0.f;
 
 	tmp = (AABB.m_Max + AABB.m_Min)*0.5f;//model martix
 
@@ -113,7 +113,7 @@ DWORD GetVectorFromeVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec3* vector) {
 	vector->y = vector->y + tmp.x*mTransform->_12 + tmp.y*mTransform->_22 + tmp.z*mTransform->_32;
 	vector->z = vector->z + tmp.x*mTransform->_13 + tmp.y*mTransform->_23 + tmp.z*mTransform->_33;
 	//vector->w = vector->w + tmp.x*mTransform->_14 + tmp.y*mTransform->_24 + tmp.z*mTransform->_34 + tmp.w*mTransform->_44;
-
+	delete mTransform;
 	return 0x0;
 }
 
@@ -136,9 +136,9 @@ bool IsAlive(fb::ClientControllableEntity* pPlayer)
 
 
 
-fb::Vec3 getVehicleSpeed(fb::ClientSoldierEntity * soldier)
+fb::Vec4 getVehicleSpeed(fb::ClientSoldierEntity * soldier)
 {
-	fb::Vec3 tempvec;
+	fb::Vec4 tempvec;
 	tempvec.x = 0.0f;
 	tempvec.y = 0.0f;
 	tempvec.z = 0.0f;
@@ -149,7 +149,7 @@ fb::Vec3 getVehicleSpeed(fb::ClientSoldierEntity * soldier)
 
 
 		if (POINTERCHK(p_veh)) {
-			tempvec = p_veh->getVehicleSpeed();
+			tempvec = *p_veh->GetVehicleSpeed();
 		
 
 	}
@@ -158,12 +158,12 @@ fb::Vec3 getVehicleSpeed(fb::ClientSoldierEntity * soldier)
 	
 	return tempvec;
 }
-float DistanceToAimRay(fb::Vec3 MyPosition, fb::Vec3 EnemyPosition,
-	const fb::Vec3 vAngle) {
+float DistanceToAimRay(fb::Vec4 MyPosition, fb::Vec4 EnemyPosition,
+	const fb::Vec4 vAngle) {
 
 	float fYawDifference, flPitchDifference;
 
-	fb::Vec3 vDir = EnemyPosition - MyPosition;
+	fb::Vec4 vDir = EnemyPosition - MyPosition;
 	float m_dist0 = vDir.len();
 	float x, y;
 	vDir.normalize();

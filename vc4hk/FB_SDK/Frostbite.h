@@ -10,8 +10,8 @@
 #include "FB_SDK/Frostbite_Classes.h"
 #include "FB_SDK/ClassT.h"
 #include "FB_SDK/Vec2.h"
-#include "FB_SDK/Vec3.h"
 #include "FB_SDK/Vec4.h"
+
 #include "FB_SDK/Mat4.h"
 #include "FB_SDK/Main.h"
 

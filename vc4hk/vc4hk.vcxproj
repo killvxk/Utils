@@ -76,9 +76,8 @@
     <ClInclude Include="FB_SDK\Offsets.h" />
     <ClInclude Include="FB_SDK\Server.h" />
     <ClInclude Include="FB_SDK\Vec2.h" />
-    <ClInclude Include="FB_SDK\Vec3.h" />
-    <ClInclude Include="FB_SDK\Vec3Transform.h" />
     <ClInclude Include="FB_SDK\Vec4.h" />
+    <ClInclude Include="FB_SDK\Vec3Transform.h" />
     <ClInclude Include="FB_SDK\x64_sdk.hpp" />
     <ClInclude Include="hkheader.h" />
     <ClInclude Include="DXTK\Inc\SimpleMath.h" />

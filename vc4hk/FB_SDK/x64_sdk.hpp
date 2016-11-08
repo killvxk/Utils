@@ -604,8 +604,8 @@ namespace fb {
 	class RayCastHit
 	{
 	public:
-		SM::Vector4 m_Position;  // 0x00
-		SM::Vector4 m_Normal;  // 0x10
+		Vec4 m_Position;  // 0x00
+		Vec4 m_Normal;  // 0x10
 		void*  m_RigidBody; // 0x20
 		Material m_Material;  // 0x28
 		DWORD  m_Part;   // 0x30
@@ -628,7 +628,7 @@ namespace fb {
 			DontCheckGroup = 0x40,
 			DontCheckPhantoms = 0x80,
 		};
-		virtual bool PhysicsRayQuery(const char* identifier, SM::Vector4* from, SM::Vector4* to, RayCastHit* hit, int flag, eastl::fixed_vector<void const*, 8, 0>* PhysicsEntityList);
+		virtual bool PhysicsRayQuery(const char* identifier, Vec4* from, Vec4* to, RayCastHit* hit, int flag, eastl::fixed_vector<void const*, 8, 0>* PhysicsEntityList);
 	};//Size=0x0008
 
 	class HavokManager
@@ -708,8 +708,8 @@ namespace fb {
 	class AxisAlignedBox
 	{
 	public:
-		Vec3 m_Min; //0x0000 
-		Vec3 m_Max; //0x0010 
+		Vec4 m_Min; //0x0000 
+		Vec4 m_Max; //0x0010 
 
 		AxisAlignedBox()
 		{}
@@ -742,7 +742,7 @@ namespace fb {
 	{
 	public:
 		char _0x0000[448];
-		Vec3 m_Velocity; //0x01C0 
+		Vec4 m_Velocity; //0x01C0 
 		char _0x01D0[48];
 	};//Size=0x0200
 
@@ -757,17 +757,44 @@ namespace fb {
 		float m_terrainLevelUpdateTime; //0x024C 
 		AxisAlignedBox m_childrenAABB; //0x0250 
 		char _0x0268[24];
-		Vec3 m_Velocity; //0x0280 
+		Vec4 m_Velocity; //0x0280 
 		char _0x028C[4];
-		Vec3 m_prevVelocity; //0x0290 
+		Vec4 m_prevVelocity; //0x0290 
 		char _0x029C[312];
 		ClientChassisComponent* m_Chassis; //0x03E0 
-		__forceinline Vec3 getVehicleSpeed()
+		__forceinline Vec4 *GetVehicleSpeed()
 		{
-			if (POINTERCHK(this->m_Chassis))return this->m_Chassis->m_Velocity;
-			else	return (this->m_Velocity);
+			return &(this->m_Velocity);
 		}
 	};//Size=0x0520
+	class ClientSoldierPrediction
+	{
+	public:
+		virtual void            function_0();
+		virtual Vec4        getPosition();
+		virtual void            setPosition(D3DXVECTOR3 pos);
+
+		CharacterPhysicsEntity* m_characterPhyEntity; //0x0008  
+		char _0x0010[16];
+		Vec4 m_ParachuteRotation; //0x0020  
+		Vec4 m_Position; //0x0030  
+		
+		Vec4 surfaceVelocity; //0x0040  
+		
+		Vec4 m_Velocity; //0x0050  
+	
+		Vec4 groundNormal; //0x0060  
+		
+		__int32 groundSupported; //0x0070  
+		__int32 groundMaterialIndex; //0x0074  
+		__int32 m_state; //0x0078  
+		BYTE m_Pose; //0x007C  
+		char _0x007D[3];
+		BYTE m_ChangingToPose; //0x0080  
+		char _0x0081[23];
+		__int32 Event; //0x0098  
+		BYTE PlayerState; //0x009C  
+	};//Size=0x009D 
 	class ClientSoldierEntity : public ClientControllableEntity
 	{
 	public:
@@ -797,11 +824,19 @@ namespace fb {
 		ClientPlayer*                  m_pPlayer;                  // 0x1E0
 		AntAnimatableComponent* m_pAnimatable; //0x01E8 
 		AntAnimatableComponent* m_pAnimatable2; //0x01F0 
-		char sd[0x378];
+		char a[0x490 - 0x1f8];
+		ClientSoldierPrediction* m_pPredictedController; //0x0490  
+		char pad_0x0498[0x4d8 - 0x490];
+		float m_authorativeYaw; //0x04D8  
+		float m_authorativePitch; //0x04DC  
+		__int32 m_aimingEnabled; //0x04E0  
+		float m_cachedPitch; //0x04E4  
+		__int64 m_soldierSound; //0x04E8  
+		__int32 m_poseType; //0x04F0  
+		char aaa[0x570 - 0x4f4];
 		ClientSoldierWeaponsComponent* m_pWeaponComponent; //0x0570 
 		ClientSoldierBodyComponent* m_pBodyComponent; //0x0578 
 		RagdollComponent* m_pRagdollComponent; //0x0580 
-
 		BreathControlHandler* m_breathControlHandler; //0x0588
 		char pad_0x0570[0x10];//0x590
 		void* m_sprintInputHandler; //0x0580  + 20
@@ -823,7 +858,16 @@ namespace fb {
 		VaultComponent* m_pVaultComp; //0x0D30 
 		char _0x0D38[1264];
 
+		inline	 Vec4* GetSoldierVelocity() {
+			void* a = *(void**)((intptr_t)this + 0x490);
 
+			if (POINTERCHK(a)) {
+				return (Vec4*)((intptr_t)a + 0x50);
+			}
+			else {
+			return nullptr;
+		}
+	}
 
 
 	};//Size=0x1228
@@ -914,14 +958,14 @@ namespace fb {
 		char _0x0044[40];
 		int m_zoomLevel; //0x0068 
 		SM::Matrix m_Transform; //0x0070 
-		SM::Vector4 m_Position; //0x00B0 
-		SM::Vector4 m_View; //0x00C0 
-		SM::Vector4 m_Velocity; //0x00D0 
+		Vec4 m_Position; //0x00B0 
+		Vec4 m_View; //0x00C0 
+		Vec4 m_Velocity; //0x00D0 
 		char _0x00E0[88];
 		float m_Fov; //0x0138 
 		char _0x013C[28];
 		TypeInfo* m_RayResult; //0x0158 
-		SM::Vector4 m_RayHitPoint; //0x0160 
+		Vec4 m_RayHitPoint; //0x0160 
 		__int32 m_RayLength; //0x0170 
 	};//Size=0x0174
 
@@ -941,7 +985,7 @@ namespace fb {
 		WeaponFiringData* m_pWeaponFiring; //0x0018 
 		WeaponModifier* m_pWeaponModifier; //0x0020 
 		char _0x0028[8];
-		Vec3 m_MoveSpeed; //0x0030 
+		Vec4 m_MoveSpeed; //0x0030 
 		SM::Matrix m_ShootSpace; //0x0040 
 		SM::Matrix m_ShootSpaceIdentity; //0x0080 
 		char _0x00C0[464];
@@ -977,9 +1021,9 @@ namespace fb {
 	class ShotConfigData
 	{
 	public:
-		Vec3 m_InitialPosition; //0x0000
-		Vec3 m_InitialDirection; //0x0010
-		Vec3 m_InitialSpeed; //0x0020
+		Vec4 m_InitialPosition; //0x0000
+		Vec4 m_InitialDirection; //0x0010
+		Vec4 m_InitialSpeed; //0x0020
 		Array<void*> m_InitialDirectionScaleByPitch; //0x0030
 		Array<void*> m_InitialSpeedScaleByPitch; //0x0038
 		Float32 m_InheritWeaponSpeedAmount; //0x0040
@@ -1038,7 +1082,7 @@ namespace fb {
 	class MessProjectileEntityData
 	{
 	public:
-		SM::Vector4 m_AngularVelocity; //0x0000 
+		Vec4 m_AngularVelocity; //0x0000 
 		char _0x0010[16]; //0x0010 
 		float m_InstantAttachableTestDistance; //0x0020 
 		float m_InstantAttachableVisualConvergenceDelay; //0x0024 
@@ -1196,8 +1240,8 @@ namespace fb {
 	class QuatTransform
 	{
 	public:
-		SM::Vector4 m_TransAndScale; //0x0000 
-		SM::Vector4 m_Rotation; //0x0010 
+		Vec4 m_TransAndScale; //0x0000 
+		Vec4 m_Rotation; //0x0010 
 	};//Size=0x0020
 
 	class UpdatePoseResultData
@@ -1450,7 +1494,7 @@ namespace fb {
 		UpdatePoseResultData m_PoseResultData; //0x0088 
 		char _0x00CC[56];
 
-		bool GetBone(const UpdatePoseResultData::BONES BoneId, Vec3* BoneOut)
+		bool GetBone(const UpdatePoseResultData::BONES BoneId, Vec4* BoneOut)
 		{
 			UpdatePoseResultData PoseResult = this->m_PoseResultData;
 
@@ -1460,7 +1504,7 @@ namespace fb {
 				if (!POINTERCHK(pQuat))
 					return false;
 
-				SM::Vector4 Bone = pQuat[BoneId].m_TransAndScale;
+				Vec4 Bone = pQuat[BoneId].m_TransAndScale;
 
 				BoneOut->x = Bone.x;
 				BoneOut->z = Bone.z;
@@ -1566,7 +1610,7 @@ namespace fb {
 		char _0x0000[24];
 		__int32 m_NumberOfBulletsPerShell; //0x0018
 		char _0x001C[4];
-		Vec3 m_InitialSpeed; //0x0020
+		Vec4 m_InitialSpeed; //0x0020
 
 	};//Size=0x002C
 
@@ -1922,7 +1966,7 @@ namespace fb {
 			int m_Value; //+0x24
 		};
 		char aEntryComponentData[240]; //+0x00 Inherited
-		Vec3 m_AnimationAccelerationMultiplier; //+0xF0
+		Vec4 m_AnimationAccelerationMultiplier; //+0xF0
 		char* m_AntEntryIDStr; //+0x100
 		AntEntryIdEnum m_AntEntryId; //+0x108
 		AntEnumeration m_AntEntryEnumeration; //+0x110
@@ -1995,8 +2039,8 @@ namespace fb {
 	{
 	public:
 		char _0x0000[0x70];
-		Vec3 m_ProjectileSpawnOffset; //0x0070
-		Vec3 m_TargetPositionOverride; //0x0080
+		Vec4 m_ProjectileSpawnOffset; //0x0070
+		Vec4 m_TargetPositionOverride; //0x0080
 		void* m_WeaponMesh; //0x0090
 		WeaponFiringData* m_WeaponFiring; //0x0098
 		char* m_pDamageGiverName; //0x00A0
@@ -2024,7 +2068,7 @@ namespace fb {
 	public:
 		float m_float_1;                                  //+0x0  (= 500.f)  
 		char a0x41[0x4];                            //+0x4  
-		Vec3 m_playerPos;                          //+0x8  
+		Vec4 m_playerPos;                          //+0x8  
 		float m_float_2;                                  //+0x18 (= 200.f)  
 		char a0x412[0x4];                                      //+0x1C  
 		float m_body_yaw;                                 //+0x20 ? (Vehicles only)  
@@ -2041,7 +2085,7 @@ namespace fb {
 		char a418[0x8];                                          //+0x70  
 		SM::Matrix  m_turretTransform;                    //+0x78 ? (Update in vehicles only)  
 		SM::Matrix  m_cameraTransform;                    //+0xB8 ?   
-		Vec3 m_cameraBodyDegree;                      //+0xF8 (x,y,z [0-360.f]);  
+		Vec4 m_cameraBodyDegree;                      //+0xF8 (x,y,z [0-360.f]);  
 		bool m_bInitialized;                              //+0x108 (= 1 if we spawned on map at least once)  
 
 	public:

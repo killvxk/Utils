@@ -68,7 +68,7 @@ namespace fb
 		virtual void Function58(); //
 		virtual void Function59(); //
 		virtual void* GetPhysiscsEntity(); //physics
-		virtual Vec3 * GetVelocity(); //velocity
+		virtual Vec4 * GetVelocity(); //velocity
 		virtual void Function62(); //
 		virtual void Function63(); //
 		virtual void Function64(); //

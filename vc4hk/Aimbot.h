@@ -11,24 +11,24 @@ class Aimbot
 {
 public:
 	Aimbot();
-	DWORD  AimCorrection2(fb::Vec3 MyPosition,
-	fb::Vec3  EnemyP, fb::Vec3 EnemyVelocity, fb::Vec3  v1, float Gravity, fb::Vec3* out);
-	fb::Vec3 * GetClosestPlayer(eastl::vector<fb::ClientPlayer*>*, fb::ClientPlayer*, int);
+	DWORD  AimCorrection2(fb::Vec4 MyPosition,
+	fb::Vec4  EnemyP, fb::Vec4 EnemyVelocity, fb::Vec4  v1, float Gravity, fb::Vec4* out);
+	fb::Vec4 * GetClosestPlayer(eastl::vector<fb::ClientPlayer*>*, fb::ClientPlayer*, int, bool);
 
-	fb::Vec3* 	GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer, fb::ClientWeapon* MyCSW, fb::FiringFunctionData* pFFD, void* pCurVehicleCam);
+	fb::Vec4 	GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* , fb::ClientWeapon* , fb::FiringFunctionData* ,bool );
 	void NullTmpVar();
 
 
 
-	fb::Vec3 *	vOrigin;
-	fb::Vec3 *v_curAngle;
-	fb::Vec3 v_lastAngle;
+	fb::Vec4 vOrigin;
+	fb::Vec4 v_curAngle;
+	fb::Vec4 v_lastAngle;
 	bool bAimHead;
 	fb::ClientSoldierEntity* LockOn_pEnemySoldier;
 	int LockOnEnemyFlags;
 	fb::ClientSoldierEntity* mp_ClosestSoldier;
 	fb::ClientPlayer* mp_ClosestPlayer;
-	fb::Vec3 * VecOfClosestSoldier;
+	fb::Vec4*  VecOfClosestSoldier;
 
 private:
 

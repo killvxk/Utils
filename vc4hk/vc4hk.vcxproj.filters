@@ -83,13 +83,7 @@
     <ClInclude Include="FB_SDK\Vec2.h">
       <Filter>FB_SDK</Filter>
     </ClInclude>
-    <ClInclude Include="FB_SDK\Vec3.h">
-      <Filter>FB_SDK</Filter>
-    </ClInclude>
     <ClInclude Include="FB_SDK\Vec3Transform.h">
-      <Filter>FB_SDK</Filter>
-    </ClInclude>
-    <ClInclude Include="FB_SDK\Vec4.h">
       <Filter>FB_SDK</Filter>
     </ClInclude>
     <ClInclude Include="FB_SDK\x64_sdk.hpp">
@@ -99,6 +93,9 @@
       <Filter>FB_SDK</Filter>
     </ClInclude>
     <ClInclude Include="FB_SDK\ClientChildBarrelComponent.h">
+      <Filter>FB_SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="FB_SDK\Vec4.h">
       <Filter>FB_SDK</Filter>
     </ClInclude>
   </ItemGroup>
