@@ -102,7 +102,7 @@ namespace fb
 			__int64 a;
 			__int32 flags;
 			__int32 cc;
-			ITypedObject* Object; //0x0000
+			ITypedObject* Object; 
 			char b[0x8];
 			
 			
@@ -110,7 +110,7 @@ namespace fb
 
 
 	
-		std::vector<void*>* GetClientComponentByID(int Id,bool CheckUnderUsing)
+	inline	std::vector<void*>* GetClientComponentByID(int Id,bool CheckUnderUsing)
 
 		{
 			void* offset = *((void**)((intptr_t)this + 0x38));
@@ -134,7 +134,7 @@ namespace fb
 			}
 				fb::ClassInfo* pType = (fb::ClassInfo*)trashclass1[obj_index].Object->GetType();
 
-				if (POINTERCHK(pType)) {
+				if (IsValidPtr(pType)) {
 
 
 				if (pType->m_ClassId == Id) {

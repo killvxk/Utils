@@ -8,12 +8,88 @@
 
 Aimbot::Aimbot()
 {
-	this->mp_ClosestSoldier = (fb::ClientSoldierEntity*)malloc(sizeof(fb::ClientSoldierEntity));
-	this->mp_ClosestPlayer = (fb::ClientPlayer*)malloc(sizeof(fb::ClientPlayer));
-	this->VecOfClosestSoldier = new fb::Vec4;
+	NullTmpVar();
+	VecOfClosestSoldier = new fb::Vec4;
 	this->bAimHead = false;
 	this->LockOnEnemyFlags = 0;
 	this->LockOn_pEnemySoldier = nullptr;
+}
+
+float Aimbot::DistanceToAimRay(fb::Vec4 MyPosition, fb::Vec4 EnemyPosition,
+	const fb::Vec4 vAngle) {
+	__try {
+		float fYawDifference, flPitchDifference;
+
+		fb::Vec4 vDir = EnemyPosition - MyPosition;
+		float m_dist0 = vDir.len();
+		float x, y;
+		vDir.normalize();
+
+
+
+
+		fYawDifference = -atan2(vDir.x, vDir.z);
+
+		if (fYawDifference < 0)fYawDifference = fYawDifference + Twice_PI;
+
+
+		fYawDifference = abs(fYawDifference - vAngle.x);
+
+		if (m_dist0 <= 5.f && fYawDifference < 3.0f)return 100000000.f;
+	
+
+
+			if (fYawDifference > 0.7f)return -2.f;
+
+		
+
+		flPitchDifference = atan2(vDir.y, vDir.VectorLength2());
+
+
+
+		flPitchDifference = abs(flPitchDifference - vAngle.y);
+
+		if (flPitchDifference >1.22f )return -2.f;
+
+		x = cos(flPitchDifference)*sin(fYawDifference);
+
+		y = sin(flPitchDifference);
+
+		return x*x + y*y;
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) { return -2.f; };
+}
+
+DWORD Aimbot::GetVectorFromVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec4* vector) {
+
+	SM::Matrix* mTransform = new SM::Matrix;
+	fb::Vec4  tmp;
+
+	fb::ClientVehicleEntity *veh = pLocalPlayer->GetVehicleEntity();
+
+	if (!IsValidPtr(veh))return 0x1;
+
+	veh->GetTransform(mTransform);
+
+	if (!IsValidPtr(mTransform))return 0x1;
+
+	fb::AxisAlignedBox AABB = *(fb::AxisAlignedBox *) ((intptr_t)veh + 0x250);
+
+
+
+	vector->x = mTransform->_41;
+	vector->y = mTransform->_42;
+	vector->z = mTransform->_43;
+	vector->w = 0.f;
+
+	tmp = (AABB.m_Max + AABB.m_Min)*0.5f;//model martix
+
+	vector->x = vector->x + tmp.x*mTransform->_11 + tmp.y*mTransform->_21 + tmp.z*mTransform->_31;
+	vector->y = vector->y + tmp.x*mTransform->_12 + tmp.y*mTransform->_22 + tmp.z*mTransform->_32;
+	vector->z = vector->z + tmp.x*mTransform->_13 + tmp.y*mTransform->_23 + tmp.z*mTransform->_33;
+	//vector->w = vector->w + tmp.x*mTransform->_14 + tmp.y*mTransform->_24 + tmp.z*mTransform->_34 + tmp.w*mTransform->_44;
+	delete mTransform;
+	return 0x0;
 }
 
 fb::Vec4  Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer ,fb::ClientWeapon* MyCSW, fb::FiringFunctionData* pFFD,bool b_InVeh) {
@@ -67,29 +143,29 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 
 	if (pVecCP->size() < 1) return nullptr;
 
-	bool found = false;
+	bool b_found = false;
 	fb::Vec4 v_EnemyVecTmp;
 
 	float flScreenDistance=-1.f;
-
+	
 	fb::ClientPlayer* pClientPlayer = nullptr;
 	fb::ClientSoldierEntity* pEnemySoldier = nullptr;
 	fb::ClientSoldierEntity* ClosestSold = nullptr;
 
+	NullTmpVar();
+	float closestdistance = 80000.f;
 
-	float closestdistance = 9999.0f;
-
-	if (!POINTERCHK(this->LockOn_pEnemySoldier)) {
+	if (!LockOnEnemyFlags) {
 
 
 		for (int i = 0; i < pVecCP->size(); i++)
 		{
-
+			__try{
 			pClientPlayer = pVecCP->at(i);
 
 
-			if (!POINTERCHK(pClientPlayer))
-				continue;
+		//	if (!IsValidPtr(pClientPlayer))
+		//		continue;
 
 			if (pLocalPlayer->m_TeamId == pClientPlayer->m_TeamId)continue;
 
@@ -97,30 +173,30 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 			pEnemySoldier = pClientPlayer->GetSoldierEntity();
 
 
-			if (!POINTERCHK(pEnemySoldier))continue;
+		//	if (!IsValidPtr(pEnemySoldier))continue;
 
 			if (!IsAlive(pEnemySoldier))continue;
 
-			if (!pClientPlayer->InVehicle() && pEnemySoldier->m_Occluded)continue;
+		//	if (!pClientPlayer->InVehicle() && pEnemySoldier->m_Occluded)continue;
 
 			fb::RagdollComponent* pRagdoll = *(fb::RagdollComponent**)((intptr_t)pEnemySoldier + 0x580);
 
-			if (!POINTERCHK(pRagdoll))continue;
+			if (!IsValidPtr(pRagdoll))continue;
 
 			if (bAimHead)
 			{
-				found = pRagdoll->GetBone(fb::UpdatePoseResultData::Head, &v_EnemyVecTmp);
+				b_found = pRagdoll->GetBone(fb::UpdatePoseResultData::HeadEnd, &v_EnemyVecTmp);
 			}
 
 			else
 			{
-				found = pRagdoll->GetBone(fb::UpdatePoseResultData::Spine2, &v_EnemyVecTmp);
+				b_found = pRagdoll->GetBone(fb::UpdatePoseResultData::Spine2, &v_EnemyVecTmp);
 			}
 
 
 
 
-			if (!found) {
+			if (!b_found) {
 
 				if ((pClientPlayer->InVehicle() && BulletClassID == 2441) || InVeh) {
 					if (GetVectorFromVehicle(pClientPlayer, &v_EnemyVecTmp) != 0)continue;
@@ -151,32 +227,44 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 				*VecOfClosestSoldier = v_EnemyVecTmp;
 
 			}
+			else if (flScreenDistance>100000.f) {
+				mp_ClosestSoldier = pEnemySoldier;
+				mp_ClosestPlayer = pClientPlayer;
+				*VecOfClosestSoldier = v_EnemyVecTmp;
+				break;
+
+			}
 
 		}
-
+			 __except (EXCEPTION_EXECUTE_HANDLER) {
+				 
+				 
+				 
+				 continue; }
+		}
+		
 
 	}
 	else {
-
+		__try {
 		pEnemySoldier = this->LockOn_pEnemySoldier;
 
-		if (!POINTERCHK(pEnemySoldier))return nullptr;
+		//if (!IsValidPtr(pEnemySoldier))return nullptr;
 
 		if (!IsAlive(pEnemySoldier))return nullptr;
 
 		pClientPlayer = pEnemySoldier->m_pPlayer;
 
-		if (!POINTERCHK(pClientPlayer))return nullptr;
+		//if (!IsValidPtr(pClientPlayer))return nullptr;
 
-		if (!pClientPlayer->InVehicle() && pEnemySoldier->m_Occluded)return nullptr;
+		//if (!pClientPlayer->InVehicle() && pEnemySoldier->m_Occluded)return nullptr;
 
 		fb::RagdollComponent* pRagdoll = *(fb::RagdollComponent**)((intptr_t)pEnemySoldier + 0x580);
 
-		if (!POINTERCHK(pRagdoll))return nullptr;
-
+	//	if (!IsValidPtr(pRagdoll))return nullptr;
 		if (bAimHead)
 		{
-			found = pRagdoll->GetBone(fb::UpdatePoseResultData::Head, &v_EnemyVecTmp);
+			b_found = pRagdoll->GetBone(fb::UpdatePoseResultData::HeadEnd, &v_EnemyVecTmp);
 
 
 
@@ -184,7 +272,7 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 
 		else
 		{
-			found = pRagdoll->GetBone(fb::UpdatePoseResultData::Spine2, &v_EnemyVecTmp);
+			b_found = pRagdoll->GetBone(fb::UpdatePoseResultData::Spine2, &v_EnemyVecTmp);
 
 
 
@@ -193,7 +281,7 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 
 
 
-		if (!found) {
+		if (!b_found) {
 
 			if ((pClientPlayer->InVehicle() && BulletClassID == 2441) || InVeh) {
 
@@ -210,33 +298,48 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 				return nullptr;
 			}
 		}
+	
 
 
 		mp_ClosestPlayer = pClientPlayer;
 		mp_ClosestSoldier = pEnemySoldier;
 		*VecOfClosestSoldier = v_EnemyVecTmp;
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) { 
+			
+			
+			
+			return nullptr;
+		}
 
 	}
 
-	if (POINTERCHK(mp_ClosestPlayer) && POINTERCHK(mp_ClosestSoldier)) {
+	if (mp_ClosestPlayer && mp_ClosestSoldier) {
 		return 	VecOfClosestSoldier;
 	}
 	else { return nullptr; }
 
 }
 
+fb::Vec4 Aimbot::GetVecOfPlayer(bool bAimHead, fb::RagdollComponent* pRagdoll) {
+	fb::Vec4 v_EnemyVecTmp;
 
+	bool found = false;
+
+	
+}
 
 
 
 
 void Aimbot::NullTmpVar() {
+	mp_ClosestPlayer = nullptr;
+	mp_ClosestSoldier = nullptr;
 	
-
 };
 DWORD  Aimbot::AimCorrection2(fb::Vec4 MyPosition,
 	fb::Vec4  EnemyP, fb::Vec4 EnemyVelocity, fb::Vec4  v1, float Gravity, fb::Vec4* out) {
-
+	__try{
 
 	float flPitch, flYaw, f_time, v0_pow2 = v1.z*v1.z + v1.y + v1.y; // x, tmp,
 
@@ -247,7 +350,7 @@ DWORD  Aimbot::AimCorrection2(fb::Vec4 MyPosition,
 	EnemyP.w = 0;
 	EnemyVelocity.w = 0;
 
-	
+
 
 	fb::Vec4 GravityVec;
 
@@ -362,7 +465,7 @@ DWORD  Aimbot::AimCorrection2(fb::Vec4 MyPosition,
 
 	}
 	else {
-	
+
 
 		f_time = (float)TimeToHit(EnemyP, EnemyVelocity, v0_pow2);
 
@@ -371,7 +474,7 @@ DWORD  Aimbot::AimCorrection2(fb::Vec4 MyPosition,
 
 
 		v_Driection = EnemyP + EnemyVelocity*f_time;
-		
+
 
 
 
@@ -402,7 +505,12 @@ DWORD  Aimbot::AimCorrection2(fb::Vec4 MyPosition,
 	out->x = flYaw;
 
 	out->y = flPitch;
+}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
 
+		return 0x4;
+	}
 
 	return 0x0;
 	}

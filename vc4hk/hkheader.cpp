@@ -85,46 +85,13 @@ bool MinRealRootOfQuarticFunction(double a, double b, double c, double d, double
 
 }
 
-DWORD GetVectorFromVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec4* vector) {
-
-	SM::Matrix* mTransform = new SM::Matrix;
-	fb::Vec4  tmp;
-
-	fb::ClientVehicleEntity *veh = pLocalPlayer->GetVehicleEntity();
-
-	if (!POINTERCHK(veh))return 0x1;
-
-	veh->GetTransform(mTransform);
-
-	if (!POINTERCHK(mTransform))return 0x1;
-
-	fb::AxisAlignedBox AABB = *(fb::AxisAlignedBox *) ((intptr_t)veh + 0x250);
-
-
-
-	vector->x = mTransform->_41;
-	vector->y = mTransform->_42;
-	vector->z = mTransform->_43;
-	vector->w = 0.f;
-
-	tmp = (AABB.m_Max + AABB.m_Min)*0.5f;//model martix
-
-	vector->x = vector->x + tmp.x*mTransform->_11 + tmp.y*mTransform->_21 + tmp.z*mTransform->_31;
-	vector->y = vector->y + tmp.x*mTransform->_12 + tmp.y*mTransform->_22 + tmp.z*mTransform->_32;
-	vector->z = vector->z + tmp.x*mTransform->_13 + tmp.y*mTransform->_23 + tmp.z*mTransform->_33;
-	//vector->w = vector->w + tmp.x*mTransform->_14 + tmp.y*mTransform->_24 + tmp.z*mTransform->_34 + tmp.w*mTransform->_44;
-	delete mTransform;
-	return 0x0;
-}
-
-
-bool IsAlive(fb::ClientControllableEntity* pPlayer)
+bool IsAlive212(fb::ClientControllableEntity* pPlayer)
 {
 
 	fb::HealthComponent* pEmeHealthComponent = *((fb::HealthComponent**)((intptr_t)pPlayer + 0x140));
 
-	if (POINTERCHK(pEmeHealthComponent)) {
-		if (pEmeHealthComponent->m_Health > 0 ) { return true; }
+	if (IsValidPtr(pEmeHealthComponent)) {
+		if (pEmeHealthComponent->m_Health > 0) { return true; }
 		else
 		{
 			return false;
@@ -133,70 +100,43 @@ bool IsAlive(fb::ClientControllableEntity* pPlayer)
 
 	return false;
 }
-
-
-
-fb::Vec4 getVehicleSpeed(fb::ClientSoldierEntity * soldier)
+bool IsAlive(fb::ClientControllableEntity* pPlayer)
 {
-	fb::Vec4 tempvec;
-	tempvec.x = 0.0f;
-	tempvec.y = 0.0f;
-	tempvec.z = 0.0f;
-	fb::ClientPlayer* p_ClientPlayer = soldier->m_pPlayer;
-	if (POINTERCHK(p_ClientPlayer))
-	{
-		fb::ClientVehicleEntity* p_veh = (fb::ClientVehicleEntity*)soldier->m_pPlayer ->m_pAttachedControllable;
+	bool b_isVeh = false;
 
 
-		if (POINTERCHK(p_veh)) {
-			tempvec = *p_veh->GetVehicleSpeed();
-		
+	fb::HealthComponent* pEmeHealthComponent = *((fb::HealthComponent**)((intptr_t)pPlayer + 0x140));
+
+	if (!IsValidPtr(pEmeHealthComponent))return false;
+
+	__try{
+	fb::ClassInfo *pT = (fb::ClassInfo*)(((fb::ITypedObject*)(pPlayer))->GetType());
+
+
+	if (IsValidPtr(pT)) {
+
+		int Id = pT->m_ClassId;
+
+		if (Id == 695) {
+			b_isVeh = true;
+		}
+	}
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
 
 	}
 
-	}
+
+	if (!b_isVeh) {
+		return (pEmeHealthComponent->m_Health > 0) ? true : false;
 	
-	return tempvec;
-}
-float DistanceToAimRay(fb::Vec4 MyPosition, fb::Vec4 EnemyPosition,
-	const fb::Vec4 vAngle) {
-
-	float fYawDifference, flPitchDifference;
-
-	fb::Vec4 vDir = EnemyPosition - MyPosition;
-	float m_dist0 = vDir.len();
-	float x, y;
-	vDir.normalize();
-
-	float m_dist1 = vDir.len();
-
-
-	fYawDifference = -atan2(vDir.x, vDir.z);
-
-	if (fYawDifference < 0)fYawDifference = fYawDifference + Twice_PI;
-
-
-	fYawDifference = abs(fYawDifference - vAngle.x);
-
-	if (m_dist0 <= 5.f && fYawDifference < 3.0f)return 0.00025f; else
+	}
+	else
 	{
-
-
-		if (fYawDifference < 0 || fYawDifference > 0.125f || _isnanf(fYawDifference))return -2.f;
-
+		return (pEmeHealthComponent->m_VehicleHealth > 0) ? true : false;
 	}
 
-	flPitchDifference = atan2(vDir.y, vDir.VectorLength2());
-
-	if (_isnanf(flPitchDifference))return -2.f;
-
-	flPitchDifference = abs(flPitchDifference - vAngle.y);
-
-	if (flPitchDifference > 1.48350f || flPitchDifference < -1.2217f || _isnanf(flPitchDifference))return -2.f;
-
-	x = abs(m_dist1*cos(flPitchDifference)*sin(fYawDifference));
-
-	y = abs(m_dist1*sin(flPitchDifference));
-
-	return x*x + y*y;
+	return false;
 }
+
+

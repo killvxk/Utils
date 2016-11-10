@@ -401,11 +401,11 @@ namespace fb
 	public:
 		T* GetData()
 		{
-			if (m_ptr == NULL)
-				return NULL;
+			if (m_ptr == nullptr)
+				return nullptr;
 
-			if (*m_ptr == NULL)
-				return NULL;
+			if (*m_ptr == nullptr)
+				return nullptr;
 
 			return (T*)((intptr_t)(*m_ptr) - sizeof(intptr_t));
 		}

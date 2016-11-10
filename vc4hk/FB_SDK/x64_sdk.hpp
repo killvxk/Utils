@@ -711,8 +711,7 @@ namespace fb {
 		Vec4 m_Min; //0x0000 
 		Vec4 m_Max; //0x0010 
 
-		AxisAlignedBox()
-		{}
+	
 	};//Size=0x0020
 
 	struct TransformAABBStruct {
@@ -743,28 +742,37 @@ namespace fb {
 	public:
 		char _0x0000[448];
 		Vec4 m_Velocity; //0x01C0 
-		char _0x01D0[48];
-	};//Size=0x0200
+		char _0x01D0[0x2d0];
+	};//Size=0x04A0
+
 
 	class ClientVehicleEntity : public ClientControllableEntity
 	{
 	public:
-		char _0x0188[0xF0];//0x148
+		char _0x0148[0xF0];//0x148
 		void* m_pPhysicsEntity;//0x238
 		float m_waterLevel; //0x0240 
 		float m_terrainLevel; //0x0244 
 		float m_waterLevelUpdateTimer; //0x0248 
 		float m_terrainLevelUpdateTime; //0x024C 
 		AxisAlignedBox m_childrenAABB; //0x0250 
-		char _0x0268[24];
+		char _0x0250[0x10];//0x0270 
 		Vec4 m_Velocity; //0x0280 
-		char _0x028C[4];
 		Vec4 m_prevVelocity; //0x0290 
-		char _0x029C[312];
+		char _0x029C[0x150];
 		ClientChassisComponent* m_Chassis; //0x03E0 
-		__forceinline Vec4 *GetVehicleSpeed()
+
+
+		inline ClientChassisComponent* GetClientChassisComponent(){
+
+			return this->m_Chassis;
+		}
+		inline Vec4 *GetVehicleVelocity()
 		{
-			return &(this->m_Velocity);
+			
+				return &(this->m_Velocity);
+			
+		
 		}
 	};//Size=0x0520
 	class ClientSoldierPrediction
@@ -772,7 +780,7 @@ namespace fb {
 	public:
 		virtual void            function_0();
 		virtual Vec4        getPosition();
-		virtual void            setPosition(D3DXVECTOR3 pos);
+		virtual void            setPosition(Vec4 pos);
 
 		CharacterPhysicsEntity* m_characterPhyEntity; //0x0008  
 		char _0x0010[16];
@@ -861,7 +869,7 @@ namespace fb {
 		inline	 Vec4* GetSoldierVelocity() {
 			void* a = *(void**)((intptr_t)this + 0x490);
 
-			if (POINTERCHK(a)) {
+			if (IsValidPtr(a)) {
 				return (Vec4*)((intptr_t)a + 0x50);
 			}
 			else {
@@ -914,9 +922,9 @@ namespace fb {
 		__int32 m_ZoomLevelMax; //0x0AC4 
 		__int32 m_ZeroingDistanceLevel; //0x0AC8 
 
-		ClientSoldierWeapon* GetActiveSoldierWeapon()
+	inline	ClientSoldierWeapon* GetActiveSoldierWeapon()
 		{
-			if (!POINTERCHK(m_Handler))
+			if (!IsValidPtr(m_Handler))
 				return nullptr;
 
 			else
@@ -1501,7 +1509,7 @@ namespace fb {
 			if (PoseResult.m_ValidTransforms)
 			{
 				QuatTransform* pQuat = PoseResult.m_ActiveWorldTransforms;
-				if (!POINTERCHK(pQuat))
+				if (!IsValidPtr(pQuat))
 					return false;
 
 				Vec4 Bone = pQuat[BoneId].m_TransAndScale;

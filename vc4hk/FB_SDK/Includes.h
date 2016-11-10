@@ -7,8 +7,8 @@
 
 
 
-#define _PTR_MAX_VALUE ((PVOID)0x000F000000000000)
-#define POINTERCHK(p)  ((p >= (void*)0x10000) && (p < _PTR_MAX_VALUE) && (p != nullptr))
+#define _PTR_MAX_VALUE (0x000F000000000000)
+//#define POINTERCHK(p)  ((p >= (void*)0x10000) && (p < _PTR_MAX_VALUE) && (p != nullptr))
 
 #define one_pi 0x141A0D8D8
 
@@ -32,3 +32,24 @@
 #define CString char*
 
 #endif
+
+static bool IsValidPtr(void* ptr) {
+
+
+	if (((intptr_t)ptr >= 0x10000) && ((intptr_t)ptr < _PTR_MAX_VALUE)&&(ptr!=nullptr) ) {
+		__try
+		{
+			
+			intptr_t a = *(intptr_t*)ptr;
+				return true;
+		
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			return false;
+		}
+
+	}
+	return false;
+
+}
