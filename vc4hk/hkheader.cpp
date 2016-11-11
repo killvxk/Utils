@@ -69,7 +69,20 @@ double TimeToHit(fb::Vec4 p, fb::Vec4 u, double v_pow2)
 }
 
 
+fb::Vec4* GetControllableSpeed(fb::ClientSoldierEntity * soldier){
 
+	__try {
+		fb::Vec4* v= soldier->GetVelocity();
+
+		return v;
+
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+
+		return nullptr;
+	}
+
+}
 
 
 

@@ -49,7 +49,7 @@ static bool IsValidPtr(void* ptr) {
 			return false;
 		}
 
-	}
+	}else
 	return false;
 
 }

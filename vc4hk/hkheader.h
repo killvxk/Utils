@@ -19,9 +19,8 @@ bool MinRealRootOfQuarticFunction(double a, double b, double c, double d, double
 
 
 
-float DistanceToAimRay(fb::Vec4 MyPosition, fb::Vec4 EnemyPosition,
-	const fb::Vec4 vAngle);
-fb::Vec4 getVehicleSpeed(fb::ClientSoldierEntity * soldier);
+
+fb::Vec4 * GetControllableSpeed(fb::ClientControllableEntity* * soldier);
 bool IsAlive(fb::ClientControllableEntity* pPlayer);
-DWORD GetVectorFromVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec4* vector);
+
 #endif 

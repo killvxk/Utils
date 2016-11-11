@@ -924,12 +924,14 @@ namespace fb {
 
 	inline	ClientSoldierWeapon* GetActiveSoldierWeapon()
 		{
-			if (!IsValidPtr(m_Handler))
-				return nullptr;
-
-			else
+			
+		__try{
+			
 				return m_Handler->m_pWeaponList[m_CurrentWeaponIndex];
-
+		}
+		__except (1) {
+			return nullptr;
+		}
 
 		};
 		int GetSlot()
@@ -1007,13 +1009,48 @@ namespace fb {
 
 	class WeaponFiringData
 	{
-	public:
-		char _0x0000[16];
-		FiringFunctionData* m_FiringData; //0x0010 
-		char _0x0018[24];
-		__int64 m_pGunSwayData; //0x0030 
+		class RumbleFiringData
+		{
+		public:
+			float LowRumble; //0x0000 
+			float HighRumble; //0x0004 
+			float RumbleDuration; //0x0008 
 
-	};//Size=0x0038
+		}; //Size=0x000C
+	public:
+		virtual void Function0(); //
+		virtual void Function1(); //
+		virtual void Function2(); //
+		virtual void Function3(); //
+		virtual void Function4(); //
+		virtual void Function5(); //
+		virtual void Function6(); //
+		virtual void Function7(); //
+		virtual void Function8(); //
+		virtual void Function9(); //
+
+		__int32 Flag00; //0x0008 
+		__int32 Flag01; //0x000C 
+		FiringFunctionData* m_FiringData; //0x0010 
+		float m_DeployTime; //0x0018 
+		float m_ReactivateCooldownTime; //0x001C 
+		float m_DisableZoomOnDeployTime; //0x0020 
+		float AltDeployTime; //0x0024 
+		__int32 AltDeployId; //0x0028 
+		char pad_0x002C[0x4]; //0x002C
+		GunSwayData* m_WeaponSway; //0x0030 
+		RumbleFiringData m_Rumble; //0x0038 
+		float m_SupportDelayStand; //0x0044 
+		float m_SupportDelayProne; //0x0048 
+		unsigned char m_UseAutoAiming; //0x004C 
+		unsigned char m_InflictSelfDamage; //0x004D 
+		unsigned char m_ShowEnemyNametagOnAim; //0x004E 
+		unsigned char m_ReloadWholeMags; //0x004F 
+		unsigned char m_DisableReloadWhileSprinting; //0x0050 
+		unsigned char m_AbortReloadOnSprint; //0x0051 
+		char pad_0x0052[0x6]; //0x0052
+
+	}; //Size=0x0058
 
 	class OverheatData
 	{
@@ -1029,38 +1066,170 @@ namespace fb {
 	class ShotConfigData
 	{
 	public:
-		Vec4 m_InitialPosition; //0x0000
-		Vec4 m_InitialDirection; //0x0010
-		Vec4 m_InitialSpeed; //0x0020
-		Array<void*> m_InitialDirectionScaleByPitch; //0x0030
-		Array<void*> m_InitialSpeedScaleByPitch; //0x0038
-		Float32 m_InheritWeaponSpeedAmount; //0x0040
-		char _0x0044[4];
-		void* m_MuzzleExplosion; //0x0048
-		ProjectileEntityData* m_ProjectileData; //0x0050
-		char _0x0058[24];
-		float m_SpawnDelay; //0x0070 
-		__int32 m_BulletsPerShell; //0x0074 
-		__int32 m_BulletsPerShot; //0x0078 
-		__int32 m_BulletsPerBurst; //0x007C 
-		unsigned char m_RelativeTargetAiming; //0x0080 
-		unsigned char m_ForceSpawnToCamera; //0x0081 
-		unsigned char m_SpawnVisualAtWeaponBone; //0x0082 
-		unsigned char m_ActiveForceSpawnToCamera; //0x0083 
-		char N00001926[12]; //0x0084 
-	};//Size=0x0090
+		Vec4 m_InitialPosition; //0x0000 
+		Vec4 m_InitialDirection; //0x0010 
+		Vec4 m_InitialSpeed; //0x0020 
+		void* InitialDirectionScaleByPitch; //0x0030 
+		void* InitialSpeedScaleByPitch; //0x0038 
+		float InheritWeaponSpeedAmount; //0x0040 
+		char pad_0x0044[0xC]; //0x0044
+		ProjectileEntityData* m_ProjectileData; //0x0050 
+		void* SecondaryProjectileData; //0x0058 
+		void* Projectile; //0x0060 
+		void* SecondaryProjectile; //0x0068 
+		float SpawnDelay; //0x0070 
+		float SpawnDelayZoomed; //0x0074 
+		__int32 NumberOfBulletsPerShell; //0x0078 
+		__int32 NumberOfBulletsPerShot; //0x007C 
+		__int32 NumberOfBulletsPerBurst; //0x0080 
+		unsigned char RelativeTargetAiming; //0x0084 
+		unsigned char ForceSpawnToCamera; //0x0085 
+		unsigned char SpawnVisualAtWeaponBone; //0x0086 
+		unsigned char ActiveForceSpawnToCamera; //0x0087 
+		char pad_0x0088[0x8]; //0x0088
+
+	}; //Size=0x0090
 
 	class FiringFunctionData
 	{
+		class OverHeatData
+		{
+		public:
+			char pad_0x0000[0x50]; //0x0000
+			float HeatPerBullet; //0x0050 
+			float HeatDropPerSecond; //0x0054 
+			float OverHeatPenaltyTime; //0x0058 
+			float OverHeatThreshold; //0x005C 
+
+		}; //Size=0x0060
+		class FiringDispersionData
+		{
+		public:
+			float MinAngle; //0x0000 
+			float MaxAngle; //0x0004 
+			float IncreasePerShot; //0x0008 
+			float DecreasePerSecond; //0x000C 
+
+		}; //Size=0x0010
+		class WeaponDispersion 
+		{
+		public:
+			FiringDispersionData StandDispersion;
+			FiringDispersionData CrouchDispersion; //0x0010 
+			FiringDispersionData ProneDispersion; //0x0020 
+			float JumpDispersionAngle; //0x0030 
+			float ProneTransitionDispersionAngle; //0x0034 
+			float MoveDispersionAngle; //0x0038 
+			float MoveZoomedDispersionAngle; //0x003C 
+			float DecreasePerSecond; //0x0040 
+
+		}; //Size=0x0044
+		class FireLogicData
+		{
+		public:
+			float MaxHoldTime; //0x0000 
+			float MinPowerModifier; //0x0004 
+			float MaxPowerModifier; //0x0008 
+			float PowerIncreasePerSecond; //0x000C 
+			float Delay; //0x0010 
+			float KilledHoldingPowerModifier; //0x0014 
+			unsigned char ForceFireWhenKilledHolding; //0x0018 
+			char pad_0x0019[0x3]; //0x0019
+			float BoltActionDelay; //0x001C 
+			float BoltActionTime; //0x0020 
+			unsigned char HoldBoltActionUntilFireRelease; //0x0024 
+			unsigned char HoldBoltActionUntilZoomRelease; //0x0025 
+			unsigned char ForceBoltActionOnFireTrigger; //0x0026 
+			unsigned char UnZoomOnBoltAction; //0x0027 
+			unsigned char ReturnToZoomAfterBoltAction; //0x0028 
+			char pad_0x0029[0x3]; //0x0029
+			float MaxRecoilAngleX; //0x002C 
+			float MinRecoilAngleX; //0x0030 
+			float MaxRecoilAngleY; //0x0034 
+			float MinRecoilAngleY; //0x0038 
+			float MaxRecoilAngleZ; //0x003C 
+			float MinRecoilAngleZ; //0x0040 
+			float MaxRecoilFov; //0x0044 
+			float MinRecoilFov; //0x0048 
+			unsigned char RecoilFollowsDispersion; //0x004C 
+			char pad_0x004D[0x3]; //0x004D
+			__int32 FireInputAction; //0x0050 
+			__int32 ReloadInputAction; //0x0054 
+			__int32 CycleFireModeInputAction; //0x0058 
+			float TriggerPullWeight; //0x005C 
+			float RateOfFire; //0x0060 
+			float RateOfFireForBurst; //0x0064 
+			float DelayBetweenBursts; //0x0068 
+			float ClientFireRateMultiplier; //0x006C 
+			float ReloadDelay; //0x0070 
+			float ReloadTime; //0x0074 
+			void* ReloadTimerArray; //0x0078 
+			float ReloadTimeBulletsLeft; //0x0080 
+			float ReloadThreshold; //0x0084 
+			float PreFireDelay; //0x0088 
+			float PreFireDelayZoomed; //0x008C 
+			float PreFireRequireHold; //0x0090 
+			float AutomaticDelay; //0x0094 
+			__int32 ReloadLogic; //0x0098 
+			__int32 ReloadType; //0x009C 
+			__int32 FireLogicType; //0x00A0 
+			char pad_0x00A4[0x4]; //0x00A4
+			void* FireLogicTypeArray; //0x00A8 
+			unsigned char HoldOffReloadUntilFireRelease; //0x00B0 
+			unsigned char HoldOffReloadUntilZoomRelease; //0x00B1 
+			unsigned char ForceReloadActionOnFireTrigger; //0x00B2 
+			unsigned char AlwaysAutoReload; //0x00B3 
+			unsigned char ZoomTransitionDisableFire; //0x00B4 
+			char pad_0x00B5[0x3]; //0x00B5
+
+		}; //Size=0x00B8
+
+		class AmmoConfigData
+		{
+		public:
+			__int32 MagazineCapacity; //0x0000 
+			__int32 NumberOfMagazines; //0x0004 
+			__int32 TraceFrequency; //0x0008 
+			__int32 AmmoPickupMinAmount; //0x000C 
+			__int32 AmmoPickupMaxAmount; //0x0010 
+			float AutoReplenishDelay; //0x0014 
+			float AmmoBagPickupDelayMultiplier; //0x0018 
+			__int32 AmmoBagPickupAmount; //0x001C 
+			unsigned char AutoReplenishMagazine; //0x0020 
+			unsigned char StartUnloaded; //0x0021 
+			char pad_0x0022[0x2]; //0x0022
+
+		}; //Size=0x0024
 	public:
-		char _0x0000[96];
+		virtual void Function0(); //
+		virtual void Function1(); //
+		virtual void Function2(); //
+		virtual void Function3(); //
+		virtual void Function4(); //
+		virtual void Function5(); //
+		virtual void Function6(); //
+		virtual void Function7(); //
+		virtual void Function8(); //
+		virtual void Function9(); //
+
+		__int32 Flag00; //0x0008 
+		__int32 Flag01; //0x000C 
+		FiringDispersionData* m_Dispersion; //0x0010 
+		WeaponDispersion m_WeaponDispersion; //0x0018 
+		char pad_0x005C[0x4]; //0x005C
 		ShotConfigData m_ShotConfigData; //0x0060 
-		OverheatData m_OverHeatData; //0x00F0 
-		__int64 m_FireEffects1; //0x0150 
-		__int64 m_FireEffects2; //0x0158 
-		__int64 m_pSound; //0x0160 
-		char _0x0168[16];
-	};//Size=0x0178
+		OverHeatData m_OverHeat; //0x00F0 
+		void* m_FireEffects1p; //0x0150 
+		void* m_FireEffects3p; //0x0158 
+		void* m_Sound; //0x0160 
+		FireLogicData m_FireLogic; //0x0168 
+		AmmoConfigData m_Ammo; //0x0220 
+		float m_SelfHealTimeWhenDeployed; //0x0244 
+		unsigned char m_UsePrimaryAmmo; //0x0248 
+		unsigned char m_UnlimitedAmmoForAI; //0x0249 
+		char pad_0x024A[0x6]; //0x024A
+
+	}; //Size=0x0250
 
 	class ProjectileEntityData
 	{

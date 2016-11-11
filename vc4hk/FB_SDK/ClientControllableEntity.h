@@ -83,16 +83,16 @@ namespace fb
 		virtual void Function73(); //
 		virtual void Function74(); //
 
-		char _0x0000[10]; //0x0000 
-		unsigned char m_OcclusionFlags; //0x0012 
-		char _0x0013[13]; //0x0013 
-		char _0x0020[16];
+		char pad_0x0008[0x12]; //0x0008 
+		BYTE m_RenderChamsBehindBigWall; //0x001A
+		char pad_0x001B[0x15]; //0x001B
 		__int64 m_Data; //0x0030 
-		char _0x0038[200];
+		char _0x0038[0xc8]; //0x0038
 		float m_Velocity; //0x0100 
+	
 		char _0x104[0xc];//0x0104
 		void * m_entryComponent;//0x110
-		char _0x108[0x38];
+		char _0x118[0x28];
 
 		HealthComponent* m_pHealthComp; //0x0140 
 

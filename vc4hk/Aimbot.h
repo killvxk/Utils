@@ -16,7 +16,7 @@ public:
 	fb::Vec4 * GetClosestPlayer(eastl::vector<fb::ClientPlayer*>*, fb::ClientPlayer*, int, bool);
 	fb::Vec4  GetVecOfPlayer(bool, fb::RagdollComponent*);
 	fb::Vec4 	GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* , fb::ClientWeapon* , fb::FiringFunctionData* ,bool );
-	void NullTmpVar();
+
 	DWORD GetVectorFromVehicle(fb::ClientPlayer* , fb::Vec4* );
 	float DistanceToAimRay(fb::Vec4 , fb::Vec4 ,
 		const fb::Vec4 );
@@ -25,14 +25,16 @@ public:
 	fb::Vec4 v_curAngle;
 	fb::Vec4 v_lastAngle;
 	bool bAimHead;
-	fb::ClientSoldierEntity* LockOn_pEnemySoldier;
+	fb::ClientSoldierEntity* m_LockOn_pEnemySoldier;
+	fb::ClientPlayer* m_LockOn_pEnemyPlayer;
 	int LockOnEnemyFlags;
+
 	fb::ClientSoldierEntity* mp_ClosestSoldier;
 	fb::ClientPlayer* mp_ClosestPlayer;
 	fb::Vec4*  VecOfClosestSoldier;
 
 private:
-
+	void NullTmpVar();
 };
 
 

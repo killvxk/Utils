@@ -12,7 +12,8 @@ Aimbot::Aimbot()
 	VecOfClosestSoldier = new fb::Vec4;
 	this->bAimHead = false;
 	this->LockOnEnemyFlags = 0;
-	this->LockOn_pEnemySoldier = nullptr;
+	this->m_LockOn_pEnemySoldier = nullptr;
+	this->m_LockOn_pEnemyPlayer = nullptr;
 }
 
 float Aimbot::DistanceToAimRay(fb::Vec4 MyPosition, fb::Vec4 EnemyPosition,
@@ -185,7 +186,7 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 
 			if (bAimHead)
 			{
-				b_found = pRagdoll->GetBone(fb::UpdatePoseResultData::HeadEnd, &v_EnemyVecTmp);
+				b_found = pRagdoll->GetBone(fb::UpdatePoseResultData::Head, &v_EnemyVecTmp);
 			}
 
 			else
@@ -247,13 +248,13 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 	}
 	else {
 		__try {
-		pEnemySoldier = this->LockOn_pEnemySoldier;
+		pEnemySoldier = this->m_LockOn_pEnemySoldier;
 
 		//if (!IsValidPtr(pEnemySoldier))return nullptr;
 
 		if (!IsAlive(pEnemySoldier))return nullptr;
 
-		pClientPlayer = pEnemySoldier->m_pPlayer;
+		pClientPlayer = this->m_LockOn_pEnemyPlayer;
 
 		//if (!IsValidPtr(pClientPlayer))return nullptr;
 
@@ -264,7 +265,7 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 	//	if (!IsValidPtr(pRagdoll))return nullptr;
 		if (bAimHead)
 		{
-			b_found = pRagdoll->GetBone(fb::UpdatePoseResultData::HeadEnd, &v_EnemyVecTmp);
+			b_found = pRagdoll->GetBone(fb::UpdatePoseResultData::Head, &v_EnemyVecTmp);
 
 
 
@@ -485,7 +486,7 @@ DWORD  Aimbot::AimCorrection2(fb::Vec4 MyPosition,
 	}
 
 
-	flPitch = flPitch - atan2(v1.y, v1.z);
+if(isnormal(v1.y))	flPitch = flPitch - atan2(v1.y, v1.z);
 
 	if (flPitch > 1.48350f || flPitch < -1.2217f || _isnanf(flPitch))return 0x2;
 

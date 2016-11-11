@@ -10,7 +10,7 @@ namespace fb
 		virtual void* GetCharacterEntity(); // ClientSoldierEntity + 188 
 		virtual void* GetCharacterUserData(); // PlayerCharacterUserData
 		virtual void* GetEntryComponent();
-		virtual bool InVehicle();
+		virtual bool InVehicle_v();
 		virtual unsigned int GetId();
 		virtual bool hasUnlockAsset(LPVOID, bool);
 		virtual void getUnlockAssets(eastl::vector<LPVOID> *);
@@ -116,7 +116,7 @@ namespace fb
 		char _0x1528[0x29];
 		bool isInVehicle;//0x1551
 
-		inline bool InVehicle11() {
+		inline bool InVehicle() {
 
 		 return isInVehicle;
 		}
