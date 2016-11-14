@@ -18,6 +18,7 @@ public:
 	fb::Vec4 	GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* , fb::ClientWeapon* , fb::FiringFunctionData* ,bool );
 
 	DWORD GetVectorFromVehicle(fb::ClientPlayer* , fb::Vec4* );
+	
 	float DistanceToAimRay(fb::Vec4 , fb::Vec4 ,
 		const fb::Vec4 );
 

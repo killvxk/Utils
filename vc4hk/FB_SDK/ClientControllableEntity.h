@@ -87,7 +87,8 @@ namespace fb
 		BYTE m_RenderChamsBehindBigWall; //0x001A
 		char pad_0x001B[0x15]; //0x001B
 		__int64 m_Data; //0x0030 
-		char _0x0038[0xc8]; //0x0038
+		void* m_Complist;//0x0038
+		char _0x0040[0xc0]; 
 		float m_Velocity; //0x0100 
 	
 		char _0x104[0xc];//0x0104
@@ -96,70 +97,10 @@ namespace fb
 
 		HealthComponent* m_pHealthComp; //0x0140 
 
-		class CompTuple
-		{
-		public:
-			__int64 a;
-			__int32 flags;
-			__int32 cc;
-			ITypedObject* Object; 
-			char b[0x8];
-			
-			
-		};//Size=0x0020
-
+	
 
 	
-	inline	std::vector<void*>* GetClientComponentByID(int Id,bool CheckUnderUsing)
 
-		{
-			void* offset = *((void**)((intptr_t)this + 0x38));
-
-
-			int size = *(BYTE*)((intptr_t)offset + 0x8);
-
-				CompTuple* trashclass1 = (CompTuple*)((intptr_t)offset + 0x10);
-
-			std::vector<void*>* vector = new std::vector<void*>;
-
-			for (int obj_index = 0; obj_index < size; obj_index++)
-
-			{
-				if (CheckUnderUsing	) {
-				__int32 flag = trashclass1[obj_index].flags >> 0xA;
-
-				flag = flag & trashclass1[obj_index].flags;
-
-				if (!(flag & 0x2))continue;
-			}
-				fb::ClassInfo* pType = (fb::ClassInfo*)trashclass1[obj_index].Object->GetType();
-
-				if (IsValidPtr(pType)) {
-
-
-				if (pType->m_ClassId == Id) {
-
-					vector->push_back((void*)(trashclass1[obj_index].Object));
-
-
-				}
-			}
-
-				
-			
-
-
-			}
-
-			if (vector->size()>0) {
-				return	vector;
-			}
-			else {
-				delete vector;
-				vector = nullptr;
-				return nullptr;
-			}
-		}
 	};//Size=0x0148
 
 

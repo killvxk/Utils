@@ -93,43 +93,35 @@ DWORD Aimbot::GetVectorFromVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec4* vec
 	return 0x0;
 }
 
-fb::Vec4  Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer ,fb::ClientWeapon* MyCSW, fb::FiringFunctionData* pFFD,bool b_InVeh) {
-
-
+fb::Vec4  Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer ,fb::ClientWeapon* MyCSW, fb::FiringFunctionData* pFFD,bool b_InVeh)  {
+	SM::Matrix ShootSpaceMat;
 	if (b_InVeh) {
-		
+
 		fb::MainVarPtr* turrent = fb::MainVarPtr::Singleton();
 
-		SM::Matrix mTransform = turrent->m_turretTransform;
+	ShootSpaceMat = turrent->m_turretTransform;
 
-		this->v_curAngle.x = -atan2(mTransform._31, mTransform._33);
-
-		if (this->v_curAngle.x < 0) 
-		{
-			this->v_curAngle.x = this->v_curAngle.x + Twice_PI;
-		}
-
-	
-		this->v_curAngle.y = atan2(mTransform._32,
-			sqrt(mTransform._33* mTransform._33 + mTransform._31* mTransform._31));
-
-		this->vOrigin.x = mTransform.Translation().x + pFFD->m_ShotConfigData.m_InitialPosition.x;
-		this->vOrigin.y = mTransform.Translation().y + pFFD->m_ShotConfigData.m_InitialPosition.y;
-		this->vOrigin.z = mTransform.Translation().z + pFFD->m_ShotConfigData.m_InitialPosition.z;
+		
 	}
 	else {
-		SM::Matrix ShootSpaceMat = MyCSW->m_ShootSpace;
 
-		this->v_curAngle.x = -atan2(ShootSpaceMat._31, ShootSpaceMat._33);
+		ShootSpaceMat = MyCSW->m_ShootSpace;
 
-		if (this->v_curAngle.x < 0) { this->v_curAngle.x = this->v_curAngle.x + Twice_PI; }
-
-		this->v_curAngle.y = atan2(ShootSpaceMat._32, sqrt(ShootSpaceMat._33* ShootSpaceMat._33 + ShootSpaceMat._31* ShootSpaceMat._31));
-
-		this->vOrigin.x = ShootSpaceMat.Translation().x + pFFD->m_ShotConfigData.m_InitialPosition.x;
-		this->vOrigin.y = ShootSpaceMat.Translation().y + pFFD->m_ShotConfigData.m_InitialPosition.y;
-		this->vOrigin.z = ShootSpaceMat.Translation().z + pFFD->m_ShotConfigData.m_InitialPosition.z;
 	}
+
+	this->v_curAngle.x = -atan2(ShootSpaceMat._31, ShootSpaceMat._33);
+
+	if (this->v_curAngle.x < 0) { this->v_curAngle.x = this->v_curAngle.x + Twice_PI; }
+
+	this->v_curAngle.y = atan2(ShootSpaceMat._32, sqrt(ShootSpaceMat._33* ShootSpaceMat._33 + ShootSpaceMat._31* ShootSpaceMat._31));
+
+	fb::Vec4 v_Tmp(ShootSpaceMat.Translation());
+	fb::Vec4 v_Up(ShootSpaceMat.Up());
+	fb::Vec4 v_Right(ShootSpaceMat.Right());
+	fb::Vec4 v_Forward(ShootSpaceMat.Backward());
+
+	this->vOrigin = v_Tmp + v_Up*pFFD->m_ShotConfigData.m_InitialPosition.y + v_Right*pFFD->m_ShotConfigData.m_InitialPosition.x + v_Forward*pFFD->m_ShotConfigData.m_InitialPosition.z;
+
 	this->vOrigin.w = 0;
 	return this->vOrigin;
 

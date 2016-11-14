@@ -5,7 +5,17 @@
 
 namespace fb {
 
+	class CompTuple
+	{
+	public:
+		__int64 a;//0x00
+		__int32 flags;//0x08
+		__int32 cc;//0x0c
+		ITypedObject* Object;//0x10
+		char b[0x8];
 
+
+	};//Size=0x0020
 
 
 
@@ -2158,7 +2168,7 @@ namespace fb {
 		ClientPlayer* m_pClientPlayer; //0x270
 	};//0x640
 	class WeaponInfo
-	{
+	{public:
 		virtual void WorldTransfrom(D3DXMATRIX&);
 		virtual void GetState(int&);
 		virtual void AddWeaponFiringCallbcks(void*);
@@ -2196,7 +2206,7 @@ namespace fb {
 		ClientPlayerEntryComponent* m_pPlayerEntry; //0x0020
 		char _0x0028[0x28];
 		DynamicPhysicsEntity* m_physicsEntity; //0x0050 Start of WeaponComponent
-		char _0x0008[0x30];
+		char _0x0058[0x30];
 		void* m_interpolationObject; //0x0088
 		ClientWeapon* m_pWeapon; //0x0090
 		void* m_pController; //0x0098 ClientWeaponComponentSimulation

@@ -24,7 +24,12 @@ namespace fb
 
 
 		}
+		Vec4(DirectX::SimpleMath::Vector3 a) 
+		
+		: x(a.x), y(a.y), z(a.z), w(0.f) {
 
+
+		}
 
 		Vec4(FLOAT x,
 			FLOAT y,

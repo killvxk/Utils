@@ -392,6 +392,8 @@ namespace eastl
 }
 namespace fb
 {
+
+
 	template <typename T>
 	class WeakPtr
 	{
