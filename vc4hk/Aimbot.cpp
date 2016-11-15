@@ -108,6 +108,14 @@ fb::Vec4  Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer 
 		ShootSpaceMat = MyCSW->m_ShootSpace;
 
 	}
+	typedef fb::Vec4* (__fastcall* Forward_vec)(fb::ClientWeapon* , fb::Vec4* );
+	
+	Forward_vec fn_calcu = (Forward_vec)(CALCU_VEC_FORWARD);
+
+
+	fb::Vec4* vec_forward = new fb::Vec4;
+
+	vec_forward = fn_calcu(MyCSW, vec_forward);
 
 	this->v_curAngle.x = -atan2(ShootSpaceMat._31, ShootSpaceMat._33);
 
@@ -118,9 +126,9 @@ fb::Vec4  Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer 
 	fb::Vec4 v_Tmp(ShootSpaceMat.Translation());
 	fb::Vec4 v_Up(ShootSpaceMat.Up());
 	fb::Vec4 v_Right(ShootSpaceMat.Right());
-	fb::Vec4 v_Forward(ShootSpaceMat.Backward());
 
-	this->vOrigin = v_Tmp + v_Up*pFFD->m_ShotConfigData.m_InitialPosition.y + v_Right*pFFD->m_ShotConfigData.m_InitialPosition.x + v_Forward*pFFD->m_ShotConfigData.m_InitialPosition.z;
+
+	this->vOrigin = v_Tmp + v_Up*pFFD->m_ShotConfigData.m_InitialPosition.y + v_Right*pFFD->m_ShotConfigData.m_InitialPosition.x ;
 
 	this->vOrigin.w = 0;
 	return this->vOrigin;

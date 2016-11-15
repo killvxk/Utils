@@ -28,6 +28,7 @@
 #define CLASSINFO_PICKUPENTITY                0x142868950 
 #define CLASSINFO_STATIC_MODEL                0x142816450 
 #define DEPLOYED                            0x1421D842E  
+#define CALCU_VEC_FORWARD					0x14098CD30
 
 #endif
 
