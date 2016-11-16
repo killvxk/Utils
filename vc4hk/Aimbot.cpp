@@ -108,14 +108,14 @@ fb::Vec4  Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer 
 		ShootSpaceMat = MyCSW->m_ShootSpace;
 
 	}
-	typedef fb::Vec4* (__fastcall* Forward_vec)(fb::ClientWeapon* , fb::Vec4* );
-	
-	Forward_vec fn_calcu = (Forward_vec)(CALCU_VEC_FORWARD);
+	//typedef fb::Vec4* (__fastcall* Forward_vec)(fb::ClientWeapon* , fb::Vec4* );
+	//
+	//Forward_vec fn_calcu = (Forward_vec)(CALCU_VEC_FORWARD);
 
 
-	fb::Vec4* vec_forward = new fb::Vec4;
+	//fb::Vec4* vec_forward = new fb::Vec4;
 
-	vec_forward = fn_calcu(MyCSW, vec_forward);
+	//vec_forward = fn_calcu(MyCSW, vec_forward);
 
 	this->v_curAngle.x = -atan2(ShootSpaceMat._31, ShootSpaceMat._33);
 
