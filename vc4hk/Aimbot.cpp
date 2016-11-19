@@ -108,19 +108,28 @@ fb::LinearTransform ShootSpaceMat;
 		ShootSpaceMat = MyCSW->m_ShootSpace;
 
 	}
+
+
 	//typedef fb::Vec4* (__fastcall* Forward_vec)(fb::ClientWeapon* , fb::Vec4* );
 	//
 	//Forward_vec fn_calcu = (Forward_vec)(CALCU_VEC_FORWARD);
  
-	//fb::Vec4* vec_forward = new fb::Vec4;
+		fb::Vec4 vec_forward = ShootSpaceMat.forward;
 
-	//vec_forward = fn_calcu(MyCSW, vec_forward);
+//	vec_forward = fn_calcu(MyCSW, &ShootSpaceMat.forward);
 
-	this->v_curAngle.x = -atan2(ShootSpaceMat._31, ShootSpaceMat._33);
+	this->v_curAngle.x = -atan2(vec_forward.x, vec_forward.z);
+
+//	this->v_curAngle.x = -atan2(ShootSpaceMat._31, ShootSpaceMat._33);
+
+
 
 	if (this->v_curAngle.x < 0) { this->v_curAngle.x = this->v_curAngle.x + Twice_PI; }
 
-	this->v_curAngle.y = atan2(ShootSpaceMat._32, sqrt(ShootSpaceMat._33* ShootSpaceMat._33 + ShootSpaceMat._31* ShootSpaceMat._31));
+	//this->v_curAngle.y = atan2(ShootSpaceMat._32, sqrt(ShootSpaceMat._33* ShootSpaceMat._33 + ShootSpaceMat._31* ShootSpaceMat._31));
+
+
+	this->v_curAngle.y = atan2(vec_forward.y, sqrt(vec_forward.z* vec_forward.z + vec_forward.x* vec_forward.x));
 
 	fb::Vec4 v_Tmp=ShootSpaceMat.trans;
 	fb::Vec4 v_Up=ShootSpaceMat.up;
