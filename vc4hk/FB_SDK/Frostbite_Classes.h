@@ -1,7 +1,7 @@
 #pragma once
 #ifndef __CLASS_DEFINE_H__
 #define __CLASS_DEFINE_H__
-namespace SM = DirectX::SimpleMath;
+
 
 
 namespace fb {
@@ -4035,7 +4035,7 @@ namespace fb {
 	class ZeroingModifier;
 	class WeaponSway;
 
-
+	class LinearTransform;
 
 	class ClientSoldierAimingEnvironment;
 	class ClientSpottingTargetComponent;

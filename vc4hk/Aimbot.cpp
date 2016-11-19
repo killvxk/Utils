@@ -63,7 +63,7 @@ float Aimbot::DistanceToAimRay(fb::Vec4 MyPosition, fb::Vec4 EnemyPosition,
 
 DWORD Aimbot::GetVectorFromVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec4* vector) {
 
-	SM::Matrix* mTransform = new SM::Matrix;
+	fb::LinearTransform* mTransform = new fb::LinearTransform;
 	fb::Vec4  tmp;
 
 	fb::ClientVehicleEntity *veh = pLocalPlayer->GetVehicleEntity();
@@ -94,7 +94,7 @@ DWORD Aimbot::GetVectorFromVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec4* vec
 }
 
 fb::Vec4  Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer ,fb::ClientWeapon* MyCSW, fb::FiringFunctionData* pFFD,bool b_InVeh)  {
-	SM::Matrix ShootSpaceMat;
+fb::LinearTransform ShootSpaceMat;
 	if (b_InVeh) {
 
 		fb::MainVarPtr* turrent = fb::MainVarPtr::Singleton();
@@ -111,8 +111,7 @@ fb::Vec4  Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer 
 	//typedef fb::Vec4* (__fastcall* Forward_vec)(fb::ClientWeapon* , fb::Vec4* );
 	//
 	//Forward_vec fn_calcu = (Forward_vec)(CALCU_VEC_FORWARD);
-
-
+ 
 	//fb::Vec4* vec_forward = new fb::Vec4;
 
 	//vec_forward = fn_calcu(MyCSW, vec_forward);
@@ -123,9 +122,9 @@ fb::Vec4  Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer 
 
 	this->v_curAngle.y = atan2(ShootSpaceMat._32, sqrt(ShootSpaceMat._33* ShootSpaceMat._33 + ShootSpaceMat._31* ShootSpaceMat._31));
 
-	fb::Vec4 v_Tmp(ShootSpaceMat.Translation());
-	fb::Vec4 v_Up(ShootSpaceMat.Up());
-	fb::Vec4 v_Right(ShootSpaceMat.Right());
+	fb::Vec4 v_Tmp=ShootSpaceMat.trans;
+	fb::Vec4 v_Up=ShootSpaceMat.up;
+	fb::Vec4 v_Right=ShootSpaceMat.right;
 
 
 	this->vOrigin = v_Tmp + v_Up*pFFD->m_ShotConfigData.m_InitialPosition.y + v_Right*pFFD->m_ShotConfigData.m_InitialPosition.x ;

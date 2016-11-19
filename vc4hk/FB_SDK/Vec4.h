@@ -24,12 +24,7 @@ namespace fb
 
 
 		}
-		Vec4(DirectX::SimpleMath::Vector3 a) 
-		
-		: x(a.x), y(a.y), z(a.z), w(0.f) {
 
-
-		}
 
 		Vec4(FLOAT x,
 			FLOAT y,
@@ -82,14 +77,7 @@ namespace fb
 			v.z = this->z + other.z;
 			return v;
 		}
-		Vec4 operator = (SM::Vector3 const &other)
-		{
-			Vec4 v;
-			v.x = other.x;
-			v.y = other.y;
-			v.z = other.z;
-			return v;
-		}
+
 		Vec4 operator - (Vec4 const &other)
 		{
 			Vec4 v;

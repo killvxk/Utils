@@ -23,5 +23,5 @@
 #include <stdio.h>
 #include <string>
 #include <D3DX10math.h>
-#include"DXTK\Inc\SimpleMath.h"
+
 

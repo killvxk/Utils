@@ -18,7 +18,32 @@ namespace fb {
 	};//Size=0x0020
 
 
+	class LinearTransform
+	{
+	public:
+		union
+		{
+			struct
+			{
+				fb::Vec4 right;
+				fb::Vec4 up;
+				fb::Vec4 forward;
+				fb::Vec4 trans;
+			};
+			FLOAT data[4][4];
+			struct 
+			{
+				float _11, _12, _13, _14,
+					_21, _22, _23, _24,
+					_31, _32, _33, _34,
+					_41, _42, _43, _44;
 
+
+			};
+		};
+		LinearTransform()
+		{}
+	};
 
 	class DxRenderer
 	{
@@ -99,7 +124,7 @@ namespace fb {
 	{
 	public:
 		char _0x0000[64];
-		SM::Matrix m_Transform; //0x0040 
+		fb::LinearTransform m_Transform; //0x0040 
 		char _0x0080[52];
 		float m_FovY; //0x00B4 
 		float m_DefaultFovY; //0x00B8 
@@ -113,16 +138,16 @@ namespace fb {
 		float m_DepthHeightRatio; //0x0254 
 		float m_FovScale; //0x0258 
 		float m_FovScaleSquared; //0x025C 
-		SM::Matrix m_View; //0x0260 
-		SM::Matrix m_ViewTranspose; //0x02A0 
-		SM::Matrix m_ViewInverse; //0x02E0 
-		SM::Matrix m_Projection; //0x0320 
-		SM::Matrix m_ViewAtOrigin; //0x0360 
-		SM::Matrix m_ProjectionTranspose; //0x03A0 
-		SM::Matrix m_ProjectionInverse; //0x03E0 
-		SM::Matrix m_ViewProjection; //0x0420 
-		SM::Matrix m_ViewProjectionTranspose; //0x0460 
-		SM::Matrix m_ViewProjectionInverse; //0x04A0 
+		fb::LinearTransform m_View; //0x0260 
+		fb::LinearTransform m_ViewTranspose; //0x02A0 
+		fb::LinearTransform m_ViewInverse; //0x02E0 
+		fb::LinearTransform m_Projection; //0x0320 
+		fb::LinearTransform m_ViewAtOrigin; //0x0360 
+		fb::LinearTransform m_ProjectionTranspose; //0x03A0 
+		fb::LinearTransform m_ProjectionInverse; //0x03E0 
+		fb::LinearTransform m_ViewProjection; //0x0420 
+		fb::LinearTransform m_ViewProjectionTranspose; //0x0460 
+		fb::LinearTransform m_ViewProjectionInverse; //0x04A0 
 
 	};//Size=0x04E0
 
@@ -697,23 +722,7 @@ namespace fb {
 
 	};//Size=0x0038
 
-	class LinearTransform
-	{
-	public:
-		union
-		{
-			struct
-			{
-				SM::Vector3 left;
-				SM::Vector3 up;
-				SM::Vector3 forward;
-				SM::Vector3 trans;
-			};
-			FLOAT data[4][4];
-		};
-		LinearTransform()
-		{}
-	};
+
 
 	class AxisAlignedBox
 	{
@@ -727,7 +736,7 @@ namespace fb {
 	struct TransformAABBStruct {
 		LinearTransform Transform;
 		AxisAlignedBox AABB;
-		SM::Matrix pad;
+		fb::LinearTransform pad;
 
 		TransformAABBStruct()
 		{}
@@ -918,7 +927,7 @@ namespace fb {
 	{
 	public:
 		char _0x0000[208];
-		SM::Matrix m_WeaponTransform; //0x00D0 
+		fb::LinearTransform m_WeaponTransform; //0x00D0 
 		char _0x0110[1920];
 		AnimatedSoldierWeaponHandler* m_Handler; //0x0890 
 		char _0x0898[48];
@@ -971,13 +980,15 @@ namespace fb {
 		float m_Pitch; //0x001C 
 		float m_AimYawTimer; //0x0020 
 		float m_AimPitchTimer; //0x0024 
-		SM::Vector2 m_Sway; //0x0028 
+		float m_Sway_x; //0x0028
+		float m_Sway_y;
 		float m_DeltaTime; //0x0030 
 		char _0x0034[8];
-		SM::Vector2 m_ViewDelta; //0x003C 
+		float m_ViewDelta_x; //0x003C 
+		float m_ViewDelta_y;
 		char _0x0044[40];
 		int m_zoomLevel; //0x0068 
-		SM::Matrix m_Transform; //0x0070 
+		fb::LinearTransform m_Transform; //0x0070 
 		Vec4 m_Position; //0x00B0 
 		Vec4 m_View; //0x00C0 
 		Vec4 m_Velocity; //0x00D0 
@@ -995,7 +1006,8 @@ namespace fb {
 	{
 	public:
 		char _0x0000[20];
-		SM::Vector2 m_AimAngles;
+		float m_AimAngles_yaw;
+		float m_AimAngles_pitch;
 	};//Size=0x001C
 
 	class ClientWeapon
@@ -1006,8 +1018,8 @@ namespace fb {
 		WeaponModifier* m_pWeaponModifier; //0x0020 
 		char _0x0028[8];
 		Vec4 m_MoveSpeed; //0x0030 
-		SM::Matrix m_ShootSpace; //0x0040 
-		SM::Matrix m_ShootSpaceIdentity; //0x0080 
+		fb::LinearTransform m_ShootSpace; //0x0040 
+		fb::LinearTransform m_ShootSpaceIdentity; //0x0080 
 		char _0x00C0[464];
 		float m_CameraFOV; //0x0290 
 		float m_WeaponFOV; //0x0294 
@@ -2270,8 +2282,8 @@ namespace fb {
 		ClientCameraComponent*           pCurVehicleCam;  //+0x60 (Vehicles\Gadgets only, and not in passenger seat with weapon)  
 		void*                            pSomeCameraInfo; //+0x68 (Vehicles\Gadgets only, and not in passenger seat with weapon)  
 		char a418[0x8];                                          //+0x70  
-		SM::Matrix  m_turretTransform;                    //+0x78 ? (Update in vehicles only)  
-		SM::Matrix  m_cameraTransform;                    //+0xB8 ?   
+		fb::LinearTransform  m_turretTransform;                    //+0x78 ? (Update in vehicles only)  
+		fb::LinearTransform  m_cameraTransform;                    //+0xB8 ?   
 		Vec4 m_cameraBodyDegree;                      //+0xF8 (x,y,z [0-360.f]);  
 		bool m_bInitialized;                              //+0x108 (= 1 if we spawned on map at least once)  
 
