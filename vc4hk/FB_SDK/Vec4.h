@@ -151,14 +151,6 @@ namespace fb
 		}
 
 
-		Vec4 TransferFromD3DXVECTOR3(D3DXVECTOR3 const &other)
-		{
-			this->x = other.x;
-			this->y = other.y;
-			this->z = other.z;
-			return *this;
-		}
-
 
 		//new from me calc Veccrossize
 		Vec4 VectorCrossSize(CONST Vec4 *pV1, CONST Vec4 *pV2)
@@ -171,13 +163,7 @@ namespace fb
 
 
 
-		float Vec4::AimFloat(Vec4 &delta, const float &FOV)
-		{
-			return asinf(this->Dot(delta)) / FOV;
-		}
-
-
-
+		
 
 	};
 
