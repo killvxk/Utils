@@ -81,7 +81,6 @@
     <ClInclude Include="FB_SDK\Vec3Transform.h" />
     <ClInclude Include="FB_SDK\x64_sdk.hpp" />
     <ClInclude Include="hkheader.h" />
-    <ClInclude Include="DXTK\Inc\SimpleMath.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="poly34.h" />
     <ClInclude Include="stdafx.h" />
@@ -95,9 +94,6 @@
     </ClCompile>
     <ClCompile Include="vc4hk.cpp" />
     <ClCompile Include="hkheader.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="DXTK\Inc\SimpleMath.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

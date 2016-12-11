@@ -30,7 +30,7 @@ namespace fb
 		virtual BOOL getJobEnable();											// V: 0x1C
 		virtual VOID onUnloadLevel();											// V: 0x20
 		virtual INT getAffinity();												// V: 0x24
-		virtual D3DXVECTOR2 getResolution();									// V: 0x28
+		virtual Vec2 getResolution();									// V: 0x28
 		virtual VOID addModule(INT, LPVOID);									// V: 0x2C
 		virtual VOID removeModule(INT);											// V: 0x30
 		//  valid Draw Job

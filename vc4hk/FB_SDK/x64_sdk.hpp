@@ -2015,20 +2015,20 @@ namespace fb {
 		char pad_0x00[0x10]; //+0x00
 		__int64 m_InputPolynomial; //+0x10
 		__int64 m_ZoomedInputPolynomial; //+0x18
-		D3DXVECTOR3 m_StickyBoxScale; //+0x20
-		D3DXVECTOR3 m_StickyDistanceScale; //+0x30
-		D3DXVECTOR3 m_SnapBoxScale; //+0x40
-		D3DXVECTOR3 m_SnapDistanceScale; //+0x50
-		D3DXVECTOR3 m_EyePosOffset; //+0x60
+		Vec4 m_StickyBoxScale; //+0x20
+		Vec4 m_StickyDistanceScale; //+0x30
+		Vec4 m_SnapBoxScale; //+0x40
+		Vec4 m_SnapDistanceScale; //+0x50
+		Vec4 m_EyePosOffset; //+0x60
 		float m_AccelerationInputThreshold; //+0x70
 		float m_AccelerationMultiplier; //+0x74
 		float m_AccelerationDamping; //+0x78
 		float m_AccelerationTimeThreshold; //+0x7C
 		float m_SquaredAcceleration; //+0x80
-		D3DXVECTOR2 m_MaxAcceleration; //+0x84
+		Vec2 m_MaxAcceleration; //+0x84
 		float m_YawSpeedStrength; //+0x8C
 		float m_PitchSpeedStrength; //+0x90
-		D3DXVECTOR2 m_AttractDistanceFallOffs; //+0x94
+		Vec2 m_AttractDistanceFallOffs; //+0x94
 		float m_AttractSoftZone; //+0x9C
 		float m_AttractUserInputMultiplier; //+0xA0
 		float m_AttractUserInputMultiplier_NoZoom; //+0xA4
@@ -2181,7 +2181,7 @@ namespace fb {
 	};//0x640
 	class WeaponInfo
 	{public:
-		virtual void WorldTransfrom(D3DXMATRIX&);
+		virtual void WorldTransfrom(LinearTransform&);
 		virtual void GetState(int&);
 		virtual void AddWeaponFiringCallbcks(void*);
 		virtual void RemoveWeaponFiringCallbcks(void*);

@@ -9,10 +9,10 @@
 #pragma warning (disable:4305) // truncation from 'int' to 'bool'
 
 #pragma comment (lib, "Winmm.lib")
-#pragma comment (lib, "d3dx9.lib") 
+
 
 #include <windows.h>
-#include <d3dx9math.h>
+
 #include <map>
 
 #define CONCAT_IMPL(x, y) x##y

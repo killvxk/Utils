@@ -32,8 +32,8 @@ namespace fb
 			 DontCheckMaterials,                    // constant 0x40
 		}; // <unnamed-tag>
 
-		/*union __m128*/LPD3DXMATRIX center;        // 0x0
-		/*union __m128*/LPD3DXMATRIX radius;        // 0x10
+		/*union __m128*/LinearTransform*  center;        // 0x0
+		/*union __m128*/LinearTransform*  radius;        // 0x10
 		EntityGridQueryJobData::QueryType queryType;// 0x20
 		EntityGridQueryJobData::QueryDetail queryDetail;// 0x24
 		int maxQueryResult;                      // 0x28

@@ -13,12 +13,12 @@ namespace fb
 		{
 			struct
 			{
-				FLOAT x;
-				FLOAT y;
-				FLOAT z;
-				FLOAT w;
+				float x;
+				float y;
+				float z;
+				float w;
 			};
-			FLOAT data[4];
+			float data[4];
 		};
 		Vec4() : x(0.f), y(0.f), z(0.f), w(0.f) {
 
@@ -26,17 +26,17 @@ namespace fb
 		}
 
 
-		Vec4(FLOAT x,
-			FLOAT y,
-			FLOAT z,
-			FLOAT w) : x(x), y(y), z(z), w(w) {
+		Vec4(float x,
+			float y,
+			float z,
+			float w) : x(x), y(y), z(z), w(w) {
 
 
 		}
 
-		Vec4(FLOAT x,
-			FLOAT y,
-			FLOAT z) : x(x), y(y), z(z), w(0.f) {
+		Vec4(float x,
+			float y,
+			float z) : x(x), y(y), z(z), w(0.f) {
 
 
 		}
@@ -153,7 +153,7 @@ namespace fb
 
 
 		//new from me calc Veccrossize
-		Vec4 VectorCrossSize(CONST Vec4 *pV1, CONST Vec4 *pV2)
+		Vec4 VectorCrossSize(const Vec4 *pV1, const Vec4 *pV2)
 		{
 			this->x = pV1->y * pV2->z - pV1->z * pV2->y;
 			this->y = pV1->z * pV2->x - pV1->x * pV2->z;

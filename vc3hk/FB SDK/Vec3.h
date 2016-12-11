@@ -130,22 +130,22 @@ namespace fb
 		}
 	
 		
-		Vec3 TransferFromD3DXVECTOR3 ( D3DXVECTOR3 const &other )
-		{
-			this->x = other.x;
-			this->y = other.y;
-			this->z = other.z;
-			return *this;
-		}
+		//Vec3 TransferFromD3DXVECTOR3 ( D3DXVECTOR3 const &other )
+		//{
+		//	this->x = other.x;
+		//	this->y = other.y;
+		//	this->z = other.z;
+		//	return *this;
+		//}
 		
-		D3DXVECTOR3 TransfertoD3DXVECTOR3 (Vec3  const &other )
-		{
-			D3DXVECTOR3 D3D;
-			D3D.x = other.x;
-			D3D.y = other.y;
-			D3D.z = other.z;
-			return D3D;
-		}
+		//D3DXVECTOR3 TransfertoD3DXVECTOR3 (Vec3  const &other )
+		//{
+		//	D3DXVECTOR3 D3D;
+		//	D3D.x = other.x;
+		//	D3D.y = other.y;
+		//	D3D.z = other.z;
+		//	return D3D;
+		//}
 
 		//new from me calc Veccrossize
 		Vec3 VectorCrossSize (CONST Vec3 *pV1, CONST Vec3 *pV2 )

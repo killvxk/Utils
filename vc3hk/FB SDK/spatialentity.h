@@ -117,11 +117,11 @@ namespace fb
 
 		DWORD m_cullGridId;                    // 0x0C
 
-		__forceinline Vec3* GetEntityOrigin()
+		__forceinline Vec3 GetEntityOrigin(LinearTransform tmp)
 		{
-			LinearTransform tmp;
+			
 			this->getTransform(tmp);
-			return &tmp.trans;
+			return tmp.trans;
 		}
 
 		__forceinline bool GetWorldOrigin(Vec3* v)

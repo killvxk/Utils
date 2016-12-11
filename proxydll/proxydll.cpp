@@ -12,7 +12,7 @@ myIDirect3D9*       gl_pmyIDirect3D9;
 HINSTANCE           gl_hThisInstance;
 LPOSVERSIONINFO mod_lpVersionInfo = new OSVERSIONINFO;
 #pragma data_seg ()
-
+//dsa
 BYTE 					originalCode[5];
 BYTE* 					originalEP = 0;
 HMODULE dllModule;

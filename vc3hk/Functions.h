@@ -177,19 +177,19 @@ inline float YAngle(float x1, float y1, float z1, float x2, float y2, float z2, 
 	return (-1)*teta;
 }
 
-static void RotatePointAlpha(float *outV, float x, float y, float z, float cx, float cy, float cz, float alpha) {
-	D3DXMATRIX rot1;
-	D3DXVECTOR4 vec;
-	vec.x = x - cx;
-	vec.z = y - cy;
-	vec.y = z - cz;
-	vec.w = 1.0;
-	D3DXMatrixRotationY(&rot1, alpha*D3DX_PI / 180.0);
-	D3DXVec4Transform(&vec, &vec, &rot1);
-	outV[0] = vec.x + cx;
-	outV[1] = vec.z + cy;
-	outV[2] = vec.y + cz;
-}
+//static void RotatePointAlpha(float *outV, float x, float y, float z, float cx, float cy, float cz, float alpha) {
+//	D3DXMATRIX rot1;
+//	D3DXVECTOR4 vec;
+//	vec.x = x - cx;
+//	vec.z = y - cy;
+//	vec.y = z - cz;
+//	vec.w = 1.0;
+//	D3DXMatrixRotationY(&rot1, alpha*D3DX_PI / 180.0);
+//	D3DXVec4Transform(&vec, &vec, &rot1);
+//	outV[0] = vec.x + cx;
+//	outV[1] = vec.z + cy;
+//	outV[2] = vec.y + cz;
+//}
 
 fb::FiringFunctionData* GetPlayerFFD(fb::ClientSoldierEntity* pMySoldier)
 {
@@ -509,8 +509,8 @@ void _stdcall Bulletesp()
 				fb::GameEntity* pEntity = reinterpret_cast<fb::GameEntity*>(Entity.firstSegment->m_Collection.at(i));
 				if (!POINTERCHK(pEntity))
 					return;
-
-				fb::Vec3* bullet = pEntity->GetEntityOrigin();
+				fb::LinearTransform tmp = {0};
+				fb::Vec3* bullet =& pEntity->GetEntityOrigin(tmp);
 
 
 				fb::DebugRenderer::Singleton()->DrawSphere(*bullet, .125f, fb::Color32::Green(), true, false);

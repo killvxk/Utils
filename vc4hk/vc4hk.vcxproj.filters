@@ -20,9 +20,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="DXTK\Inc\SimpleMath.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="enums.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -115,10 +112,5 @@
     <ClCompile Include="hkheader.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="DXTK\Inc\SimpleMath.inl">
-      <Filter>Header</Filter>
-    </None>
   </ItemGroup>
 </Project>

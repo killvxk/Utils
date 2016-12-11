@@ -6,8 +6,21 @@
 
 #include <Windows.h>
 #include <d3d11.h>
-#include <d3dx11.h>
 
+struct D3DXVECTOR4
+{
+	union
+	{
+		struct
+		{
+			float x;
+			float y;
+			float z;
+			float w;
+		};
+		float data[4];
+	};
+};
 typedef D3DXVECTOR4 hkVector4;
 
 template <class T>

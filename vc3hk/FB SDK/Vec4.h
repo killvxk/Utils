@@ -61,7 +61,7 @@ class Vec4
 			FLOAT data[4];
 		};
 
-		union __m128 simdvalue;                     // 0x0
+//		union __m128 simdvalue;                     // 0x0
 
 		Vec4(){}
 

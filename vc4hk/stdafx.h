@@ -22,6 +22,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
-#include <D3DX10math.h>
+//#include <D3DX10math.h>
 
 
