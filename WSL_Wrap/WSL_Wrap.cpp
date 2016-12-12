@@ -16,8 +16,8 @@ int main(int argc, char *argv[])
 	if (extName) {
 
 		if (!_stricmp(extName, ".exe")) {
-			extName[0] = ' ';
-			extName[1] = '\0';
+		
+			extName[0] = '\0';
 
 
 		}
@@ -42,12 +42,14 @@ int main(int argc, char *argv[])
 		strcat_s(buffer, argv[0]);
 	}
 
+
+
 	for (int i = 1; i < argc; i++) {
 
 
-
-		strcat_s(buffer, argv[i]);
 		strcat_s(buffer, " ");
+		strcat_s(buffer, argv[i]);
+		
 
 	}
 
