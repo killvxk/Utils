@@ -31,22 +31,23 @@ bool IsPathValid(String^ path) {
 	}
 
 }
-int main(int argc, char* argv[])
+int _tmain(int argc, TCHAR *argv[])
 {
+	setlocale(LC_ALL, "");
 	
 
 
-	char buffer[8200] =
-		"\"bash -c \"";
+		TCHAR buffer[8200] =
+			__T("\"bash -c \"");
 
-	char * exeName = _tcsrchr(argv[0], '\\');
-	char * extName = _tcsrchr(exeName, '.');
+	TCHAR * exeName = _tcsrchr(argv[0], __T('\\'));
+	TCHAR * extName = _tcsrchr(exeName, __T('.'));
 
 	if (extName) {
 
-		if (!_tcsicmp(extName, ".exe")) {
+		if (!_tcsicmp(extName, __T(".exe"))) {
 
-			extName[0] = '\0';
+			extName[0] = __T('\0');
 
 
 		}
@@ -71,30 +72,30 @@ int main(int argc, char* argv[])
 		_tcscat_s(buffer, argv[0]);
 	}
 
-
+	System::String^ para;
 
 
 
 	for (int i = 1; i < argc; i++) {
 
 
-		_tcscat_s(buffer," ");
+		_tcscat_s(buffer, __T(" "));
 
-		System::String^ para = gcnew System::String(argv[i]);
+		 para = gcnew System::String(argv[i]);
 
 
 
 		if (IsPathValid(para)) {
 
-			char path[MAX_PATH] = "/mnt/";
+			TCHAR path[MAX_PATH] = __T("/mnt/");
 		
-			char sa = _totlower(*argv[i]);
+			TCHAR sa = _totlower(*argv[i]);
 		
 			_tcsncat_s(path,&sa ,1);
 
-			std::string s(&argv[i][2]);
+			std::wstring s(&argv[i][2]);
 
-			std::replace(s.begin(), s.end(), '\\', '/');
+			std::replace(s.begin(), s.end(), __T('\\'), __T('/'));
 
 			_tcscat_s(path,s.c_str() );
 
@@ -112,7 +113,9 @@ int main(int argc, char* argv[])
 
 	}
 
-	_tcscat_s(buffer, "\"\"");
+	delete para;
+
+	_tcscat_s(buffer, __T("\"\""));
 
 
 
@@ -120,7 +123,7 @@ int main(int argc, char* argv[])
 //	_tprintf_s(buffer);
 	
 
-	return	system(buffer);
+	return	_wsystem(buffer);
 
 
 }
