@@ -3,30 +3,49 @@
 #include <string.h>
 #include <Windows.h>
 #include  <string>
-
+#include <algorithm>
 #using <system.dll>
 
 
 using namespace System;
 
+bool IsPathValid(String^ path) {
 
-int main(int argc, char *argv[])
+
+
+
+	try {
+		String^ fullPath = System::IO::Path::GetFullPath(path);
+
+
+		return !String::Compare(fullPath, path, true);
+
+	}
+	catch (System::Exception^
+
+		) {
+
+
+		return false;
+
+	}
+
+}
+int main(int argc, char* argv[])
 {
-	
-
 	
 
 
 	char buffer[8200] =
 		"\"bash -c \"";
 
-	char * exeName = strrchr(argv[0], '\\');
-	char * extName = strrchr(exeName, '.');
+	char * exeName = _tcsrchr(argv[0], '\\');
+	char * extName = _tcsrchr(exeName, '.');
 
 	if (extName) {
 
-		if (!_stricmp(extName, ".exe")) {
-		
+		if (!_tcsicmp(extName, ".exe")) {
+
 			extName[0] = '\0';
 
 
@@ -44,48 +63,64 @@ int main(int argc, char *argv[])
 
 
 	if (exeName) {
-		strcat_s(buffer, exeName);
+		_tcscat_s(buffer, exeName);
 
 	}
 	else
 	{
-		strcat_s(buffer, argv[0]);
+		_tcscat_s(buffer, argv[0]);
 	}
-	try{
-	System::Uri^  siteUri = gcnew Uri("dsd");
-	}
-	finally{
 
 
-	}
+
+
 
 	for (int i = 1; i < argc; i++) {
 
 
-		strcat_s(buffer, " ");
+		_tcscat_s(buffer," ");
 
-		System::String^ para=gcnew System::String(argv[i]);
-	
-		System::Uri  siteUri(para);
+		System::String^ para = gcnew System::String(argv[i]);
 
-		if (siteUri.IsWellFormedOriginalString()) {
 
-			System::Console::WriteLine(para);
+
+		if (IsPathValid(para)) {
+
+			char path[MAX_PATH] = "/mnt/";
+		
+			char sa = _totlower(*argv[i]);
+		
+			_tcsncat_s(path,&sa ,1);
+
+			std::string s(&argv[i][2]);
+
+			std::replace(s.begin(), s.end(), '\\', '/');
+
+			_tcscat_s(path,s.c_str() );
+
+			_tcscat_s(buffer, path);
+		
+
 
 		}
 		else
 		{
-			strcat_s(buffer, argv[i]);
+			_tcscat_s(buffer, argv[i]);
 		}
-	
-		
-aa
+
+
+
 	}
 
-	//strcat_s(buffer, " \"\"");
+	_tcscat_s(buffer, "\"\"");
 
-//	system(buffer);
 
+
+
+//	_tprintf_s(buffer);
+	
+
+	return	system(buffer);
 
 
 }
