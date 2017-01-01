@@ -191,15 +191,7 @@ HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter,
 	*ppReturnedDeviceInterface = gl_pmyIDirect3DDevice9;
 	
 
-	//HRESULT(WINAPI IDirect3DDevice9::*o_IDirect3DDevice9_Reset)(D3DPRESENT_PARAMETERS*);
 
-	//o_IDirect3DDevice9_Reset = &IDirect3DDevice9::Reset;
-
-	//void* pReset= reinterpret_cast<void*>(&o_IDirect3DDevice9_Reset);
-
-	//o_Reset = *(_Reset_type)pReset;
-
-	//*(int*)pReset = (int)my_IDirect3DDevice9_Reset;
 	
 	return(hres);
 
