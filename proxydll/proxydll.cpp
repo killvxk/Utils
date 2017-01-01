@@ -18,9 +18,11 @@ BYTE* 					originalEP = 0;
 HMODULE dllModule;
 HINSTANCE hExecutableInstance;
 WCHAR* DllPath = new WCHAR[MAX_PATH],
+*ExePath = new WCHAR[MAX_PATH],
 *szSystemPath = new WCHAR[MAX_PATH],
 *szSystemDllPath = new WCHAR[MAX_PATH];
-
+PWCHAR 	DllName;
+PWCHAR 	ExeName;
 
 
 void Redirect(PWCHAR);
@@ -430,8 +432,6 @@ HRESULT WINAPI mod_D3D11CreateDevice(
 		D3D_FEATURE_LEVEL   *,
 		ID3D11DeviceContext **);
 
-
-
 	
 
 	ori_Create_fn ori_D3D11CreateDevice= (ori_Create_fn)GetProcAddress(d3d11.dll, "D3D11CreateDevice");
@@ -555,15 +555,50 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 		hExecutableInstance = GetModuleHandle(NULL); // passing NULL should be safe even with the loader lock being held (according to ReactOS ldr.c)
 
 		GetModuleFileName(dllModule, DllPath, MAX_PATH);
+		GetModuleFileName(NULL, ExePath, MAX_PATH);
+		
 
-		PWCHAR 	DllName = _tcsrchr(DllPath, '\\');
+		 	DllName = _tcsrchr(DllPath, '\\');
+	
 		DllName++;
-
+		
 
 		GetSystemDirectory(szSystemPath, MAX_PATH);
 
 
 		Redirect(DllName);
+
+		 	ExeName = _tcsrchr(ExePath, '\\');
+		ExeName++;
+
+
+		//L.A.Noire 60 fps unlock
+		if (_tcsicmp(ExeName, L"LANoire.exe") == NULL) {
+			//	int *a =(int*) 0x1957d4;
+			//		*a = 0x1;
+			DWORD dwOld;
+
+			BYTE *pAddress = (BYTE *)0x00DF4AB7;
+
+
+			VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
+
+
+			BYTE Hijack_spoof_2[7] = { 0xc6,0x40,0x04,0x01 ,0xc2,0x04,0x00 };
+
+			memcpy_s(pAddress, 7, Hijack_spoof_2, 7);
+
+
+
+
+			VirtualProtect(pAddress, 7, dwOld, NULL);
+
+		}
+		
+		
+		
+
+	
 
 		////
 		//

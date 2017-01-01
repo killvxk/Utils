@@ -2,9 +2,19 @@
 #include <stdio.h>
 #include <string.h>
 #include <Windows.h>
+#include  <string>
+
+#using <system.dll>
+
+
+using namespace System;
+
 
 int main(int argc, char *argv[])
 {
+	
+
+	
 
 
 	char buffer[8200] =
@@ -41,21 +51,40 @@ int main(int argc, char *argv[])
 	{
 		strcat_s(buffer, argv[0]);
 	}
+	try{
+	System::Uri^  siteUri = gcnew Uri("dsd");
+	}
+	finally{
 
 
+	}
 
 	for (int i = 1; i < argc; i++) {
 
 
 		strcat_s(buffer, " ");
-		strcat_s(buffer, argv[i]);
-		
 
+		System::String^ para=gcnew System::String(argv[i]);
+	
+		System::Uri  siteUri(para);
+
+		if (siteUri.IsWellFormedOriginalString()) {
+
+			System::Console::WriteLine(para);
+
+		}
+		else
+		{
+			strcat_s(buffer, argv[i]);
+		}
+	
+		
+aa
 	}
 
-	strcat_s(buffer, " \"\"");
+	//strcat_s(buffer, " \"\"");
 
-	system(buffer);
+//	system(buffer);
 
 
 
