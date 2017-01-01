@@ -23,8 +23,6 @@ typedef  HRESULT(WINAPI  *_Reset_type)(D3DPRESENT_PARAMETERS*);
 _Reset_type o_Reset;
 
 
-
-
 HRESULT(WINAPI *o_IDirect3DDevice9_Present)( const RECT    *pSourceRect,
 	 const RECT    *pDestRect,
 	     HWND    hDestWindowOverride,
@@ -47,15 +45,12 @@ HRESULT WINAPI my_IDirect3DDevice9_Reset( D3DPRESENT_PARAMETERS* pPresentationPa
 	pPresentationParameters->BackBufferCount = 2;
 	pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 
-	
 
 	return o_Reset(pPresentationParameters);
 
 
 	
 }
-
-
 myIDirect3D9::myIDirect3D9(IDirect3D9 *pOriginal)
 {
     m_pIDirect3D9 = pOriginal;
@@ -180,9 +175,6 @@ HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter,
 	IDirect3DDevice9** ppReturnedDeviceInterface)
 {
 
-
-	
-
    
 	extern myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
 
@@ -194,11 +186,8 @@ HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter,
 		Adapter, DeviceType, hFocusWindow, BehaviorFlags,
 		pPresentationParameters, ppReturnedDeviceInterface);
 
-
-
 	gl_pmyIDirect3DDevice9 = new myIDirect3DDevice9(*ppReturnedDeviceInterface);
 
-	
 	*ppReturnedDeviceInterface = gl_pmyIDirect3DDevice9;
 	
 
