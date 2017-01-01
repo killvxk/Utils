@@ -12,8 +12,6 @@ using namespace System;
 bool IsPathValid(String^ path) {
 
 
-
-
 	try {
 		String^ fullPath = System::IO::Path::GetFullPath(path);
 
@@ -109,8 +107,6 @@ int _tmain(int argc, TCHAR *argv[])
 			_tcscat_s(buffer, argv[i]);
 		}
 
-
-
 	}
 
 	delete para;
@@ -119,9 +115,6 @@ int _tmain(int argc, TCHAR *argv[])
 
 
 
-
-//	_tprintf_s(buffer);
-	
 
 	return	_wsystem(buffer);
 
