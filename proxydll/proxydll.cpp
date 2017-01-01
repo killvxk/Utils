@@ -12,9 +12,8 @@ myIDirect3D9*       gl_pmyIDirect3D9;
 HINSTANCE           gl_hThisInstance;
 LPOSVERSIONINFO mod_lpVersionInfo = new OSVERSIONINFO;
 #pragma data_seg ()
-//dsa
-BYTE 					originalCode[5];
-BYTE* 					originalEP = 0;
+
+
 HMODULE dllModule;
 HINSTANCE hExecutableInstance;
 WCHAR* DllPath = new WCHAR[MAX_PATH],
@@ -25,8 +24,8 @@ PWCHAR 	DllName;
 PWCHAR 	ExeName;
 
 
-void Redirect(PWCHAR);
-BOOL CALLBACK FindHwndFromPID(HWND hwnd, LPARAM lParam);
+
+
 void InitInstance(HANDLE hModule)
 {
 //	OutputDebugString("PROXYDLL: InitInstance called.\r\n");
@@ -448,7 +447,7 @@ HRESULT WINAPI mod_D3D11CreateDevice(
 	//d3d11.D3D11CreateDevice = GetProcAddress(d3d11.dll, "D3D11CreateDevice")
 
 }
-
+// Exported function (faking d3d9.dll's one-and-only export)
 IDirect3D9* WINAPI mod_Direct3DCreate9(UINT SDKVersion)
 {
 	 // looking for the "right d3d9.dll"
@@ -469,33 +468,8 @@ IDirect3D9* WINAPI mod_Direct3DCreate9(UINT SDKVersion)
 	return (gl_pmyIDirect3D9);
 }
 
-// Exported function (faking d3d9.dll's one-and-only export)
-//IDirect3D9* WINAPI Direct3DCreate9(UINT SDKVersion)
-//{
-//	if (!gl_hOriginalDll) LoadOriginalDll(); // looking for the "right d3d9.dll"
-//	
-//	// Hooking IDirect3D Object from Original Library
-//	typedef IDirect3D9 *(WINAPI* D3D9_Type)(UINT SDKVersion);
-//	D3D9_Type D3DCreate9_fn = (D3D9_Type) GetProcAddress( gl_hOriginalDll, "Direct3DCreate9");
-//    
-//    // Debug
-//	if (!D3DCreate9_fn) 
-//    {
-//        OutputDebugString(L"PROXYDLL: Pointer to original D3DCreate9 function not received ERROR ****\r\n");
-//        ::ExitProcess(0); // exit the hard way
-//    }
-//	
-//	// Request pointer from Original Dll. 
-//	IDirect3D9 *pIDirect3D9_orig = D3DCreate9_fn(SDKVersion);
-//	
-//	// Create my IDirect3D8 object and store pointer to original object there.
-//	// note: the object will delete itself once Ref count is zero (similar to COM objects)
-//	gl_pmyIDirect3D9 = new myIDirect3D9(pIDirect3D9_orig);
-//	
-//	// Return pointer to hooking Object instead of "real one"
-//	return (gl_pmyIDirect3D9);
-//}
-//
+
+
 //void InitInstance(HANDLE hModule) 
 //{
 //	OutputDebugString(L"PROXYDLL: InitInstance called.\r\n");
@@ -558,7 +532,7 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 		GetModuleFileName(NULL, ExePath, MAX_PATH);
 		
 
-		 	DllName = _tcsrchr(DllPath, '\\');
+		 	DllName = _tcsrchr(DllPath, L'\\');
 	
 		DllName++;
 		
@@ -568,7 +542,7 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 
 		Redirect(DllName);
 
-		 	ExeName = _tcsrchr(ExePath, '\\');
+		 	ExeName = _tcsrchr(ExePath, L'\\');
 		ExeName++;
 
 
@@ -600,59 +574,7 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 
 	
 
-		////
-		//
-		//	LPVOID IcmpCreateFile = (LPVOID)GetModuleHandle(L"conviction_game.exe");
-
-		////	char Hijack_spoof_1[13] = { '\xb8','\x11','\x00','\x00','\x00','\x89' ,'\x43','\x08' ,'\xe9' ,'\x74' ,'\xff','\xff' ,'\xff' };
-		////	char Hijack_spoof_2[6] = { '\xe9','\x80','\x00','\x00' ,'\x00','\x90'};
-		//
-		////	if (IcmpCreateFile)break;
-		//
-		////ping spoof
-		//	GetVersionExW(mod_lpVersionInfo);
-
-		//if (IcmpCreateFile) {
-
-
-		// IcmpCreateFile = (LPVOID)(GetProcAddress(GetModuleHandleW(L"Kernel32.dll"), "GetVersionExW") );
-
-		// 
-
-		// if (IcmpCreateFile) {
-		//	 DWORD dwOld, dwRelAddr;
-
-		//	
-		//	 BYTE *pAddress = (BYTE *)IcmpCreateFile;
-		//	 dwRelAddr = (DWORD)((DWORD)&hkGetVersionEx - (DWORD)pAddress) - 5;
-
-		//	 VirtualProtect(pAddress, 13, PAGE_EXECUTE_READWRITE, &dwOld);
-		//	 *pAddress = 0xe9;
-		//	 *((DWORD *)(pAddress + 0x1)) = dwRelAddr;
-		//	 //memset((LPVOID)IcmpCreateFile, 0xeb, 1);
-
-		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 1), 0x11, 1);//ping ms
-
-		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 2), 0x00, 3);//
-
-
-
-		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 5), 0x89, 1);
-		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 6), 0x43, 1);
-		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 7), 0x08, 1);
-
-
-		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 8), 0xe9, 1);
-		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 9), 0x74, 1);
-		//	 //memset((LPVOID)((intptr_t)IcmpCreateFile + 10), 0xff, 3);
-
-
-		//	 VirtualProtect(pAddress, 13, dwOld, NULL);
-		//	 MessageBox(0, L"Hook", L"", NULL);
-		// }
-
-
-		//};
+		
 	}
 	else if (reason == DLL_PROCESS_DETACH)
 	{
