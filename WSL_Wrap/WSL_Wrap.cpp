@@ -32,13 +32,19 @@ bool IsPathValid(String^ path) {
 int _tmain(int argc, TCHAR *argv[])
 {
 	setlocale(LC_ALL, "");
-	
-
+	TCHAR szExeFileName[MAX_PATH];
+	GetModuleFileName(NULL, szExeFileName, MAX_PATH);
+	 
 
 		TCHAR buffer[8200] =
-			__T("\"bash -c \"");
+			__T("\"bash -i -c \"");
 
-	TCHAR * exeName = _tcsrchr(argv[0], __T('\\'));
+		
+	
+		
+
+	TCHAR * exeName = _tcsrchr(szExeFileName, __T('\\'));
+
 	TCHAR * extName = _tcsrchr(exeName, __T('.'));
 
 	if (extName) {
