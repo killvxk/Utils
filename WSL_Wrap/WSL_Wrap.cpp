@@ -51,41 +51,42 @@ int _tmain(int argc, TCHAR*argv[])
 
 			
 	}
-
-	LPTSTR exeName = new TCHAR[MAX_PATH];
-
-
-	GetModuleFileName(nullptr, exeName, MAX_PATH);
+	std::wstring exeString(rArray[0]);
 
 	
 
-	LPTSTR sz_AllParametersOrigin= _tcsdup(GetCommandLine());
+	std::wstring str_parameter0(GetCommandLine());
+	
+	if (str_parameter0.at(0) == L'\"'){
+		str_parameter0.erase(str_parameter0.begin(), str_parameter0.begin()+ exeString.length()+2);
+
+	}
+	else {
+
+		str_parameter0.erase(str_parameter0.begin(), str_parameter0.begin() + exeString.length());
+
+	}
+
+	size_t pos = exeString.rfind(L"\\")+1;
+	size_t len = exeString.rfind(L".") - pos;
 
 
-	sz_AllParametersOrigin = sz_AllParametersOrigin + _tcslen(rArray[0]);
+	std::wstring exeFileName = exeString.substr(pos, len);
 
-
+//	_tprintf(L"%ls", exeFileName.c_str()); return 0;
 
 	TCHAR buffer[8200] =
 		__T("bash -c \"");
 
-	exeName = _tcsrchr(exeName, __T('\\'));
 
-	if (exeName) {
-
-
-		exeName = &(exeName[1]);
-
-
-	}
 	
-	std::wstring exeString(exeName);
-	std::string::size_type iii = exeString.find(__T(".exe"));
+	
+	
 
-	if (iii != std::string::npos)
-		exeString.erase(iii, 4);
-
-		_tcscat_s(buffer, exeString.c_str());
+		_tcscat_s(buffer, 
+			
+			
+			exeFileName.c_str());
 
 	System::String^ str_parameter;
 
@@ -99,24 +100,28 @@ int _tmain(int argc, TCHAR*argv[])
 
 		if (IsPathValid(str_parameter)) {
 
-			TCHAR path[MAX_PATH] = __T("/mnt/");
+			std::wstring path(L"/mnt/");
 
-			TCHAR sa = _totlower(*rArray[i]);
+			
 
-			_tcsncat_s(path, &sa, 1);
+			TCHAR  letter = tolower(rArray[i][0]);
 
-			std::wstring s(&rArray[i][2]);
+			path.append(&letter);
 
-			std::replace(s.begin(), s.end(), __T('\\'), __T('/'));
 
-			_tcscat_s(path, s.c_str());
-		
+			path.append(&rArray[i][2]);
+
+
+
+			std::replace(path.begin(), path.end(), __T('\\'), __T('/'));
+
+
 
 			std::wstring s1(rArray[i]);
-			std::wstring s2(path);
+			
 			
 			v_pathVectorOri->push_back(s1);
-			v_pathVector->push_back(s2);
+			v_pathVector->push_back(path);
 
 
 
@@ -130,15 +135,15 @@ int _tmain(int argc, TCHAR*argv[])
 
 	}
 
-	std::wstring s(sz_AllParametersOrigin);
+	
 
 
 	while (v_pathVector->size() != 0)
 
 	{
 	
-		size_t pos = s.rfind(v_pathVectorOri->back());
-		s.replace(pos, v_pathVectorOri->back().size(), v_pathVector->back());
+		size_t pos = str_parameter0.rfind(v_pathVectorOri->back());
+		str_parameter0.replace(pos, v_pathVectorOri->back().size(), v_pathVector->back());
 
 		v_pathVectorOri->pop_back();
 		v_pathVector->pop_back();
@@ -146,17 +151,18 @@ int _tmain(int argc, TCHAR*argv[])
 
 
 	
-	_tcscat_s(buffer, s.c_str());
+	_tcscat_s(buffer, str_parameter0.c_str());
+	
 
 	_tcscat_s(buffer, __T("\""));
 
 
 
-	_tprintf(L"%ls", buffer);
+//	_tprintf(L"%ls", buffer); return 0;
 
 
 
-	return 0; //_wsystem(buffer);
+	return  _wsystem(buffer);
 
 
 }
