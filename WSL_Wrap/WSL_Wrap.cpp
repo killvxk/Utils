@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include  <string>
 #include <algorithm>
+#include <vector>
 #using <system.dll>
 
 
@@ -11,6 +12,8 @@ using namespace System;
 
 bool IsPathValid(String^ path) {
 
+
+	if (!(path->Contains(":\\")))return false;
 
 	try {
 		String^ fullPath = System::IO::Path::GetFullPath(path);
@@ -29,100 +32,131 @@ bool IsPathValid(String^ path) {
 	}
 
 }
-int _tmain(int argc, TCHAR *argv[])
+int _tmain(int argc, TCHAR*argv[])
 {
 	setlocale(LC_ALL, "");
-	TCHAR szExeFileName[MAX_PATH];
-	GetModuleFileName(NULL, szExeFileName, MAX_PATH);
-	 
 
-		TCHAR buffer[8200] =
-			__T("\"bash -i -c \"");
 
-		
+	TCHAR**  rArray =  new TCHAR*[argc+1];
+
+	for (int i = 0; i < argc; i++) {
+
+
 	
+	
+
+		rArray[i]= _tcsdup(argv[i]);
 		
 
-	TCHAR * exeName = _tcsrchr(szExeFileName, __T('\\'));
 
-	TCHAR * extName = _tcsrchr(exeName, __T('.'));
-
-	if (extName) {
-
-		if (!_tcsicmp(extName, __T(".exe"))) {
-
-			extName[0] = __T('\0');
-
-
-		}
-
-
+			
 	}
+
+	LPTSTR exeName = new TCHAR[MAX_PATH];
+
+
+	GetModuleFileName(nullptr, exeName, MAX_PATH);
+
+	
+
+	LPTSTR sz_AllParametersOrigin= _tcsdup(GetCommandLine());
+
+
+	sz_AllParametersOrigin = sz_AllParametersOrigin + _tcslen(rArray[0]);
+
+
+
+	TCHAR buffer[8200] =
+		__T("bash -c \"");
+
+	exeName = _tcsrchr(exeName, __T('\\'));
 
 	if (exeName) {
-		exeName++;
+
+
+		exeName = &(exeName[1]);
 
 
 	}
+	
+	std::wstring exeString(exeName);
+	std::string::size_type iii = exeString.find(__T(".exe"));
+
+	if (iii != std::string::npos)
+		exeString.erase(iii, 4);
+
+		_tcscat_s(buffer, exeString.c_str());
+
+	System::String^ str_parameter;
 
 
+	std::vector<std::wstring>* v_pathVector = new std::vector<std::wstring>;
+	std::vector<std::wstring>* v_pathVectorOri = new std::vector<std::wstring>;
 
-	if (exeName) {
-		_tcscat_s(buffer, exeName);
+	for (size_t i = 1; i < argc; i++) {
 
-	}
-	else
-	{
-		_tcscat_s(buffer, argv[0]);
-	}
+		str_parameter = gcnew System::String(rArray[i]);
 
-	System::String^ para;
-
-
-
-	for (int i = 1; i < argc; i++) {
-
-
-		_tcscat_s(buffer, __T(" "));
-
-		 para = gcnew System::String(argv[i]);
-
-
-
-		if (IsPathValid(para)) {
+		if (IsPathValid(str_parameter)) {
 
 			TCHAR path[MAX_PATH] = __T("/mnt/");
-		
-			TCHAR sa = _totlower(*argv[i]);
-		
-			_tcsncat_s(path,&sa ,1);
 
-			std::wstring s(&argv[i][2]);
+			TCHAR sa = _totlower(*rArray[i]);
+
+			_tcsncat_s(path, &sa, 1);
+
+			std::wstring s(&rArray[i][2]);
 
 			std::replace(s.begin(), s.end(), __T('\\'), __T('/'));
 
-			_tcscat_s(path,s.c_str() );
-
-			_tcscat_s(buffer, path);
+			_tcscat_s(path, s.c_str());
 		
 
+			std::wstring s1(rArray[i]);
+			std::wstring s2(path);
+			
+			v_pathVectorOri->push_back(s1);
+			v_pathVector->push_back(s2);
+
+
+
 
 		}
-		else
-		{
-			_tcscat_s(buffer, argv[i]);
-		}
+
+
+		delete str_parameter;
+
+
 
 	}
 
-	delete para;
-
-	_tcscat_s(buffer, __T("\"\""));
+	std::wstring s(sz_AllParametersOrigin);
 
 
+	while (v_pathVector->size() != 0)
+
+	{
+	
+		size_t pos = s.rfind(v_pathVectorOri->back());
+		s.replace(pos, v_pathVectorOri->back().size(), v_pathVector->back());
+
+		v_pathVectorOri->pop_back();
+		v_pathVector->pop_back();
+	}
 
 
-	return	_wsystem(buffer);
+	
+	_tcscat_s(buffer, s.c_str());
+
+	_tcscat_s(buffer, __T("\""));
+
+
+
+	_tprintf(L"%ls", buffer);
+
+
+
+	return 0; //_wsystem(buffer);
 
 
 }
