@@ -1,14 +1,12 @@
 #include "stdafx.h"
-#include <stdio.h>
-#include <string.h>
 #include <Windows.h>
 #include  <string>
-#include <algorithm>
-#include <vector>
 #using <system.dll>
 
 
 using namespace System;
+using namespace System::Text;
+using namespace System::Collections::Generic;
 
 bool IsPathValid(String^ path) {
 
@@ -32,137 +30,98 @@ bool IsPathValid(String^ path) {
 	}
 
 }
+
+void MarshalString(String ^ s, std::wstring& os) {
+	using namespace Runtime::InteropServices;
+	const wchar_t* chars =
+		(const wchar_t*)(Marshal::StringToHGlobalUni(s)).ToPointer();
+	os = chars;
+	Marshal::FreeHGlobal(IntPtr((void*)chars));
+}
 int _tmain(int argc, TCHAR*argv[])
 {
 	setlocale(LC_ALL, "");
 
 
-	TCHAR**  rArray =  new TCHAR*[argc+1];
-
-	for (int i = 0; i < argc; i++) {
+	String^   str_Exe_Const = gcnew String(argv[0]);
 
 
-	
-	
-
-		rArray[i]= _tcsdup(argv[i]);
-		
+	String ^ str_fullCommandLine_Const = gcnew String(GetCommandLine());
 
 
-			
-	}
-	std::wstring exeString(rArray[0]);
+	Text::StringBuilder^ str_fullCommandLine;
 
-	
 
-	std::wstring str_parameter0(GetCommandLine());
-	
-	if (str_parameter0.at(0) == L'\"'){
-		str_parameter0.erase(str_parameter0.begin(), str_parameter0.begin()+ exeString.length()+2);
+	Text::StringBuilder^   str_Exe;
+
+	if (str_fullCommandLine_Const->StartsWith(L"\"")) {
+
+		str_fullCommandLine = gcnew StringBuilder(
+			str_fullCommandLine_Const->Substring(str_Exe_Const->Length + 2));
+
 
 	}
 	else {
-
-		str_parameter0.erase(str_parameter0.begin(), str_parameter0.begin() + exeString.length());
-
+		str_fullCommandLine = gcnew StringBuilder(
+			str_fullCommandLine_Const->Substring(str_Exe_Const->Length));
 	}
 
-	size_t pos = exeString.rfind(L"\\")+1;
-	size_t len = exeString.rfind(L".") - pos;
+	int pos = str_Exe_Const->LastIndexOf(L'\\') + 1;
+
+	int len = str_Exe_Const->LastIndexOf(L'.') - pos;
+
+	str_Exe = gcnew System::Text::StringBuilder(str_Exe_Const->Substring(pos, len));
 
 
-	std::wstring exeFileName = exeString.substr(pos, len);
+	StringBuilder^ str_commandBuffer = gcnew StringBuilder(__T("bash -c \""));
 
-//	_tprintf(L"%ls", exeFileName.c_str()); return 0;
-
-	TCHAR buffer[8200] =
-		__T("bash -c \"");
+	str_commandBuffer->Append(str_Exe);
 
 
-	
-	
-	
-
-		_tcscat_s(buffer, 
-			
-			
-			exeFileName.c_str());
-
-	System::String^ str_parameter;
 
 
-	std::vector<std::wstring>* v_pathVector = new std::vector<std::wstring>;
-	std::vector<std::wstring>* v_pathVectorOri = new std::vector<std::wstring>;
+	for (int i = 1; i < argc; i++) {
 
-	for (size_t i = 1; i < argc; i++) {
-
-		str_parameter = gcnew System::String(rArray[i]);
+		String ^	str_parameter = gcnew String(argv[i]);
 
 		if (IsPathValid(str_parameter)) {
 
-			std::wstring path(L"/mnt/");
+			StringBuilder path(L"/mnt/");
 
-			
+			path.Append(str_parameter->Substring(0, 1)->ToLower());
 
-			TCHAR  letter = tolower(rArray[i][0]);
+			path.Append(str_parameter->Substring(2));
 
-			path.append(&letter);
-
-
-			path.append(&rArray[i][2]);
+			path.Replace(__T('\\'), __T('/'));
 
 
+			str_fullCommandLine->Replace(str_parameter, path.ToString());
 
-			std::replace(path.begin(), path.end(), __T('\\'), __T('/'));
-
-
-
-			std::wstring s1(rArray[i]);
-			
-			
-			v_pathVectorOri->push_back(s1);
-			v_pathVector->push_back(path);
-
-
-
-
+		}
+		else {
+			continue;
 		}
 
 
-		delete str_parameter;
-
 
 
 	}
 
-	
-
-
-	while (v_pathVector->size() != 0)
-
-	{
-	
-		size_t pos = str_parameter0.rfind(v_pathVectorOri->back());
-		str_parameter0.replace(pos, v_pathVectorOri->back().size(), v_pathVector->back());
-
-		v_pathVectorOri->pop_back();
-		v_pathVector->pop_back();
-	}
-
-
-	
-	_tcscat_s(buffer, str_parameter0.c_str());
-	
-
-	_tcscat_s(buffer, __T("\""));
 
 
 
-//	_tprintf(L"%ls", buffer); return 0;
+
+
+	str_commandBuffer->Append(str_fullCommandLine);
+
+
+	str_commandBuffer->Append(__T("\""));
+
+
+	std::wstring a;
+	MarshalString(str_commandBuffer->ToString(), a);
 
 
 
-	return  _wsystem(buffer);
-
-
+	return _wsystem(a.c_str());
 }
