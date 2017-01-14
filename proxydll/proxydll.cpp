@@ -1,7 +1,6 @@
 // proxydll.cpp
 #include "stdafx.h"
-#include <iomanip>
-#include <sstream>
+
 #include "myIDirect3D9.h"
 #include "myIDirect3DDevice9.h"
 #include "proxydll.h"
@@ -16,14 +15,41 @@ LPOSVERSIONINFO mod_lpVersionInfo = new OSVERSIONINFO;
 
 HMODULE dllModule;
 HINSTANCE hExecutableInstance;
-WCHAR* DllPath = new WCHAR[MAX_PATH],
+WCHAR* wc_DllPath = new WCHAR[MAX_PATH],
 *ExePath = new WCHAR[MAX_PATH],
-*szSystemPath = new WCHAR[MAX_PATH],
+*sz_SystemPath = new WCHAR[MAX_PATH],
 *szSystemDllPath = new WCHAR[MAX_PATH];
 PWCHAR 	DllName;
 PWCHAR 	ExeName;
 
+void SomeGameMod(PWCHAR name) {
+	//L.A.Noire 60 fps unlock
+	if (_tcsicmp(ExeName, L"LANoire.exe") == NULL) {
+		//	int *a =(int*) 0x1957d4;
+		//		*a = 0x1;
+		DWORD dwOld;
 
+		BYTE *pAddress = (BYTE *)0x00DF4AB7;
+
+
+		VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
+
+
+		BYTE Hijack_spoof_2[7] = { 0xc6,0x40,0x04,0x01 ,0xc2,0x04,0x00 };
+
+		memcpy_s(pAddress, 7, Hijack_spoof_2, 7);
+
+
+		VirtualProtect(pAddress, 7, dwOld, NULL);
+
+	}
+	else {
+
+		return;
+
+	}
+
+}
 
 
 void InitInstance(HANDLE hModule)
@@ -40,13 +66,52 @@ void InitInstance(HANDLE hModule)
 }
 
 
+HRESULT WINAPI mod_D3D11CreateDevice(
+	_In_opt_        IDXGIAdapter        *pAdapter,
+	D3D_DRIVER_TYPE     DriverType,
+	HMODULE             Software,
+	UINT                Flags,
+	_In_opt_  D3D_FEATURE_LEVEL   *pFeatureLevels,
+	UINT                FeatureLevels,
+	UINT                SDKVersion,
+	_Out_opt_       ID3D11Device        **ppDevice,
+	_Out_opt_       D3D_FEATURE_LEVEL   *pFeatureLevel,
+	_Out_opt_       ID3D11DeviceContext **ppImmediateContext
+) {
+	typedef HRESULT(*ori_D3D11CreateDevice_fn)(IDXGIAdapter *,
+		D3D_DRIVER_TYPE,
+		HMODULE,
+		UINT,
+		const D3D_FEATURE_LEVEL*,
+		UINT,
+		UINT,
+		ID3D11Device**,
+		D3D_FEATURE_LEVEL   *,
+		ID3D11DeviceContext **);
 
+
+
+	ori_D3D11CreateDevice_fn ori_D3D11CreateDevice = (ori_D3D11CreateDevice_fn)GetProcAddress(
+		d3d11.dll, "D3D11CreateDevice");
+
+	HRESULT hr =
+
+		ori_D3D11CreateDevice(pAdapter, DriverType, Software,
+			Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice
+			, pFeatureLevel, ppImmediateContext);
+
+
+
+	return hr;
+	//d3d11.D3D11CreateDevice = GetProcAddress(d3d11.dll, "D3D11CreateDevice")
+
+}
 
 void Redirect(PWCHAR name)
 {
 	
 
-	wcscpy_s(szSystemDllPath, MAX_PATH,szSystemPath);
+	wcscpy_s(szSystemDllPath, MAX_PATH,sz_SystemPath);
 
 	wcscat_s(szSystemDllPath, MAX_PATH, L"\\");
 
@@ -408,45 +473,7 @@ void Redirect(PWCHAR name)
 
 }
 
-HRESULT WINAPI mod_D3D11CreateDevice(
-	_In_opt_        IDXGIAdapter        *pAdapter,
-	D3D_DRIVER_TYPE     DriverType,
-	HMODULE             Software,
-	UINT                Flags,
-	_In_opt_  D3D_FEATURE_LEVEL   *pFeatureLevels,
-	UINT                FeatureLevels,
-	UINT                SDKVersion,
-	_Out_opt_       ID3D11Device        **ppDevice,
-	_Out_opt_       D3D_FEATURE_LEVEL   *pFeatureLevel,
-	_Out_opt_       ID3D11DeviceContext **ppImmediateContext
-) {
-	typedef HRESULT(*ori_Create_fn)(IDXGIAdapter *,
-		D3D_DRIVER_TYPE,
-		HMODULE,
-		UINT,
-		const D3D_FEATURE_LEVEL*,
-		UINT,
-		UINT,
-		ID3D11Device**,
-		D3D_FEATURE_LEVEL   *,
-		ID3D11DeviceContext **);
 
-	
-
-	ori_Create_fn ori_D3D11CreateDevice= (ori_Create_fn)GetProcAddress(d3d11.dll, "D3D11CreateDevice");
-
-	HRESULT hr=
-
-	 ori_D3D11CreateDevice(pAdapter, DriverType, Software,
-		Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice
-		, pFeatureLevel, ppImmediateContext);
-
-	
-
-	return hr;
-	//d3d11.D3D11CreateDevice = GetProcAddress(d3d11.dll, "D3D11CreateDevice")
-
-}
 // Exported function (faking d3d9.dll's one-and-only export)
 IDirect3D9* WINAPI mod_Direct3DCreate9(UINT SDKVersion)
 {
@@ -528,47 +555,25 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 
 		hExecutableInstance = GetModuleHandle(NULL); // passing NULL should be safe even with the loader lock being held (according to ReactOS ldr.c)
 
-		GetModuleFileName(dllModule, DllPath, MAX_PATH);
-		GetModuleFileName(NULL, ExePath, MAX_PATH);
+		GetModuleFileName(dllModule, wc_DllPath, MAX_PATH);
+		GetModuleFileName(hExecutableInstance, ExePath, MAX_PATH);
 		
 
-		 	DllName = _tcsrchr(DllPath, L'\\');
+		 	DllName = _tcsrchr(wc_DllPath, L'\\');
 	
-		DllName++;
-		
+			DllName = &DllName[1];
 
-		GetSystemDirectory(szSystemPath, MAX_PATH);
+		GetSystemDirectory(sz_SystemPath, MAX_PATH);
 
 
 		Redirect(DllName);
 
 		 	ExeName = _tcsrchr(ExePath, L'\\');
-		ExeName++;
 
+			ExeName = &ExeName[1];
 
-		//L.A.Noire 60 fps unlock
-		if (_tcsicmp(ExeName, L"LANoire.exe") == NULL) {
-			//	int *a =(int*) 0x1957d4;
-			//		*a = 0x1;
-			DWORD dwOld;
-
-			BYTE *pAddress = (BYTE *)0x00DF4AB7;
-
-
-			VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
-
-
-			BYTE Hijack_spoof_2[7] = { 0xc6,0x40,0x04,0x01 ,0xc2,0x04,0x00 };
-
-			memcpy_s(pAddress, 7, Hijack_spoof_2, 7);
-
-
-
-
-			VirtualProtect(pAddress, 7, dwOld, NULL);
-
-		}
-		
+			 SomeGameMod(ExeName);
+	
 		
 		
 

@@ -102,19 +102,19 @@ void _stdcall Aimbot()
 	fb::Vec3 flbulletspeed;
 	fb::ClientSoldierAimingSimulation* aimer;
 	fb::ClientGameContext* g_pGameContext = fb::ClientGameContext::Singleton();
-	if (!POINTERCHK(g_pGameContext))
+	if (!IsValidPtr(g_pGameContext))
 		return;
 
 	fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
-	if (!POINTERCHK(pPlayerManager) || pPlayerManager->m_players.empty())
+	if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.empty())
 		return;
 
 	fb::ClientPlayer* pLocalPlayer = pPlayerManager->m_localPlayer;
-	if (!POINTERCHK(pLocalPlayer))
+	if (!IsValidPtr(pLocalPlayer))
 		return;
 
 	fb::ClientSoldierEntity* pMySoldier = pLocalPlayer->getSoldierEnt();
-	if (!POINTERCHK(pMySoldier))
+	if (!IsValidPtr(pMySoldier))
 		return;
 
 	if (!pMySoldier->IsAlive()) return;
@@ -126,34 +126,34 @@ void _stdcall Aimbot()
 
 	fb::ClientSoldierWeapon* MyCSW = pMySoldier->GetCSW();
 	//valid checks on Weapons
-	if (!POINTERCHK(MyCSW)
-		|| !POINTERCHK(MyCSW->m_weapon)
-		|| !POINTERCHK(MyCSW->m_predictedFiring)
-		|| !POINTERCHK(MyCSW->m_predictedFiring->m_data->m_primaryFire)) return;
+	if (!IsValidPtr(MyCSW)
+		|| !IsValidPtr(MyCSW->m_weapon)
+		|| !IsValidPtr(MyCSW->m_predictedFiring)
+		|| !IsValidPtr(MyCSW->m_predictedFiring->m_data->m_primaryFire)) return;
 
 	fb::FiringFunctionData* pFFD = pMySoldier->getCurrentWeaponFiringData()->m_primaryFire;
-	if (!POINTERCHK(pFFD)) return;
+	if (!IsValidPtr(pFFD)) return;
 
 	//weaponmodifier only active if its your mainweapon
 	fb::BulletEntityData* pBED;
-	if (POINTERCHK(MyCSW)
-		&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponProjectileModifier)
-		&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData))
+	if (IsValidPtr(MyCSW)
+		&& IsValidPtr(MyCSW->m_weaponModifier.m_weaponProjectileModifier)
+		&& IsValidPtr(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData))
 	{
 		pBED = reinterpret_cast<fb::BulletEntityData*>(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData);
 	
-		if (!POINTERCHK(pBED)) pBED = pFFD->m_shot.m_projectileData;
+		if (!IsValidPtr(pBED)) pBED = pFFD->m_shot.m_projectileData;
 	}
 	else
 		pBED = pFFD->m_shot.m_projectileData;
-	if (!POINTERCHK(pBED)) {
+	if (!IsValidPtr(pBED)) {
 
 		return;
 	}
 
 
-	if (POINTERCHK(MyCSW)
-		&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponShotModifier)	)
+	if (IsValidPtr(MyCSW)
+		&& IsValidPtr(MyCSW->m_weaponModifier.m_weaponShotModifier)	)
 	{
 		flbulletspeed = MyCSW->m_weaponModifier.m_weaponShotModifier->m_initialSpeed;
 		
@@ -174,7 +174,7 @@ void _stdcall Aimbot()
 
 
 	aimer = MyCSW->m_authorativeAiming;
-	if (!POINTERCHK(aimer))
+	if (!IsValidPtr(aimer))
 		return;
 
 
@@ -200,7 +200,7 @@ void _stdcall Aimbot()
 	fb::Vec3 Enemyvectmp;
 
 	if (LockOnEme == false
-		|| !POINTERCHK(LockOn_pEnemySoldier)) {
+		|| !IsValidPtr(LockOn_pEnemySoldier)) {
 		//float closestdistanceworld = 9999.0f;
 		float flScreenDistance;
 		float closestdistance = 9999.0f;
@@ -211,7 +211,7 @@ void _stdcall Aimbot()
 				continue;
 
 			pEnemySoldier = pClientPlayer->getSoldierEnt();
-			if (!POINTERCHK(pEnemySoldier))
+			if (!IsValidPtr(pEnemySoldier))
 				continue;
 
 			if (!isalive(pEnemySoldier->isAlive()))
@@ -271,9 +271,9 @@ void _stdcall Aimbot()
 
 	}
 	else {
-		if (!POINTERCHK(LockOn_pEnemySoldier))return;
+		if (!IsValidPtr(LockOn_pEnemySoldier))return;
 		pEnemySoldier = LockOn_pEnemySoldier;
-		if (!POINTERCHK(pEnemySoldier))return;
+		if (!IsValidPtr(pEnemySoldier))return;
 
 
 		if (!isalive(pEnemySoldier->isAlive()))return;
@@ -314,10 +314,10 @@ void _stdcall Aimbot()
 
 
 
-	if (!POINTERCHK(ClosestClient))
+	if (!IsValidPtr(ClosestClient))
 		return;
 
-	if (!POINTERCHK(ClosestSold))
+	if (!IsValidPtr(ClosestSold))
 		return;
 
 
@@ -340,7 +340,7 @@ void _stdcall Aimbot()
 		rc = AimCorrection2(Origin, EnemyAimVec, enemyspeed, flbulletspeed, flBulletGrav, vDir);
 	}
 
-	if (!POINTERCHK(vDir)) return;
+	if (!IsValidPtr(vDir)) return;
 	if (rc != 0x0)return;
 
 
@@ -420,10 +420,10 @@ void _stdcall PlayerIteration()
 	if (bMinimapHack || bForceSquadSpawn)
 	{
 		fb::ClientGameContext* g_pGameContext = fb::ClientGameContext::Singleton();
-		if (!POINTERCHK(g_pGameContext)) return;
+		if (!IsValidPtr(g_pGameContext)) return;
 
 		fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
-		if (!POINTERCHK(pPlayerManager) || pPlayerManager->m_players.empty()) return;
+		if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.empty()) return;
 
 		eastl::vector<fb::ClientPlayer*> pVecCP = pPlayerManager->m_players;
 		if (pVecCP.empty()) return;
@@ -438,7 +438,7 @@ void _stdcall PlayerIteration()
 		{
 			fb::ClientPlayer* pClientPlayer = pVecCP.at(i);
 			fb::ClientSoldierEntity* pSoldier = pClientPlayer->getSoldierEnt();
-			if (!POINTERCHK(pSoldier)) continue;
+			if (!IsValidPtr(pSoldier)) continue;
 
 			if (pSoldier->isInVehicle()) continue;
 
@@ -448,7 +448,7 @@ void _stdcall PlayerIteration()
 			if (bMinimapHack)
 			{
 				fb::ClientSpottingTargetComponent* pCSTC = pSoldier->getComponent<fb::ClientSpottingTargetComponent>("ClientSpottingTargetComponent");
-				if (POINTERCHK(pCSTC)) {
+				if (IsValidPtr(pCSTC)) {
 					if (pCSTC->m_spotType == fb::SpotType_None) { pCSTC->m_spotType = fb::SpotType_Passive; }
 					else
 					{
@@ -464,13 +464,13 @@ void _stdcall EntityWorld()
 	if (bMinimapHack || bSpottedExplosive)
 	{
 		fb::ClientGameContext* g_pGameContext = fb::ClientGameContext::Singleton();
-		if (!POINTERCHK(g_pGameContext)) return;
+		if (!IsValidPtr(g_pGameContext)) return;
 
 		fb::ClientLevel* g_pLevel = g_pGameContext->m_level;
-		if (!POINTERCHK(g_pLevel)) return;
+		if (!IsValidPtr(g_pLevel)) return;
 
 		fb::GameWorld* g_pGameWorld = g_pLevel->m_gameWorld;
-		if (!POINTERCHK(g_pGameWorld)) return;
+		if (!IsValidPtr(g_pGameWorld)) return;
 
 		if (bMinimapHack)
 		{
@@ -481,10 +481,10 @@ void _stdcall EntityWorld()
 				{
 
 					fb::ClientVehicleEntity* pEntity = reinterpret_cast<fb::ClientVehicleEntity*>(vehicle.firstSegment->m_Collection.at(i));
-					if (POINTERCHK(pEntity))
+					if (IsValidPtr(pEntity))
 					{
 						fb::ClientSpottingTargetComponent* vehicleSpotting = pEntity->getComponent<fb::ClientSpottingTargetComponent>("ClientSpottingTargetComponent");
-						if (POINTERCHK(vehicleSpotting)) {
+						if (IsValidPtr(vehicleSpotting)) {
 							
 							
 							if (vehicleSpotting->m_spotType == fb::SpotType_None) {
@@ -506,7 +506,7 @@ void _stdcall EntityWorld()
 				{
 
 					fb::ClientExplosionPackEntity* pEntity = reinterpret_cast<fb::ClientExplosionPackEntity*>(explosive.firstSegment->m_Collection.at(i));
-					if (POINTERCHK(pEntity))
+					if (IsValidPtr(pEntity))
 					{
 						pEntity->m_isSpotted = 1; // 1 is spotted on map, 2 is spotted map and HUD (3D)
 					}
@@ -541,16 +541,16 @@ void _stdcall EntityWorld()
 void _stdcall VehicleWeaponUpgrade()
 {
 	fb::ClientGameContext* g_pGameContext = fb::ClientGameContext::Singleton();
-	if (!POINTERCHK(g_pGameContext)) return;
+	if (!IsValidPtr(g_pGameContext)) return;
 
 	fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
-	if (!POINTERCHK(pPlayerManager) || pPlayerManager->m_players.empty()) return;
+	if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.empty()) return;
 
 	fb::ClientPlayer* pLocalPlayer = pPlayerManager->m_localPlayer;
-	if (!POINTERCHK(pLocalPlayer)) return;
+	if (!IsValidPtr(pLocalPlayer)) return;
 
 	fb::ClientSoldierEntity* pMySoldier = pLocalPlayer->getSoldierEnt();
-	if (!POINTERCHK(pMySoldier)) return;
+	if (!IsValidPtr(pMySoldier)) return;
 
 	if (!pMySoldier->isInVehicle()) return;
 
@@ -566,12 +566,12 @@ void _stdcall VehicleWeaponUpgrade()
 	if (bSeatHasWeapon)
 	{
 		fb::WeaponFiring* pWeaponFiring = GetVehicleWeapon(pLocalPlayer);
-		if (POINTERCHK(pWeaponFiring))
+		if (IsValidPtr(pWeaponFiring))
 		{
 			if (bNoRecoil)
 			{
 				fb::WeaponSway* pWps = pWeaponFiring->m_weaponSway;
-				if (POINTERCHK(pWps)) //
+				if (IsValidPtr(pWps)) //
 				{
 
 					pWps->m_currentRecoilDeviation.m_pitch = 0.0f;
@@ -631,16 +631,16 @@ void _stdcall VehicleWeaponUpgrade()
 		if (false)
 		{
 			fb::ClientGameContext* g_pGameContext = fb::ClientGameContext::Singleton();
-			if (!POINTERCHK(g_pGameContext)) return;
+			if (!IsValidPtr(g_pGameContext)) return;
 
 			fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
-			if (!POINTERCHK(pPlayerManager) || pPlayerManager->m_players.empty()) return;
+			if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.empty()) return;
 
 			fb::ClientPlayer* pLocalPlayer = pPlayerManager->m_localPlayer;
-			if (!POINTERCHK(pLocalPlayer)) return;
+			if (!IsValidPtr(pLocalPlayer)) return;
 
 			fb::ClientSoldierEntity* pMySoldier = pLocalPlayer->getSoldierEnt();
-			if (!POINTERCHK(pMySoldier)) return;
+			if (!IsValidPtr(pMySoldier)) return;
 
 			if (pMySoldier->isInVehicle()) return;
 
@@ -655,12 +655,12 @@ void _stdcall VehicleWeaponUpgrade()
 			for (int i = 0; i < size; i++)
 			{
 				fb::ClientPlayer* pClientPlayer = pVecCP.at(i);
-				if (!POINTERCHK(pClientPlayer)) continue;
+				if (!IsValidPtr(pClientPlayer)) continue;
 
 				if (pLocalPlayer->m_teamId == pClientPlayer->m_teamId) continue;
 
 				fb::ClientSoldierEntity* pEnemySoldier = pClientPlayer->getSoldierEnt();
-				if (!POINTERCHK(pEnemySoldier)) continue;
+				if (!IsValidPtr(pEnemySoldier)) continue;
 
 				if (!isalive(pEnemySoldier->Alive())) continue;
 
@@ -669,26 +669,26 @@ void _stdcall VehicleWeaponUpgrade()
 
 				fb::ClientSoldierWeapon* MyCSW = pMySoldier->GetCSW();
 				//valid checks on Weapons
-				if (!POINTERCHK(MyCSW)
-					|| !POINTERCHK(MyCSW->m_weapon)
-					|| !POINTERCHK(MyCSW->m_predictedFiring)
-					|| !POINTERCHK(MyCSW->m_predictedFiring->m_data->m_primaryFire)) return;
+				if (!IsValidPtr(MyCSW)
+					|| !IsValidPtr(MyCSW->m_weapon)
+					|| !IsValidPtr(MyCSW->m_predictedFiring)
+					|| !IsValidPtr(MyCSW->m_predictedFiring->m_data->m_primaryFire)) return;
 
 				fb::FiringFunctionData* pFFD = pMySoldier->getCurrentWeaponFiringData()->m_primaryFire;
-				if (!POINTERCHK(pFFD)) return;
+				if (!IsValidPtr(pFFD)) return;
 
 				//weaponmodifier only active if its your mainweapon
 				fb::BulletEntityData* pBED;
-				if (POINTERCHK(MyCSW)
-					&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponProjectileModifier)
-					&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData))
+				if (IsValidPtr(MyCSW)
+					&& IsValidPtr(MyCSW->m_weaponModifier.m_weaponProjectileModifier)
+					&& IsValidPtr(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData))
 				{
 					pBED = reinterpret_cast<fb::BulletEntityData*>(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData);
-					if (!POINTERCHK(pBED)) pBED = pFFD->m_shot.m_projectileData;
+					if (!IsValidPtr(pBED)) pBED = pFFD->m_shot.m_projectileData;
 				}
 				else
 					pBED = pFFD->m_shot.m_projectileData;
-				if (!POINTERCHK(pBED)) return;
+				if (!IsValidPtr(pBED)) return;
 
 				float flBulletspeed = pFFD->m_shot.m_initialSpeed.z;
 				float flBulletdamage = pBED->m_endDamage;
@@ -696,7 +696,7 @@ void _stdcall VehicleWeaponUpgrade()
 				if (flBulletdamage > 2.00 && flBulletspeed > 40.0f)
 				{
 					fb::ClientWeapon* clWeapon = MyCSW->m_weapon;
-					if (POINTERCHK(clWeapon))
+					if (IsValidPtr(clWeapon))
 					{
 						__asm
 						{
@@ -717,19 +717,19 @@ void _stdcall SoldierWeaponUpgrade()
 {
 
 	fb::ClientGameContext* g_pGameContext = fb::ClientGameContext::Singleton();
-	if (!POINTERCHK(g_pGameContext)) return;
+	if (!IsValidPtr(g_pGameContext)) return;
 
 	fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
-	if (!POINTERCHK(pPlayerManager) || pPlayerManager->m_players.empty()) return;
+	if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.empty()) return;
 
 	fb::ClientPlayer* pLocalPlayer = pPlayerManager->m_localPlayer;//[0x2380b58]fb::ClientPlayer*
-	if (!POINTERCHK(pLocalPlayer)) return;
+	if (!IsValidPtr(pLocalPlayer)) return;
 	//hook isUnlocked()
 	//HookUnlock( pLocalPlayer);
 
 
 	fb::ClientSoldierEntity* pMySoldier = pLocalPlayer->getSoldierEnt();
-	if (!POINTERCHK(pMySoldier)) return;
+	if (!IsValidPtr(pMySoldier)) return;
 
 	if (pMySoldier->isInVehicle())
 	{
@@ -748,14 +748,14 @@ void _stdcall SoldierWeaponUpgrade()
 
 	fb::ClientSoldierWeapon* MyCSW = pMySoldier->GetCSW();
 	//valid checks on Weapons
-	if (!POINTERCHK(MyCSW)
-		|| !POINTERCHK(MyCSW->m_weapon)
-		|| !POINTERCHK(MyCSW->m_predictedFiring)
-		|| !POINTERCHK(MyCSW->m_predictedFiring->m_data->m_primaryFire)) return;
+	if (!IsValidPtr(MyCSW)
+		|| !IsValidPtr(MyCSW->m_weapon)
+		|| !IsValidPtr(MyCSW->m_predictedFiring)
+		|| !IsValidPtr(MyCSW->m_predictedFiring->m_data->m_primaryFire)) return;
 
 	//disable breath sway this needs to be executed always
 	fb::ClientSoldierEntity::BreathControlHandler* pBreath = pMySoldier->m_breathControlHandler;
-	if (bNoBreath && POINTERCHK(pBreath))
+	if (bNoBreath && IsValidPtr(pBreath))
 	{
 		pBreath->m_breathControlMultiplier = 0.0001;
 		pBreath->m_breathControlTimer = 0.0001;
@@ -769,12 +769,12 @@ void _stdcall SoldierWeaponUpgrade()
 
 
 
-	if (bNoSway && POINTERCHK(pCWSCI))
+	if (bNoSway && IsValidPtr(pCWSCI))
 	{
 		fb::SoldierAimingSimulationData* pSASD = MyCSW->m_authorativeAiming->m_data;
 		//	MyCSW->m_authorativeAiming->m_sway.x = 0.f;
 
-		if (POINTERCHK(pSASD->m_zoomLevels[0]))
+		if (IsValidPtr(pSASD->m_zoomLevels[0]))
 		{
 			pSASD->m_zoomLevels.At(0)->m_swayPitchMultiplier = 0.0000001f;
 			pSASD->m_zoomLevels.At(0)->m_swayYawMultiplier = 0.0000001f;
@@ -788,7 +788,7 @@ void _stdcall SoldierWeaponUpgrade()
 		}
 		if (MyCSW->m_authorativeAiming->m_zoomLevel > 0)
 		{
-			if (POINTERCHK(pSASD->m_zoomLevels[1]))
+			if (IsValidPtr(pSASD->m_zoomLevels[1]))
 			{
 
 				pSASD->m_zoomLevels.At(1)->m_swayPitchMultiplier = 0.0000001f;
@@ -820,7 +820,7 @@ void _stdcall SoldierWeaponUpgrade()
 	// disable recoil and spread ... this needs to be executed always
 
 	fb::WeaponSway* pWps = pMySoldier->getWeaponSway();
-	if (POINTERCHK(pWps)) //
+	if (IsValidPtr(pWps)) //
 	{
 
 		HookRecoil(pWps);
@@ -846,10 +846,10 @@ void _stdcall SoldierWeaponUpgrade()
 
 	}
 	fb::WeaponFiring* pWeaponFiring = pMySoldier->getCurrentWeaponFiring();
-	if (!POINTERCHK(pWeaponFiring)) {
+	if (!IsValidPtr(pWeaponFiring)) {
 		return;
 	}
-	else if (POINTERCHK(pWeaponFiring))
+	else if (IsValidPtr(pWeaponFiring))
 	{
 		pWeaponFiring->m_overheatDropMultiplier = 500;
 		pWeaponFiring->m_primaryFire.isOverheated = false;
@@ -860,24 +860,24 @@ void _stdcall SoldierWeaponUpgrade()
 
 
 	fb::FiringFunctionData* pFFD = pMySoldier->getCurrentWeaponFiringData()->m_primaryFire;
-	if (!POINTERCHK(pFFD)) return; else {
+	if (!IsValidPtr(pFFD)) return; else {
 	
 	}	
 	
 		
 	
 	fb::BulletEntityData* pBED;
-	if (POINTERCHK(MyCSW)
-		&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponProjectileModifier)
-		&& POINTERCHK(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData))
+	if (IsValidPtr(MyCSW)
+		&& IsValidPtr(MyCSW->m_weaponModifier.m_weaponProjectileModifier)
+		&& IsValidPtr(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData))
 	{
 		pBED = reinterpret_cast<fb::BulletEntityData*>(MyCSW->m_weaponModifier.m_weaponProjectileModifier->m_projectileData);
 
-		if (!POINTERCHK(pBED)) pBED = pFFD->m_shot.m_projectileData;
+		if (!IsValidPtr(pBED)) pBED = pFFD->m_shot.m_projectileData;
 	}
 	else
 		pBED = pFFD->m_shot.m_projectileData;
-	if (!POINTERCHK(pBED)) return;
+	if (!IsValidPtr(pBED)) return;
 
 
 
@@ -1048,19 +1048,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, unsigned long ulReason, void* param)
 		//	  fopen_s(&m_log,"e:\log.txt", "a+" );
 
 			//ping proof
-		intptr_t IcmpCreateFile = (intptr_t)GetProcAddress(GetModuleHandleW(L"iphlpapi.dll"), "IcmpCreateFile") + 0x289;
 
-		DWORD dwOld;
-		//ping spoof
-		if (POINTERCHK(IcmpCreateFile)) {
-			VirtualProtect((LPVOID)IcmpCreateFile, 3 * sizeof(BYTE), PAGE_EXECUTE_READWRITE, &dwOld);
-
-			memset((LPVOID)IcmpCreateFile, 0x31, 1);
-			memset((LPVOID)(IcmpCreateFile + 1), 0xc0, 1);//xor eax,eax
-			memset((LPVOID)(IcmpCreateFile + 2), 0x40, 1);//inc eax
-
-			VirtualProtect((LPVOID)IcmpCreateFile, 3 * sizeof(BYTE), dwOld, NULL);
-		}
 
 
 	}

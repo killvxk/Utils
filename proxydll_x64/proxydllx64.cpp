@@ -6,8 +6,8 @@
 
 HMODULE dllModule;
 HINSTANCE hExecutableInstance;
-WCHAR *DllPath = new WCHAR[MAX_PATH],
-*szSystemPath = new WCHAR[MAX_PATH],
+WCHAR *wc_DllPath = new WCHAR[MAX_PATH],
+*sz_SystemPath = new WCHAR[MAX_PATH],
 *szSystemDllPath = new WCHAR[MAX_PATH];
 
 
@@ -164,7 +164,7 @@ void _D3D11CoreCreateDevice() {
  void Redirect(PWCHAR name) {
 
 	 PWCHAR DllName = name;
-	 wcscpy_s(szSystemDllPath,sizeof(szSystemDllPath), szSystemPath);
+	 wcscpy_s(szSystemDllPath,sizeof(szSystemDllPath), sz_SystemPath);
 	 wcscat_s(szSystemDllPath, sizeof(szSystemDllPath), DllName);
 
 	 if (_tcsicmp(DllName + 1, L"d3d11.dll") == NULL) {
@@ -249,11 +249,11 @@ BOOL APIENTRY DllMain( HMODULE hInst,
 	{
 		dllModule = hInst;
 		hExecutableInstance = GetModuleHandle(NULL); // passing NULL should be safe even with the loader lock being held (according to ReactOS ldr.c)
-		GetModuleFileName(dllModule, DllPath, MAX_PATH);
+		GetModuleFileName(dllModule, wc_DllPath, MAX_PATH);
 
-		WCHAR	*DllName = _tcsrchr(DllPath, '\\');
+		WCHAR	*DllName = _tcsrchr(wc_DllPath, '\\');
 
-		SHGetKnownFolderPath(FOLDERID_System, 0, NULL, &szSystemPath);
+		SHGetKnownFolderPath(FOLDERID_System, 0, NULL, &sz_SystemPath);
 
 		//_tcscat(szSystemPath, DllName);
 		//	_tcscat(szSystemDllPath,L"d3d11.dll");

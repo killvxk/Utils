@@ -40,31 +40,31 @@ bool ProjectToScreen(fb::Vec3* world, fb::Vec3* out)//xCyniu
 }
 
 static bool GetBonePos(fb::ClientSoldierEntity* pEnt, int iBone, fb::Vec3 *vOut) { //chevvy
-	if (!POINTERCHK(pEnt))
+	if (!IsValidPtr(pEnt))
 		return false;
 
 	if (!iBone)
 		return false;
 
-	if (!POINTERCHK(vOut))
+	if (!IsValidPtr(vOut))
 		return false;
 
 	fb::ClientAntAnimatableComponent* pAnt = pEnt->m_animatableComponent[1];
 
-	if (!POINTERCHK(pAnt))
+	if (!IsValidPtr(pAnt))
 		return false;
 
 	pAnt->m_handler.m_hadVisualUpdate = true;
 
 	fb::Animatable* pAnimatable = pAnt->m_handler.m_animatable;
 
-	if (!POINTERCHK(pAnimatable))
+	if (!IsValidPtr(pAnimatable))
 		return false;
 
 	if (pAnimatable->m_updatePoseResultData.m_validTransforms) {
 		fb::QuatTransform* pQuat = pAnimatable->m_updatePoseResultData.m_activeWorldTransforms;
 
-		if (!POINTERCHK(pQuat))
+		if (!IsValidPtr(pQuat))
 			return false;
 
 		fb::Vec3 vTmp = pQuat[iBone].transAndScale;
@@ -79,17 +79,17 @@ static bool GetBonePos(fb::ClientSoldierEntity* pEnt, int iBone, fb::Vec3 *vOut)
 	return false;
 }
 static float GetDistance(fb::ClientPlayer* pLocal, fb::ClientPlayer* pPlayer) {
-	if (!POINTERCHK(pLocal) || !POINTERCHK(pPlayer))
+	if (!IsValidPtr(pLocal) || !IsValidPtr(pPlayer))
 		return 0.0f;
 
 	fb::ClientSoldierEntity* plEnt = pLocal->m_soldier.GetData();
 
-	if (!POINTERCHK(plEnt))
+	if (!IsValidPtr(plEnt))
 		return 0.0f;
 
 	fb::ClientSoldierEntity* pEnt = pPlayer->m_soldier.GetData();
 
-	if (!POINTERCHK(pEnt))
+	if (!IsValidPtr(pEnt))
 		return 0.0f;
 
 	return (plEnt->m_replicatedController->m_state.position.DistanceFrom(pEnt->m_replicatedController->m_state.position));
@@ -193,15 +193,15 @@ inline float YAngle(float x1, float y1, float z1, float x2, float y2, float z2, 
 
 fb::FiringFunctionData* GetPlayerFFD(fb::ClientSoldierEntity* pMySoldier)
 {
-	if (!POINTERCHK(pMySoldier))
+	if (!IsValidPtr(pMySoldier))
 		return NULL;
 
 	fb::WeaponFiringData* WepFiring = pMySoldier->getCurrentWeaponFiringData();
-	if (!POINTERCHK(WepFiring))
+	if (!IsValidPtr(WepFiring))
 		return NULL;
 
 	fb::FiringFunctionData* pFFD = WepFiring->m_primaryFire;
-	if (!POINTERCHK(pFFD))
+	if (!IsValidPtr(pFFD))
 		return NULL;
 
 	return pFFD;
@@ -209,11 +209,11 @@ fb::FiringFunctionData* GetPlayerFFD(fb::ClientSoldierEntity* pMySoldier)
 fb::ClientVehicleEntity* GetVehicle(fb::ClientPlayer* pClientPlayer)
 {
 	fb::ClientControllableEntity* pControllable = pClientPlayer->m_attachedControllable;
-	if (!POINTERCHK(pControllable))
+	if (!IsValidPtr(pControllable))
 		return NULL;
 
 	fb::ClientVehicleEntity* pVehicle = reinterpret_cast<fb::ClientVehicleEntity*>(pControllable);
-	if (!POINTERCHK(pVehicle))
+	if (!IsValidPtr(pVehicle))
 		return NULL;
 
 	return pVehicle;
@@ -243,7 +243,7 @@ static bool IsVisible(fb::Vec3* target, fb::ClientSoldierEntity* pMySoldier, fb:
 	if (!pMySoldier->physics() || !pMySoldier->physics()->m_manager) return false;
 
 	fb::IPhysicsRayCaster* pIRC = pMySoldier->physics()->m_manager->m_rayCaster;
-	if (!POINTERCHK(pIRC)) return false;
+	if (!IsValidPtr(pIRC)) return false;
 
 	fb::RayCastHit  pRCH;
 	fb::MaterialContainerPair * pM;
@@ -259,7 +259,7 @@ static bool IsVisible(fb::Vec3* target, fb::ClientSoldierEntity* pMySoldier, fb:
 	{
 		pM = pRCH.m_material;
 
-		if (!POINTERCHK(pM))
+		if (!IsValidPtr(pM))
 			return false;
 
 		if (pM->isPenetrable() || pM->isSeeTrough()
@@ -473,18 +473,18 @@ stMyVehicle* GetVehicleValues(char* szName)
 char* GetVehicleName(fb::ClientPlayer* pClientPlayer)
 {
 	fb::ClientControllableEntity *pCCE = pClientPlayer->m_attachedControllable;
-	if (POINTERCHK(pCCE))
+	if (IsValidPtr(pCCE))
 	{
-		if (POINTERCHK(pClientPlayer->getEntry()))
+		if (IsValidPtr(pClientPlayer->getEntry()))
 		{
 			fb::ClientVehicleEntity* MyVehicle = reinterpret_cast<fb::ClientVehicleEntity*>(pCCE);
-			if (POINTERCHK(MyVehicle))
+			if (IsValidPtr(MyVehicle))
 			{
 				fb::PhysicsEntity *pPE = MyVehicle->m_physicsEntity;
-				if (POINTERCHK(pPE))
+				if (IsValidPtr(pPE))
 				{
 					fb::PhysicsEntityData *pPED = pPE->m_data;
-					if (POINTERCHK(pPED))
+					if (IsValidPtr(pPED))
 					{
 						return pPED->GetObjectName();
 					}
@@ -497,7 +497,7 @@ char* GetVehicleName(fb::ClientPlayer* pClientPlayer)
 void _stdcall Bulletesp()
 {
 	fb::ClientGameContext* p_gameconext = fb::ClientGameContext::Singleton();
-	if (!POINTERCHK(p_gameconext)) return;
+	if (!IsValidPtr(p_gameconext)) return;
 
 	fb::EntityWorld::EntityCollection Entity = p_gameconext->m_level->m_gameWorld->m_collections.at(252);
 	if (Entity.firstSegment)
@@ -507,7 +507,7 @@ void _stdcall Bulletesp()
 			if (Entity.firstSegment->m_Collection.size() > 0)
 			{
 				fb::GameEntity* pEntity = reinterpret_cast<fb::GameEntity*>(Entity.firstSegment->m_Collection.at(i));
-				if (!POINTERCHK(pEntity))
+				if (!IsValidPtr(pEntity))
 					return;
 				fb::LinearTransform tmp = {0};
 				fb::Vec3* bullet =& pEntity->GetEntityOrigin(tmp);

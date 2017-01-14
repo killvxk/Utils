@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include <Windows.h>
-#include  <string>
+#include <string>
 #using <system.dll>
 
 
@@ -66,12 +66,11 @@ int _tmain(int argc, TCHAR*argv[])
 			str_fullCommandLine_Const->Substring(str_Exe_Const->Length));
 	}
 
-	int pos = str_Exe_Const->LastIndexOf(L'\\') + 1;
+	int n_FileNameStart = str_Exe_Const->LastIndexOf(L'\\') + 1;
 
-	int len = str_Exe_Const->LastIndexOf(L'.') - pos;
+	int n_FileNameLen = str_Exe_Const->LastIndexOf(L'.') - n_FileNameStart;
 
-	str_Exe = gcnew System::Text::StringBuilder(str_Exe_Const->Substring(pos, len));
-
+	str_Exe = gcnew System::Text::StringBuilder(str_Exe_Const->Substring(n_FileNameStart, n_FileNameLen));
 
 	StringBuilder^ str_commandBuffer = gcnew StringBuilder(__T("bash -c \""));
 
@@ -102,20 +101,12 @@ int _tmain(int argc, TCHAR*argv[])
 			continue;
 		}
 
-
-
-
 	}
-
-
-
-
-
 
 	str_commandBuffer->Append(str_fullCommandLine);
 
 
-	str_commandBuffer->Append(__T("\""));
+	str_commandBuffer->Append(__T('\"'));
 
 
 	std::wstring a;

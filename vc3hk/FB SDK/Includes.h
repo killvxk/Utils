@@ -18,6 +18,26 @@
 #define CONCAT_IMPL(x, y) x##y
 #define MACRO_CONCAT(x, y) CONCAT_IMPL(x, y)
 #define PAD(SIZE) BYTE MACRO_CONCAT(_pad, __COUNTER__)[SIZE];
-#define POINTERCHK( pointer ) ( pointer  && pointer !=0  && HIWORD( pointer ) )
 
+static bool IsValidPtr(void* ptr) {
+
+
+	if ((ptr != nullptr)&&HIWORD(ptr)  ) {
+		__try
+		{
+
+			intptr_t a = *(intptr_t*)ptr;
+			return true;
+
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			return false;
+		}
+
+	}
+	else
+		return false;
+
+}
 #endif
