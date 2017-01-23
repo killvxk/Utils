@@ -111,8 +111,10 @@ int _tmain(int argc, TCHAR*argv[])
 
 	std::wstring a;
 	MarshalString(str_commandBuffer->ToString(), a);
-
-
-
+#ifdef DEBUG
+	printf_s("%ls", a.c_str());
+	return 0;
+#else
 	return _wsystem(a.c_str());
+#endif 
 }
