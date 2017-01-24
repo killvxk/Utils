@@ -193,9 +193,8 @@ void Redirect(PWCHAR name)
 						d3d9.D3DPERF_SetRegion = GetProcAddress(d3d9.dll, "D3DPERF_SetRegion");
 						d3d9.DebugSetLevel = GetProcAddress(d3d9.dll, "DebugSetLevel");
 						d3d9.DebugSetMute = GetProcAddress(d3d9.dll, "DebugSetMute");
-					
 						//d3d9.Direct3D9EnableMaximizedWindowedModeShim = GetProcAddress(d3d9.dll, "Direct3D9EnableMaximizedWindowedModeShim");
-						//d3d9.Direct3DCreate9 = GetProcAddress(d3d9.dll, "Direct3DCreate9");
+					//	d3d9.Direct3DCreate9 = GetProcAddress(d3d9.dll, "Direct3DCreate9");
 						d3d9.Direct3DCreate9 = (FARPROC)mod_Direct3DCreate9;
 						d3d9.Direct3DCreate9Ex = GetProcAddress(d3d9.dll, "Direct3DCreate9Ex");
 						d3d9.Direct3DShaderValidatorCreate9 = GetProcAddress(d3d9.dll, "Direct3DShaderValidatorCreate9");

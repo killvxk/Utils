@@ -2,21 +2,8 @@
 #include <string> 
 #include "myIDirect3D9.h"
 #include "myIDirect3DDevice9.h"
-namespace MyInterface {
-//#pragma warning(push)
-//#define CINTERFACE                  // Windows SDK : BaseTypes.h
-//#pragma warning(disable : 4005)
-//#define STDMETHOD_(type,method)     type (STDMETHODCALLTYPE * method)
-//#define STDMETHOD(method)           STDMETHOD_(HRESULT,method)
-//#define PURE
-//#define THIS                        INTERFACE FAR* This
-//#define THIS_                       THIS,
-//
-//#undef _D3D9_H_
 #include <d3d9.h>
-//#pragma warning(pop)
 
-} 
 
 
 typedef  HRESULT(WINAPI  *_Reset_type)(D3DPRESENT_PARAMETERS*);
