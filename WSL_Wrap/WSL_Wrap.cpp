@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <Windows.h>
 #include <string>
+#include <shellapi.h>
 #using <system.dll>
 
 
@@ -42,8 +43,16 @@ int _tmain(int argc, TCHAR*argv[])
 {
 	setlocale(LC_ALL, "");
 
+	int nArgs;
 
-	String^   str_Exe_Const = gcnew String(argv[0]);
+	LPWSTR *szArglist = CommandLineToArgvW(GetCommandLine(), &nArgs);
+
+	if (NULL == szArglist)
+	{
+	
+		return 0;
+	}
+	String^   str_Exe_Const = gcnew String(szArglist[0]);
 
 
 	String ^ str_fullCommandLine_Const = gcnew String(GetCommandLine());
@@ -53,7 +62,7 @@ int _tmain(int argc, TCHAR*argv[])
 
 
 	Text::StringBuilder^   str_Exe;
-
+	
 	if (str_fullCommandLine_Const->StartsWith(L"\"")) {
 
 		str_fullCommandLine = gcnew StringBuilder(
@@ -66,16 +75,21 @@ int _tmain(int argc, TCHAR*argv[])
 			str_fullCommandLine_Const->Substring(str_Exe_Const->Length));
 	}
 
-	int n_FileNameStart = str_Exe_Const->LastIndexOf(L'\\') + 1;
+	int find = str_Exe_Const->LastIndexOf(L'\\');
 
-	int n_FileNameLen = str_Exe_Const->LastIndexOf(L'.') - n_FileNameStart;
+	int n_FileNameStart = (find>-1)?(find + 1):0;
+
+	find = str_Exe_Const->LastIndexOf(L'.');
+
+	int n_FileNameLen = (find>-1) ? (find- n_FileNameStart) :( str_Exe_Const->Length - n_FileNameStart);
+
+
 
 	str_Exe = gcnew System::Text::StringBuilder(str_Exe_Const->Substring(n_FileNameStart, n_FileNameLen));
 
 	StringBuilder^ str_commandBuffer = gcnew StringBuilder(__T("bash -c \""));
 
 	str_commandBuffer->Append(str_Exe);
-
 
 
 
@@ -111,7 +125,7 @@ int _tmain(int argc, TCHAR*argv[])
 
 	std::wstring a;
 	MarshalString(str_commandBuffer->ToString(), a);
-#ifdef DEBUG
+#ifdef _DEBUG
 	printf_s("%ls", a.c_str());
 	return 0;
 #else
