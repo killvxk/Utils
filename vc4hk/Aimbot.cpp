@@ -258,19 +258,16 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 		__try {
 		pEnemySoldier = this->m_LockOn_pEnemySoldier;
 
-		//if (!IsValidPtr(pEnemySoldier))return nullptr;
+	
 
 		if (!IsAlive(pEnemySoldier))return nullptr;
 
 		pClientPlayer = this->m_LockOn_pEnemyPlayer;
-
-		//if (!IsValidPtr(pClientPlayer))return nullptr;
-
-		//if (!pClientPlayer->InVehicle() && pEnemySoldier->m_Occluded)return nullptr;
+		
 
 		fb::RagdollComponent* pRagdoll = *(fb::RagdollComponent**)((intptr_t)pEnemySoldier + 0x580);
 
-	//	if (!IsValidPtr(pRagdoll))return nullptr;
+	
 		if (bAimHead)
 		{
 			b_found = pRagdoll->GetBone(fb::UpdatePoseResultData::Head, &v_EnemyVecTmp);
@@ -316,8 +313,7 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER) { 
 			
-			
-			
+	
 			return nullptr;
 		}
 
