@@ -25,10 +25,6 @@ float Aimbot::DistanceToAimRay(fb::Vec4 MyPosition, fb::Vec4 EnemyPosition,
 		float m_dist0 = vDir.len();
 		float x, y;
 		vDir.normalize();
-
-
-
-
 		fYawDifference = -atan2(vDir.x, vDir.z);
 
 		if (fYawDifference < 0)fYawDifference = fYawDifference + Twice_PI;
@@ -36,7 +32,7 @@ float Aimbot::DistanceToAimRay(fb::Vec4 MyPosition, fb::Vec4 EnemyPosition,
 
 		fYawDifference = abs(fYawDifference - vAngle.x);
 
-		if (m_dist0 <= 5.f && fYawDifference < 3.0f)return 100000000.f;
+		if (m_dist0 <= 6.f && fYawDifference < 3.0f)return 100000000.f;
 	
 
 
@@ -45,8 +41,6 @@ float Aimbot::DistanceToAimRay(fb::Vec4 MyPosition, fb::Vec4 EnemyPosition,
 		
 
 		flPitchDifference = atan2(vDir.y, vDir.VectorLength2());
-
-
 
 		flPitchDifference = abs(flPitchDifference - vAngle.y);
 
