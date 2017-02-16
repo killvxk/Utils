@@ -12,15 +12,32 @@ struct VehcileAimingData {
 
 };
 
+class HackKev {
+public:
+	fb::ClientGameContext* mp_GameContext;
+	fb::PlayerManager* mp_PlayerMngr;
+	fb::ClientPlayer* mp_LocalPlayer;
+	fb::ClientSoldierEntity*mp_LocalSoldier;
+	bool mb_Unlcok;
+	bool	mb_AmmoBox;
+	void* mp_CurVehicleCamera;
+	float g_pInputBuffers[123];
+	intptr_t* slotG1_list[4][15];
+	HackKev();
 
-double FindMinPos(double a[2]);
-double FindMinPosRoot(double *a, int n);double TimeToHit(fb::Vec4 p, fb::Vec4 u, double v_pow2);
-bool MinRealRootOfQuarticFunction(double a, double b, double c, double d, double e, double& root);
+	void AmmoBox();
+	size_t GetClientComponentByID(void*, std::vector<void*>*, int, bool,
+		bool);
+	void VehicleWeaponUpgrade();
+	void MiniMap();
+	void VarsUpdate();
+	void WeaponUpgrade();
+
+private:
 
 
+	bool IsAlive(fb::ClientControllableEntity* pPlayer);
+};
 
-
-fb::Vec4 * GetControllableSpeed(fb::ClientControllableEntity* * soldier);
-bool IsAlive(fb::ClientControllableEntity* pPlayer);
 
 #endif 

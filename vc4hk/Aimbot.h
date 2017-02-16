@@ -18,9 +18,8 @@ public:
 
 	DWORD GetVectorFromVehicle(fb::ClientPlayer* , fb::Vec4* );
 	
-	float DistanceToAimRay(fb::Vec4 , fb::Vec4 ,
-		const fb::Vec4 );
 
+	bool mb_AimKeyPressed;
 	fb::Vec4 vOrigin;
 	fb::Vec4 v_curAngle;
 	fb::Vec4 v_lastAngle;
@@ -34,7 +33,14 @@ public:
 	fb::Vec4*  VecOfClosestSoldier;
 
 private:
+
+	double FindMinPos(double a[2]);
+	double FindMinPosRoot(double *a, int n); 
+	double TimeToHit(fb::Vec4 p, fb::Vec4 u, double v_pow2);
+
 	void NullTmpVar();
+	float DistanceToAimRay(fb::Vec4, fb::Vec4,
+		const fb::Vec4);
 };
 
 

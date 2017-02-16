@@ -5,7 +5,69 @@
 #include "poly34.h"
 
 #include "hkheader.h"
+double Aimbot::FindMinPos(double a[2]) {
+	if (a[0] <= 0 && a[1] <= 0)return 0.0;
 
+	else if (a[0] <= 0)return a[1];
+
+	else if (a[1] <= 0)return a[0];
+
+	else return a[0] < a[1] ? a[0] : a[1];
+}
+double Aimbot::TimeToHit(fb::Vec4 p, fb::Vec4 u, double v_pow2)
+{
+	double a = v_pow2 - u.Dot(u);
+	double b = -2 * p.Dot(u);
+	double c = -1 * p.Dot(p);
+
+
+	double t0[2] = { 0 };
+
+
+	double de = b*b - 4 * a*c;
+
+
+
+	if (de >= 0)
+	{
+		t0[0] = (-b + sqrt(de)) / (2 * a);
+
+		t0[1] = (-b - sqrt(de)) / (2 * a);
+	}
+	else
+	{
+		return -2.0f;
+	}
+
+	return FindMinPos(t0);
+
+}
+
+
+
+double Aimbot::FindMinPosRoot(double *a, int n) {
+
+	if (n == 2) {
+
+		return FindMinPos(a);
+
+	}
+	else {
+
+		double tmp[2];
+
+		tmp[0] = FindMinPos(a);
+
+		tmp[1] = FindMinPos(&(a[2]));
+
+		return FindMinPos(tmp);
+
+	}
+
+
+	return 0.0;
+
+}
 Aimbot::Aimbot()
 {
 	NullTmpVar();
@@ -14,6 +76,7 @@ Aimbot::Aimbot()
 	this->LockOnEnemyFlags = 0;
 	this->m_LockOn_pEnemySoldier = nullptr;
 	this->m_LockOn_pEnemyPlayer = nullptr;
+	this->mb_AimKeyPressed=false;
 }
 
 float Aimbot::DistanceToAimRay(fb::Vec4 MyPosition, fb::Vec4 EnemyPosition,
@@ -178,7 +241,7 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 
 		//	if (!IsValidPtr(pEnemySoldier))continue;
 
-			if (!IsAlive(pEnemySoldier))continue;
+	//		if (!IsAlive(pEnemySoldier))continue;
 
 		//	if (!pClientPlayer->InVehicle() && pEnemySoldier->m_Occluded)continue;
 
@@ -252,9 +315,8 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 		__try {
 		pEnemySoldier = this->m_LockOn_pEnemySoldier;
 
-	
 
-		if (!IsAlive(pEnemySoldier))return nullptr;
+	//	if (!IsAlive(pEnemySoldier))return nullptr;
 
 		pClientPlayer = this->m_LockOn_pEnemyPlayer;
 		

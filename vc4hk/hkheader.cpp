@@ -4,69 +4,7 @@
 
 
 
-double FindMinPos(double a[2]) {
-	if (a[0] <= 0 && a[1] <= 0)return 0.0;
 
-	else if (a[0] <= 0)return a[1];
-
-	else if (a[1] <= 0)return a[0];
-
-	else return a[0] < a[1] ? a[0] : a[1];
-}
-
-
-double FindMinPosRoot(double *a, int n) {
-
-	if (n == 2) {
-
-		return FindMinPos(a);
-
-	}
-	else {
-
-		double tmp[2];
-
-		tmp[0] = FindMinPos(a);
-
-		tmp[1] = FindMinPos(&(a[2]));
-
-		return FindMinPos(tmp);
-
-	}
-
-
-	return 0.0;
-
-}
-
-double TimeToHit(fb::Vec4 p, fb::Vec4 u, double v_pow2)
-{
-	double a = v_pow2 - u.Dot(u);
-	double b = -2 * p.Dot(u);
-	double c = -1 * p.Dot(p);
-
-
-	double t0[2] = { 0 };
-
-
-	double de = b*b - 4 * a*c;
-
-
-
-	if (de >= 0)
-	{
-		t0[0] = (-b + sqrt(de)) / (2 * a);
-
-		t0[1] = (-b - sqrt(de)) / (2 * a);
-	}
-	else
-	{
-		return -2.0f;
-	}
-
-	return FindMinPos(t0);
-
-}
 
 
 fb::Vec4* GetControllableSpeed(fb::ClientSoldierEntity * soldier){
@@ -113,7 +51,7 @@ bool IsAlive212(fb::ClientControllableEntity* pPlayer)
 
 	return false;
 }
-bool IsAlive(fb::ClientControllableEntity* pPlayer)
+bool HackKev::IsAlive(fb::ClientControllableEntity* pPlayer)
 {
 	bool b_isVeh = false;
 
@@ -151,5 +89,386 @@ bool IsAlive(fb::ClientControllableEntity* pPlayer)
 
 	return false;
 }
+HackKev::HackKev() {
+	mb_Unlcok = false;
+	mb_AmmoBox = false;
+	slotG1_list[4][15] = { 0 };
+	g_pInputBuffers[123] = { 0.f };
+}
+
+void HackKev::VarsUpdate() {
+
+	this->mp_GameContext= fb::ClientGameContext::GetInstance();
+	
+	if (IsValidPtr(this->mp_GameContext)) {
+		this->mp_PlayerMngr = mp_GameContext->m_pPlayerManager;
+	}
+	else {
+		this->mp_PlayerMngr = nullptr;
+	}
+
+	if (IsValidPtr(this->mp_PlayerMngr)) {
+
+		this->mp_LocalPlayer = mp_PlayerMngr->m_pLocalPlayer;
+	}
+	else {
+		this->mp_LocalPlayer = nullptr;
+	}
+
+
+	mp_CurVehicleCamera = *(void**)(OFFSET_PPCURRENTWEAPONFIRING + 0x10);
+
+
+	if (IsValidPtr(this->mp_LocalPlayer)) {
+		this->mp_LocalSoldier = mp_LocalPlayer->GetSoldierEntity();
+	}
+	else {
+		this->mp_LocalSoldier = nullptr;
+	}
+
+
+
+
+	
+}
+void  HackKev::AmmoBox() {
+
+	fb::ClientGameContext* p = mp_GameContext;
+
+	if (mb_AmmoBox)return;
+	fb::Level* pLevel = p->m_pLevel;
+
+	// POINTERCHK
+	if (!IsValidPtr(pLevel)) {
+
+		mb_AmmoBox = false;	return;
+	}
+
+	if (!IsValidPtr(pLevel->m_TeamEntity[1])) {
+
+		mb_AmmoBox = false;	return;
+	};
+
+
+	intptr_t EndOfArray = 0;
+
+	fb::TeamEntityData* m_teamEntity;
+
+	fb::TeamData* Team;
+
+
+
+	for (int i = 1; i <= 2; i++) {
+
+		m_teamEntity = pLevel->m_TeamEntity[i];
+
+		if (!IsValidPtr(m_teamEntity))
+			return;
+
+		Team = m_teamEntity->m_Team;
+
+		slotG1_list[0][0] = Team->m_SoldierCustomization[0]->m_pWeaponTable->m_ppList[2]->m_SelectableUnlocks[0];
+		//	slotG2_list[0][0] = Team->m_SoldierCustomization[0]->m_pWeaponTable->m_ppList[3]->m_SelectableUnlocks[0];
+		for (int j = 0; j < 4; j++) {
+
+			int index = 1;
+
+			while (index < 15)
+			{
+				slotG1_list[j][index] = Team->m_SoldierCustomization[j]->m_pWeaponTable->m_ppList[2]->m_SelectableUnlocks[index];
+				//	slotG2_list[j][index] = Team->m_SoldierCustomization[j]->m_pWeaponTable->m_ppList[3]->m_SelectableUnlocks[index];
+				index++;
+			}
+
+
+
+
+		}
+		slotG1_list[3][15] = &EndOfArray;
+		//slotG2_list[3][15] = &EndOfArray;      //0  //1  //2 //5 //6 //7
+		for (int k = 0; k < 4; k++) {
+
+			Team->m_SoldierCustomization[k]->m_pWeaponTable->m_ppList[7]->m_SelectableUnlocks[2] = slotG1_list[2][6]; //ammobox
+
+			Team->m_SoldierCustomization[k]->m_pWeaponTable->m_ppList[2]->m_SelectableUnlocks[0] = slotG1_list[0][11]; //U_Medkit
+
+			Team->m_SoldierCustomization[k]->m_pWeaponTable->m_ppList[5]->m_SelectableUnlocks[0] = slotG1_list[3][2]; //C4
+		}
+	}
+
+	mb_AmmoBox = true;
+}
+void HackKev::MiniMap() {
+
+	if (!IsValidPtr(mp_LocalPlayer))return;
+	if (!IsValidPtr(mp_PlayerMngr))return;
+
+	eastl::vector<fb::ClientPlayer*>* pVecCP = mp_PlayerMngr->getPlayers();
+
+
+	if (pVecCP->size() == 0) return;
+
+
+
+	for (int i = 0; i < pVecCP->size(); i++)
+	{
+		__try {
+
+			fb::ClientPlayer* pClientPlayer = pVecCP->at(i);
+
+
+
+			if (mp_LocalPlayer->m_TeamId == pClientPlayer->m_TeamId)continue;
+
+			fb::ClientControllableEntity* pControllable;
+
+			pControllable = pClientPlayer->m_pControlledControllable;
+			std::vector<void*> *
+				v_pCSTC = new  std::vector<void*>();
+				
+
+			size_t size=	GetClientComponentByID(pControllable->m_Complist, v_pCSTC, 366, false, false);
+
+
+			if (!(size > 0)) {
+				continue;
+				delete v_pCSTC;
+			}
+			fb::ClientSpottingTargetComponent* pCSTC;
+
+
+			for (int index = 0; index < v_pCSTC->size(); index++)
+			{
+				pCSTC = (fb::ClientSpottingTargetComponent*)v_pCSTC->at(index);
+
+				if (pCSTC->activeSpotType == fb::SpotType_None) { pCSTC->activeSpotType = fb::SpotType_Passive; }
+			}
+
+
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+		
+			continue;
+		}
+	};
+
+
+
+}
+
+void  HackKev::VehicleWeaponUpgrade() {
+
+
+	if (!(mp_LocalPlayer->InVehicle() && mp_CurVehicleCamera)) {
+		return;	}
+
+	__try {
+		fb::WeaponFiring* pWepFiring = *(fb::WeaponFiring**)OFFSET_PPCURRENTWEAPONFIRING;
+		fb::WeaponFiringData* pFiring = pWepFiring->m_pPrimaryFire;
+
+
+
+		fb::FiringFunctionData* pFFD = pFiring->m_FiringData;
+		pFFD->m_Dispersion->MaxAngle = 0.f;
+		pFFD->m_Dispersion->MinAngle = 0.f;
+		pFFD->m_Dispersion->IncreasePerShot = 0.f;
+		pFFD->m_Dispersion->DecreasePerSecond = 100000.f;
+
+		pFFD->m_FireLogic.MaxRecoilAngleX = 0.f;
+		pFFD->m_FireLogic.MinRecoilAngleX = 0.f;
+		pFFD->m_FireLogic.MaxRecoilAngleY = 0.f;
+		pFFD->m_FireLogic.MinRecoilAngleY = 0.f;
+		pFFD->m_FireLogic.MaxRecoilAngleZ = 0.f;
+		pFFD->m_FireLogic.MinRecoilAngleZ = 0.f;
+
+		pFFD->m_OverHeat.HeatDropPerSecond = 1000.f;
+		pFFD->m_OverHeat.HeatPerBullet = 0.f;
+		pFFD->m_OverHeat.OverHeatPenaltyTime = 0.f;
+		pFFD->m_OverHeat.OverHeatThreshold = 1000000.f;
+
+		auto veh = fb::MainVarPtr::Singleton()->pVehicleEntry;
+		auto vec = veh->GetVehicleVelocity();
+		float speed = vec->len();
+		if (speed > 65.f) {
+			speed = speed*3.6f;
+
+			if (speed < 310.f) {
+				g_pInputBuffers[fb::ConceptMoveForward] = 1.f;
+
+				g_pInputBuffers[fb::ConceptMoveFB] = 1.f;
+			}
+			else if (speed > 312.5f)
+			{
+				g_pInputBuffers[fb::ConceptMoveFB] = -1.f;
+				g_pInputBuffers[fb::ConceptMoveBackward] = 1.f;
+				g_pInputBuffers[fb::ConceptCrawl] = 1.f;
+				g_pInputBuffers[fb::ConceptBrake] = 1.f;
+			}
+		}
+		//if(	pFFD->m_FireLogic.RateOfFire > 540.f)	pFFD->m_FireLogic.RateOfFire = 4000.f;
+
+	}
+	__except (1) {
+
+		return;
+	}
+}
+
+void  HackKev::WeaponUpgrade() {
+
+
+
+		__try {
+
+			//unlock
+
+			if (!mb_Unlcok) {
+				LPVOID unlock = *(LPVOID*)OFFSET_SYNCEDBFSETTINGS;
+
+				if (IsValidPtr(unlock)) {
+
+					*(bool*)((intptr_t)unlock + 0x54) = true;
+					mb_Unlcok = true;
+				}
+				else {
+
+					mb_Unlcok = false;
+				}
+
+			}
+
+
+			if (!IsValidPtr(mp_LocalSoldier)) {
+				mb_AmmoBox = false;				
+				mb_Unlcok = false;	return;
+			}
+
+
+			//if (!IsAlive(pLocalSoldier))return;
+
+			fb::ClientSoldierWeaponsComponent* pWepComp = fb::MainVarPtr::Singleton()->pWeaponComp;
+
+
+
+			fb::ClientSoldierWeapon* MySW = pWepComp->GetActiveSoldierWeapon();
+
+			if (!IsValidPtr(MySW)) {
+				return;
+			}
+
+
+			fb::WeaponFiring*	pWepFiring = MySW->m_pPrimary;
+
+			if (!IsValidPtr(pWepFiring)) {
+				return;
+			}
+
+
+			fb::FiringFunctionData* pFFD = pWepFiring->m_pPrimaryFire->m_FiringData;
+
+
+
+			if (pFFD->m_ShotConfigData.m_InitialSpeed.z < 10.f)return;
+
+
+			pFFD->m_Dispersion->MaxAngle = 0.f;
+			pFFD->m_Dispersion->MinAngle = 0.f;
+			pFFD->m_Dispersion->IncreasePerShot = 0.f;
+			pFFD->m_Dispersion->DecreasePerSecond = 1000.f;
+
+			pFFD->m_FireLogic.MaxRecoilAngleX = 0.f;
+			pFFD->m_FireLogic.MinRecoilAngleX = 0.f;
+			pFFD->m_FireLogic.MaxRecoilAngleY = 0.f;
+			pFFD->m_FireLogic.MinRecoilAngleY = 0.f;
+			pFFD->m_FireLogic.MaxRecoilAngleZ = 0.f;
+			pFFD->m_FireLogic.MinRecoilAngleZ = 0.f;
+
+			pFFD->m_OverHeat.HeatDropPerSecond = 1000.f;
+			pFFD->m_OverHeat.HeatPerBullet = 0.f;
+
+
+			fb::WeaponSway* pSway = pWepFiring->m_Sway;
+
+
+			fb::GunSwayData* pSwayData = pSway->m_Data;
+
+
+			fb::BreathControlHandler *pBreath = *(fb::BreathControlHandler **)((intptr_t)mp_LocalSoldier + 0x588);
+
+
+			pBreath->m_breathControlTimer = 0.f;
+			pBreath->m_breathControlMultiplier = 0.f;
+			pBreath->m_breathControlPenaltyTimer = 0.f;
+			pBreath->m_breathControlpenaltyMultiplier = 0.f;
+
+			pBreath->m_Enabled = 0;
+
+
+			pSwayData->m_DeviationScaleFactorZoom = 0.f;
+			pSwayData->m_GameplayDeviationScaleFactorZoom = 0.f;
+			pSwayData->m_DeviationScaleFactorNoZoom = 0.f;
+			pSwayData->m_GameplayDeviationScaleFactorNoZoom = 0.f;
+			pSwayData->m_FirstShotRecoilMultiplier = 0.f;
+			pSwayData->m_ShootingRecoilDecreaseScale = 1000.f;
+		}
+		__except (1) {
+
+			return;
+		}
+
+	
+}
+size_t HackKev::GetClientComponentByID(void* p_List, std::vector<void*>* ret, int Id, bool CheckUnderUsing,
+
+	bool bGetClientWeaponComponent)
+
+{
+	void* offset = p_List;
+	int size = *(BYTE*)((intptr_t)offset + 0x8);
+
+	fb::CompTuple* trashclass1 = (fb::CompTuple*)((intptr_t)offset + 0x10);
+
+	std::vector<void*>* vector = ret;
+
+	for (int obj_index = 0; obj_index < size; obj_index++)
+
+	{
+		if (CheckUnderUsing) {
+			__int32 flag = trashclass1[obj_index].flags >> 0xA;
+
+			flag = flag & trashclass1[obj_index].flags;
+
+			if (!(flag & 0x2))continue;
+		}
+
+		if (bGetClientWeaponComponent) {
+
+			__int32 flag = trashclass1[obj_index].flags;
+
+
+
+			if (!((flag & 0x8) && (flag & 0x800)))continue;
+
+		}
+
+		fb::ClassInfo* pType = (fb::ClassInfo*)trashclass1[obj_index].Object->GetType();
+
+		if (IsValidPtr(pType)) {
+
+
+			if (pType->m_ClassId == Id) {
+
+				vector->push_back((void*)(trashclass1[obj_index].Object));
+
+
+			}
+		}
+
+	}
+
+	
+
+		return vector->size();
+	}
 
 
