@@ -9,22 +9,22 @@
 myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
 myIDirect3D9*       gl_pmyIDirect3D9;
 HINSTANCE           gl_hThisInstance;
-LPOSVERSIONINFO mod_lpVersionInfo = new OSVERSIONINFO;
+
 #pragma data_seg ()
 
 
 HMODULE dllModule;
 HINSTANCE hExecutableInstance;
 WCHAR* wc_DllPath = new WCHAR[MAX_PATH],
-*ExePath = new WCHAR[MAX_PATH],
+*wc_ExePath = new WCHAR[MAX_PATH],
 *sz_SystemPath = new WCHAR[MAX_PATH],
 *szSystemDllPath = new WCHAR[MAX_PATH];
-PWCHAR 	DllName;
-PWCHAR 	ExeName;
+PWCHAR 	pwc_DllName;
+PWCHAR 	pwc_ExeName;
 
-void SomeGameMod(PWCHAR name) {
+void SomeGameMod() {
 	//L.A.Noire 60 fps unlock
-	if (_tcsicmp(ExeName, L"LANoire.exe") == NULL) {
+	if (_tcsicmp(pwc_ExeName, L"LANoire.exe") == NULL) {
 		//	int *a =(int*) 0x1957d4;
 		//		*a = 0x1;
 		DWORD dwOld;
@@ -54,9 +54,9 @@ void SomeGameMod(PWCHAR name) {
 
 void InitInstance(HANDLE hModule)
 {
-//	OutputDebugString("PROXYDLL: InitInstance called.\r\n");
+	//	OutputDebugString("PROXYDLL: InitInstance called.\r\n");
 
-	// Initialisation
+		// Initialisation
 	gl_hThisInstance = NULL;
 	gl_pmyIDirect3D9 = NULL;
 	gl_pmyIDirect3DDevice9 = NULL;
@@ -109,18 +109,18 @@ HRESULT WINAPI mod_D3D11CreateDevice(
 
 void Redirect(PWCHAR name)
 {
-	
 
-	wcscpy_s(szSystemDllPath, MAX_PATH,sz_SystemPath);
+
+	wcscpy_s(szSystemDllPath, MAX_PATH, sz_SystemPath);
 
 	wcscat_s(szSystemDllPath, MAX_PATH, L"\\");
 
 	wcscat_s(szSystemDllPath, MAX_PATH, name);
-	
+
 
 	PWCHAR DllName = name;
 
-	if (_tcsicmp(DllName , L"dsound.dll") == NULL) {
+	if (_tcsicmp(DllName, L"dsound.dll") == NULL) {
 		dsound.dll = LoadLibrary(szSystemDllPath);
 		dsound.DirectSoundCaptureCreate = GetProcAddress(dsound.dll, "DirectSoundCaptureCreate");
 		dsound.DirectSoundCaptureCreate8 = GetProcAddress(dsound.dll, "DirectSoundCaptureCreate8");
@@ -137,7 +137,7 @@ void Redirect(PWCHAR name)
 	}
 	else
 
-		if (_tcsicmp(DllName , L"dinput8.dll") == NULL) {
+		if (_tcsicmp(DllName, L"dinput8.dll") == NULL) {
 			dinput8.dll = LoadLibrary(szSystemDllPath);
 			dinput8.DirectInput8Create = GetProcAddress(dinput8.dll, "DirectInput8Create");
 			dinput8.DllCanUnloadNow = GetProcAddress(dinput8.dll, "DllCanUnloadNow");
@@ -147,7 +147,7 @@ void Redirect(PWCHAR name)
 		}
 		else
 
-			if (_tcsicmp(DllName , L"ddraw.dll") == NULL) {
+			if (_tcsicmp(DllName, L"ddraw.dll") == NULL) {
 				ddraw.dll = LoadLibrary(szSystemDllPath);
 				ddraw.AcquireDDThreadLock = GetProcAddress(ddraw.dll, "AcquireDDThreadLock");
 				ddraw.CheckFullscreen = GetProcAddress(ddraw.dll, "CheckFullscreen");
@@ -174,7 +174,7 @@ void Redirect(PWCHAR name)
 			}
 			else
 
-				if (_tcsicmp(DllName , L"d3d8.dll") == NULL) {
+				if (_tcsicmp(DllName, L"d3d8.dll") == NULL) {
 					d3d8.dll = LoadLibrary(szSystemDllPath);
 					d3d8.DebugSetMute_d3d8 = GetProcAddress(d3d8.dll, "DebugSetMute_d3d8");
 					d3d8.Direct3DCreate8 = GetProcAddress(d3d8.dll, "Direct3DCreate8");
@@ -182,7 +182,7 @@ void Redirect(PWCHAR name)
 					d3d8.ValidateVertexShader = GetProcAddress(d3d8.dll, "ValidateVertexShader");
 				}
 				else
-					if (_tcsicmp(DllName , L"d3d9.dll") == NULL) {
+					if (_tcsicmp(DllName, L"d3d9.dll") == NULL) {
 						d3d9.dll = LoadLibrary(szSystemDllPath);
 						d3d9.D3DPERF_BeginEvent = GetProcAddress(d3d9.dll, "D3DPERF_BeginEvent");
 						d3d9.D3DPERF_EndEvent = GetProcAddress(d3d9.dll, "D3DPERF_EndEvent");
@@ -203,7 +203,7 @@ void Redirect(PWCHAR name)
 					}
 					else
 
-						if (_tcsicmp(DllName , L"d3d11.dll") == NULL) {
+						if (_tcsicmp(DllName, L"d3d11.dll") == NULL) {
 							d3d11.dll = LoadLibrary(szSystemDllPath);
 							d3d11.D3D11CoreCreateDevice = GetProcAddress(d3d11.dll, "D3D11CoreCreateDevice");
 							d3d11.D3D11CoreCreateLayeredDevice = GetProcAddress(d3d11.dll, "D3D11CoreCreateLayeredDevice");
@@ -256,7 +256,7 @@ void Redirect(PWCHAR name)
 						}
 						else
 
-							if (_tcsicmp(DllName , L"winmmbase.dll") == NULL) {
+							if (_tcsicmp(DllName, L"winmmbase.dll") == NULL) {
 								winmmbase.dll = LoadLibrary(szSystemDllPath);
 								winmmbase.CloseDriver = GetProcAddress(winmmbase.dll, "CloseDriver");
 								winmmbase.DefDriverProc = GetProcAddress(winmmbase.dll, "DefDriverProc");
@@ -412,7 +412,7 @@ void Redirect(PWCHAR name)
 							}
 							else
 
-								if (_tcsicmp(DllName , L"msacm32.dll") == NULL) {
+								if (_tcsicmp(DllName, L"msacm32.dll") == NULL) {
 									msacm32.dll = LoadLibrary(szSystemDllPath);
 									msacm32.acmDriverAddA = GetProcAddress(msacm32.dll, "acmDriverAddA");
 									msacm32.acmDriverAddW = GetProcAddress(msacm32.dll, "acmDriverAddW");
@@ -476,10 +476,10 @@ void Redirect(PWCHAR name)
 // Exported function (faking d3d9.dll's one-and-only export)
 IDirect3D9* WINAPI mod_Direct3DCreate9(UINT SDKVersion)
 {
-	 // looking for the "right d3d9.dll"
+	// looking for the "right d3d9.dll"
 //	MessageBox(NULL, L"OK", L"mod_Direct3DCreate9", MB_ICONWARNING);
 											 // Hooking IDirect3D Object from Original Library
-	typedef IDirect3D9 *(WINAPI *D3D9_Type)(UINT );
+	typedef IDirect3D9 *(WINAPI *D3D9_Type)(UINT);
 
 	D3D9_Type D3DCreate9_fn = (D3D9_Type)GetProcAddress(d3d9.dll, "Direct3DCreate9");
 
@@ -527,22 +527,6 @@ IDirect3D9* WINAPI mod_Direct3DCreate9(UINT SDKVersion)
 //	if (!gl_hOriginalDll)
 //	{
 //
- BOOL WINAPI hkGetVersionEx(
-	 LPOSVERSIONINFO lpVersionInfo
-) {
-	lpVersionInfo->dwOSVersionInfoSize = mod_lpVersionInfo->dwOSVersionInfoSize;
-	lpVersionInfo->dwMajorVersion = mod_lpVersionInfo->dwMajorVersion;
-
-	lpVersionInfo->dwMinorVersion = mod_lpVersionInfo->dwMinorVersion;
-
-	lpVersionInfo->dwBuildNumber = mod_lpVersionInfo->dwBuildNumber;
-	lpVersionInfo->dwPlatformId = mod_lpVersionInfo->dwPlatformId;
-	for (int i = 0; i < 128; i++) {
-		lpVersionInfo->szCSDVersion[i] = mod_lpVersionInfo->szCSDVersion[i];
-}
-	return TRUE;
-};
-
 
 BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 {
@@ -555,30 +539,27 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 		hExecutableInstance = GetModuleHandle(NULL); // passing NULL should be safe even with the loader lock being held (according to ReactOS ldr.c)
 
 		GetModuleFileName(dllModule, wc_DllPath, MAX_PATH);
-		GetModuleFileName(hExecutableInstance, ExePath, MAX_PATH);
-		
+		GetModuleFileName(hExecutableInstance, wc_ExePath, MAX_PATH);
 
-		 	DllName = _tcsrchr(wc_DllPath, L'\\');
-	
-			DllName = &DllName[1];
+
+		pwc_DllName = _tcsrchr(wc_DllPath, L'\\');
+
+		pwc_DllName = &pwc_DllName[1];
 
 		GetSystemDirectory(sz_SystemPath, MAX_PATH);
 
 
-		Redirect(DllName);
+		Redirect(pwc_DllName);
 
-		 	ExeName = _tcsrchr(ExePath, L'\\');
+		pwc_ExeName = _tcsrchr(wc_ExePath, L'\\');
 
-			ExeName = &ExeName[1];
+		pwc_ExeName = &pwc_ExeName[1];
 
-			 SomeGameMod(ExeName);
-	
-		
-		
+		SomeGameMod();
 
-	
 
-		
+
+
 	}
 	else if (reason == DLL_PROCESS_DETACH)
 	{

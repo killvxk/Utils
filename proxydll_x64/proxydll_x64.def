@@ -1,5 +1,25 @@
 EXPORTS
 
+;LIBRARY "version"
+GetFileVersionInfoSizeA=Proxy_GetFileVersionInfoSizeA @101
+VerQueryValueA=Proxy_VerQueryValueA @102
+VerQueryValueW=Proxy_VerQueryValueW @103
+GetFileVersionInfoExW=Proxy_GetFileVersionInfoExW @104
+GetFileVersionInfoSizeExW=Proxy_GetFileVersionInfoSizeExW @105
+GetFileVersionInfoSizeW=Proxy_GetFileVersionInfoSizeW @106
+GetFileVersionInfoW=Proxy_GetFileVersionInfoW @107
+GetFileVersionInfoA=Proxy_GetFileVersionInfoA @108
+GetFileVersionInfoExA=Proxy_GetFileVersionInfoExA @109
+GetFileVersionInfoSizeExA=Proxy_GetFileVersionInfoSizeExA @110
+VerFindFileA=Proxy_VerFindFileA @111
+VerInstallFileA=Proxy_VerInstallFileA @112
+GetFileVersionInfoByHandle=Proxy_GetFileVersionInfoByHandle @113
+VerFindFileW=Proxy_VerFindFileW @114
+VerInstallFileW=Proxy_VerInstallFileW @115
+VerLanguageNameA=Proxy_VerLanguageNameA @116
+VerLanguageNameW=Proxy_VerLanguageNameW @117
+
+;LIBRARY "d3d11"
 D3D11CoreCreateDevice = _D3D11CoreCreateDevice @160
 D3D11CoreCreateLayeredDevice = _D3D11CoreCreateLayeredDevice @161
 D3D11CoreGetLayeredDeviceSize = _D3D11CoreGetLayeredDeviceSize @162

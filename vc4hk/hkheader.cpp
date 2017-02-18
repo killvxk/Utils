@@ -7,22 +7,6 @@
 
 
 
-fb::Vec4* GetControllableSpeed(fb::ClientSoldierEntity * soldier){
-
-	__try {
-		fb::Vec4* v= soldier->GetVelocity();
-
-		return v;
-
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER) {
-
-		return nullptr;
-	}
-
-}
-
-
 
 bool MinRealRootOfQuarticFunction(double a, double b, double c, double d, double e, double& root) {
 
@@ -32,25 +16,8 @@ bool MinRealRootOfQuarticFunction(double a, double b, double c, double d, double
 	double delta_0 = c*c - 3 * b*d + 12 * a*e;
 	double delta_1 = 2 * c*c*c - 9 * b*c*d + 27 * b*b*e + 27 * a*d*d - 72 * a*c*e;
 
-
-
 }
 
-bool IsAlive212(fb::ClientControllableEntity* pPlayer)
-{
-
-	fb::HealthComponent* pEmeHealthComponent = *((fb::HealthComponent**)((intptr_t)pPlayer + 0x140));
-
-	if (IsValidPtr(pEmeHealthComponent)) {
-		if (pEmeHealthComponent->m_Health > 0) { return true; }
-		else
-		{
-			return false;
-		}
-	};
-
-	return false;
-}
 bool HackKev::IsAlive(fb::ClientControllableEntity* pPlayer)
 {
 	bool b_isVeh = false;
@@ -418,8 +385,9 @@ void  HackKev::WeaponUpgrade() {
 
 	
 }
-size_t HackKev::GetClientComponentByID(void* p_List, std::vector<void*>* ret, int Id, bool CheckUnderUsing,
-
+size_t HackKev::GetClientComponentByID(void* p_List,
+	std::vector<void*>* ret, 
+	int Id, bool CheckUnderUsing,
 	bool bGetClientWeaponComponent)
 
 {
