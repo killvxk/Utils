@@ -150,7 +150,8 @@ DWORD Aimbot::GetVectorFromVehicle(fb::ClientPlayer* pLocalPlayer, fb::Vec4* vec
 	return 0x0;
 }
 
-fb::Vec4  Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer ,fb::ClientWeapon* MyCSW, fb::FiringFunctionData* pFFD,bool b_InVeh)  {
+fb::Vec4  Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer ,
+	fb::ClientWeapon* MyCSW, fb::FiringFunctionData* pFFD,bool b_InVeh)  {
 fb::LinearTransform ShootSpaceMat;
 	if (b_InVeh) {
 

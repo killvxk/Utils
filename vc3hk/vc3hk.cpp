@@ -177,9 +177,6 @@ void _stdcall Aimbot()
 	if (!IsValidPtr(aimer))
 		return;
 
-
-
-
 	if (pMySoldier->isInVehicle())return;
 	eastl::vector<fb::ClientPlayer*> pVecCP = pPlayerManager->m_players;
 
@@ -188,8 +185,10 @@ void _stdcall Aimbot()
 
 	int size = pVecCP.size();
 
-	fb::GameRenderer::Singleton()->m_viewParams.view.Update();//matrix not filled by default
-	fb::Vec3 Origin = fb::GameRenderer::Singleton()->m_viewParams.view.m_viewMatrixInverse.trans;
+//	fb::GameRenderer::Singleton()->m_viewParams.view.Update();//matrix not filled by default
+	fb::Vec3 Origin = MyCSW->m_weapon->m_shootSpace.trans;
+		
+	
 
 
 	fb::ClientPlayer* ClosestClient = NULL;
@@ -835,9 +834,6 @@ void _stdcall SoldierWeaponUpgrade()
 		pWps->m_currentLagDeviation.m_yaw = 0.0f;
 		pWps->m_currentLagDeviation.m_roll = 0.0f;
 		pWps->m_currentLagDeviation.m_transY = 0.0f;
-
-
-
 
 
 

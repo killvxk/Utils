@@ -11,13 +11,13 @@ class Aimbot
 public:
 	Aimbot();
 	DWORD  AimCorrection2(fb::Vec4 MyPosition,
-	fb::Vec4  EnemyP, fb::Vec4 EnemyVelocity, fb::Vec4  v1, float Gravity, fb::Vec4* out);
-	fb::Vec4 * GetClosestPlayer(eastl::vector<fb::ClientPlayer*>*, fb::ClientPlayer*, int, bool);
-	fb::Vec4  GetVecOfPlayer(bool, fb::RagdollComponent*);
-	fb::Vec4 	GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* , fb::ClientWeapon* , fb::FiringFunctionData* ,bool );
+		fb::Vec4  EnemyP, fb::Vec4 EnemyVelocity, fb::Vec4  v1, float Gravity, fb::Vec4* out);
+	fb::Vec4* GetClosestPlayer(eastl::vector<fb::ClientPlayer*>*, fb::ClientPlayer*, int, bool);
+	fb::Vec4 GetVecOfPlayer(bool, fb::RagdollComponent*);
+	fb::Vec4 GetOriginAndUpdateCurrentAngle(fb::ClientPlayer*, fb::ClientWeapon*, fb::FiringFunctionData*, bool);
 
-	DWORD GetVectorFromVehicle(fb::ClientPlayer* , fb::Vec4* );
-	
+	DWORD GetVectorFromVehicle(fb::ClientPlayer*, fb::Vec4*);
+
 
 	bool mb_AimKeyPressed;
 	fb::Vec4 vOrigin;
@@ -35,7 +35,7 @@ public:
 private:
 
 	double FindMinPos(double a[2]);
-	double FindMinPosRoot(double *a, int n); 
+	double FindMinPosRoot(double *a, int n);
 	double TimeToHit(fb::Vec4 p, fb::Vec4 u, double v_pow2);
 
 	void NullTmpVar();
