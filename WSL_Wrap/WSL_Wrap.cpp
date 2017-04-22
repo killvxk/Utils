@@ -10,27 +10,14 @@ using namespace System::Text;
 using namespace System::Collections::Generic;
 
 bool IsPathValid(String^ path) {
-
-
 	if (!(path->Contains(":\\")))return false;
-
 	try {
 		String^ fullPath = System::IO::Path::GetFullPath(path);
-
-
 		return !String::Compare(fullPath, path, true);
-
 	}
-	catch (System::Exception^
-
-		) {
-
-
+	catch (System::Exception^) {
 		return false;
-
-	}
-
-}
+	}}
 
 void MarshalString(String ^ s, std::wstring& os) {
 	using namespace Runtime::InteropServices;
@@ -39,6 +26,7 @@ void MarshalString(String ^ s, std::wstring& os) {
 	os = chars;
 	Marshal::FreeHGlobal(IntPtr((void*)chars));
 }
+
 int _tmain(int argc, TCHAR*argv[])
 {
 	setlocale(LC_ALL, "");
@@ -49,26 +37,20 @@ int _tmain(int argc, TCHAR*argv[])
 
 	if (NULL == szArglist)
 	{
-	
 		return 0;
 	}
-	String^   str_Exe_Const = gcnew String(szArglist[0]);
 
+	String^  str_Exe_Const = gcnew String(szArglist[0]);
 
 	String ^ str_fullCommandLine_Const = gcnew String(GetCommandLine());
 
-
 	Text::StringBuilder^ str_fullCommandLine;
 
+	Text::StringBuilder^ str_Exe;
 
-	Text::StringBuilder^   str_Exe;
-	
 	if (str_fullCommandLine_Const->StartsWith(L"\"")) {
-
 		str_fullCommandLine = gcnew StringBuilder(
 			str_fullCommandLine_Const->Substring(str_Exe_Const->Length + 2));
-
-
 	}
 	else {
 		str_fullCommandLine = gcnew StringBuilder(
@@ -77,21 +59,18 @@ int _tmain(int argc, TCHAR*argv[])
 
 	int find = str_Exe_Const->LastIndexOf(L'\\');
 
-	int n_FileNameStart = (find>-1)?(find + 1):0;
+	int n_FileNameStart = (find > -1) ? (find + 1) : 0;
 
 	find = str_Exe_Const->LastIndexOf(L'.');
 
-	int n_FileNameLen = (find>-1) ? (find- n_FileNameStart) :( str_Exe_Const->Length - n_FileNameStart);
+	int n_FileNameLen = (find > -1) ? (find - n_FileNameStart) : (str_Exe_Const->Length - n_FileNameStart);
 
-
-
-	str_Exe = gcnew System::Text::StringBuilder(str_Exe_Const->Substring(n_FileNameStart, n_FileNameLen));
+	str_Exe = gcnew System::Text::StringBuilder(str_Exe_Const->Substring(
+		n_FileNameStart, n_FileNameLen));
 
 	StringBuilder^ str_commandBuffer = gcnew StringBuilder(__T("bash -c \""));
 
 	str_commandBuffer->Append(str_Exe);
-
-
 
 	for (int i = 1; i < argc; i++) {
 
@@ -107,7 +86,6 @@ int _tmain(int argc, TCHAR*argv[])
 
 			path.Replace(__T('\\'), __T('/'));
 
-
 			str_fullCommandLine->Replace(str_parameter, path.ToString());
 
 		}
@@ -119,9 +97,7 @@ int _tmain(int argc, TCHAR*argv[])
 
 	str_commandBuffer->Append(str_fullCommandLine);
 
-
 	str_commandBuffer->Append(__T('\"'));
-
 
 	std::wstring a;
 	MarshalString(str_commandBuffer->ToString(), a);
