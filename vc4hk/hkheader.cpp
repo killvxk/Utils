@@ -4,6 +4,16 @@
 
 
 
+char *buffer0= new char[0xff];
+std::ofstream log_file0(
+	"e:\\log\\hk0.log", std::ios_base::out | std::ios_base::trunc);
+
+void logxxx0(const std::string &text)
+{
+
+	log_file0 << text << std::endl;
+}
+
 
 
 
@@ -171,55 +181,52 @@ void HackKev::MiniMap() {
 	if (!IsValidPtr(mp_PlayerMngr))return;
 
 	eastl::vector<fb::ClientPlayer*>* pVecCP = mp_PlayerMngr->getPlayers();
-
-
 	if (pVecCP->size() == 0) return;
-
-
 
 	for (int i = 0; i < pVecCP->size(); i++)
 	{
-		__try {
+				fb::ClientPlayer* pClientPlayer = pVecCP->at(i);
 
-			fb::ClientPlayer* pClientPlayer = pVecCP->at(i);
-
-
+				if (!IsValidPtr(pClientPlayer))continue;
 
 			if (mp_LocalPlayer->m_TeamId == pClientPlayer->m_TeamId)continue;
 
 			fb::ClientControllableEntity* pControllable;
-
+		
 			pControllable = pClientPlayer->m_pControlledControllable;
+			if (!IsValidPtr(pControllable))continue;
 			std::vector<void*> *
 				v_pCSTC = new  std::vector<void*>();
 				
-
-			size_t size=	GetClientComponentByID(pControllable->m_Complist, v_pCSTC, 366, false, false);
-
+			size_t size=GetClientComponentByName(pControllable->m_Complist, v_pCSTC, "Spotting", false, false);
 
 			if (!(size > 0)) {
 				continue;
 				delete v_pCSTC;
 			}
-			fb::ClientSpottingTargetComponent* pCSTC;
 
+
+			fb::ClientSpottingComponent* pCSTC;
 
 			for (int index = 0; index < v_pCSTC->size(); index++)
 			{
-				pCSTC = (fb::ClientSpottingTargetComponent*)v_pCSTC->at(index);
 
-				if (pCSTC->activeSpotType == fb::SpotType_None) { pCSTC->activeSpotType = fb::SpotType_Passive; }
+
+				
+
+				pCSTC = (fb::ClientSpottingComponent*)v_pCSTC->at(index);
+
+				fb::ClassInfo* pType = (fb::ClassInfo*)((fb::ITypedObject*)pCSTC)->GetType();
+
+				sprintf_s(buffer0, 0xff, "name:%s;id:%d;", pType->GetTypeInfoData()->m_Name, pType->m_ClassId); logxxx0(buffer0);
+
+				if (!IsValidPtr(pCSTC))continue;
+		//		if (pCSTC->activeSpotType == fb::SpotType_None) { pCSTC->activeSpotType = fb::SpotType_Active; }
 			}
 
 
-		}
-		__except (EXCEPTION_EXECUTE_HANDLER) {
-		
-			continue;
-		}
+
 	};
-
-
 
 }
 
@@ -385,14 +392,14 @@ void  HackKev::WeaponUpgrade() {
 
 	
 }
-size_t HackKev::GetClientComponentByID(void* p_List,
+size_t HackKev::GetClientComponentByName(void* p_List,
 	std::vector<void*>* ret, 
-	int Id, bool CheckUnderUsing,
+	std::string name, bool CheckUnderUsing,
 	bool bGetClientWeaponComponent)
 
 {
 	void* offset = p_List;
-	int size = *(BYTE*)((intptr_t)offset + 0x8);
+	__int16 size = *(__int16*)((intptr_t)offset + 0x9);
 
 	fb::CompTuple* trashclass1 = (fb::CompTuple*)((intptr_t)offset + 0x10);
 
@@ -413,24 +420,19 @@ size_t HackKev::GetClientComponentByID(void* p_List,
 
 			__int32 flag = trashclass1[obj_index].flags;
 
-
-
 			if (!((flag & 0x8) && (flag & 0x800)))continue;
 
 		}
 
 		fb::ClassInfo* pType = (fb::ClassInfo*)trashclass1[obj_index].Object->GetType();
-
-		if (IsValidPtr(pType)) {
-
-
-			if (pType->m_ClassId == Id) {
-
+		sprintf_s(buffer0, 0xff, "index:d%---id:%d---name:%s---size:%d",obj_index , pType->m_ClassId, pType->GetTypeInfoData()->m_Name,  size); logxxx0(buffer0);
+		
+		if (std::string(pType->GetTypeInfoData()->m_Name).find(name) != std::string::npos)
+		{
 				vector->push_back((void*)(trashclass1[obj_index].Object));
 
 
 			}
-		}
 
 	}
 

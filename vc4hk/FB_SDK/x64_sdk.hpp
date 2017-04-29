@@ -8,7 +8,8 @@ namespace fb {
 	class CompTuple
 	{
 	public:
-		__int64 a;//0x00
+		__int32 classid;//0x00
+		__int32 a;
 		__int32 flags;//0x08
 		__int32 cc;//0x0c
 		ITypedObject* Object;//0x10

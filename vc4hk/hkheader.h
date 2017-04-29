@@ -26,7 +26,7 @@ public:
 	HackKev();
 
 	void AmmoBox();
-	size_t GetClientComponentByID(void*, std::vector<void*>*, int, bool,
+	size_t GetClientComponentByName(void*, std::vector<void*>*, std::string, bool,
 		bool);
 	void VehicleWeaponUpgrade();
 	void MiniMap();
