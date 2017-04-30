@@ -12,7 +12,7 @@ public:
 	Aimbot();
 	DWORD  AimCorrection2(fb::Vec4 MyPosition,
 		fb::Vec4  EnemyP, fb::Vec4 EnemyVelocity, fb::Vec4  v1, float Gravity, fb::Vec4* out);
-	fb::Vec4* GetClosestPlayer(eastl::vector<fb::ClientPlayer*>*, fb::ClientPlayer*, int, bool);
+	fb::Vec4* GetClosestPlayer(eastl::vector<fb::ClientPlayer*>*, fb::ClientPlayer*, bool, bool);
 	fb::Vec4 GetVecOfPlayer(bool, fb::RagdollComponent*);
 	fb::Vec4 GetOriginAndUpdateCurrentAngle(fb::ClientPlayer*, fb::ClientWeapon*, fb::FiringFunctionData*, bool);
 

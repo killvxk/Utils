@@ -8,7 +8,8 @@ namespace fb {
 	class CompTuple
 	{
 	public:
-		__int32 classid;//0x00
+		unsigned __int16 classid;//0x00
+		__int16 aaaaaaaaa;//0x00
 		__int32 a;
 		__int32 flags;//0x08
 		__int32 cc;//0x0c
@@ -32,7 +33,7 @@ namespace fb {
 				fb::Vec4 trans;
 			};
 			FLOAT data[4][4];
-			struct 
+			struct
 			{
 				float _11, _12, _13, _14,
 					_21, _22, _23, _24,
@@ -731,7 +732,7 @@ namespace fb {
 		Vec4 m_Min; //0x0000 
 		Vec4 m_Max; //0x0010 
 
-	
+
 	};//Size=0x0020
 
 	struct TransformAABBStruct {
@@ -756,7 +757,7 @@ namespace fb {
 		char _0x0054[4];
 		float m_Enabled; //0x0058 
 	};
-	
+
 	class ClientChassisComponent
 	{
 	public:
@@ -783,16 +784,16 @@ namespace fb {
 		ClientChassisComponent* m_Chassis; //0x03E0 
 
 
-		inline ClientChassisComponent* GetClientChassisComponent(){
+		inline ClientChassisComponent* GetClientChassisComponent() {
 
 			return this->m_Chassis;
 		}
 		inline Vec4 *GetVehicleVelocity()
 		{
-			
-				return &(this->m_Velocity);
-			
-		
+
+			return &(this->m_Velocity);
+
+
 		}
 	};//Size=0x0520
 	class ClientSoldierPrediction
@@ -806,13 +807,13 @@ namespace fb {
 		char _0x0010[16];
 		Vec4 m_ParachuteRotation; //0x0020  
 		Vec4 m_Position; //0x0030  
-		
+
 		Vec4 surfaceVelocity; //0x0040  
-		
+
 		Vec4 m_Velocity; //0x0050  
-	
+
 		Vec4 groundNormal; //0x0060  
-		
+
 		__int32 groundSupported; //0x0070  
 		__int32 groundMaterialIndex; //0x0074  
 		__int32 m_state; //0x0078  
@@ -893,9 +894,9 @@ namespace fb {
 				return (Vec4*)((intptr_t)a + 0x50);
 			}
 			else {
-			return nullptr;
+				return nullptr;
+			}
 		}
-	}
 
 
 	};//Size=0x1228
@@ -942,16 +943,16 @@ namespace fb {
 		__int32 m_ZoomLevelMax; //0x0AC4 
 		__int32 m_ZeroingDistanceLevel; //0x0AC8 
 
-	inline	ClientSoldierWeapon* GetActiveSoldierWeapon()
+		inline	ClientSoldierWeapon* GetActiveSoldierWeapon()
 		{
-			
-		__try{
-			
+
+			__try {
+
 				return m_Handler->m_pWeaponList[m_CurrentWeaponIndex];
-		}
-		__except (1) {
-			return nullptr;
-		}
+			}
+			__except (1) {
+				return nullptr;
+			}
 
 		};
 		int GetSlot()
@@ -1134,7 +1135,7 @@ namespace fb {
 			float DecreasePerSecond; //0x000C 
 
 		}; //Size=0x0010
-		class WeaponDispersion 
+		class WeaponDispersion
 		{
 		public:
 			FiringDispersionData StandDispersion;
@@ -2181,7 +2182,8 @@ namespace fb {
 		ClientPlayer* m_pClientPlayer; //0x270
 	};//0x640
 	class WeaponInfo
-	{public:
+	{
+	public:
 		virtual void WorldTransfrom(LinearTransform&);
 		virtual void GetState(int&);
 		virtual void AddWeaponFiringCallbcks(void*);
@@ -2196,7 +2198,7 @@ namespace fb {
 	};
 #ifndef _ClientBoneComponent_
 #define _ClientBoneComponent_
-	class fb::ClientBoneComponent 
+	class fb::ClientBoneComponent
 	{
 		//public:
 		//    static __inline unsigned int ClassId()
@@ -2261,7 +2263,7 @@ namespace fb {
 
 
 
-	
+
 
 	class MainVarPtr
 	{
