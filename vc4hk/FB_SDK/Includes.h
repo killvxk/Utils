@@ -33,14 +33,14 @@
 
 #endif
 
-static bool IsValidPtr(void* ptr) {
+inline static bool IsValidPtr(void* ptr) {
 
 
 	if (((intptr_t)ptr >= 0x10000) && ((intptr_t)ptr < _PTR_MAX_VALUE)&&(ptr!=nullptr) ) {
 		__try
 		{
 			
-			intptr_t a = *(intptr_t*)ptr;
+			BYTE a = *(BYTE*)ptr;
 				return true;
 		
 		}
@@ -49,7 +49,10 @@ static bool IsValidPtr(void* ptr) {
 			return false;
 		}
 
-	}else
-	return false;
+	}
+	else
+	{
+		return false;
+	}
 
 }

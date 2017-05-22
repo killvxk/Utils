@@ -82,6 +82,7 @@ void HackKev::VarsUpdate() {
 	}
 	else {
 		this->mp_PlayerMngr = nullptr;
+	//	this->mp_GameContext = nullptr;
 	}
 
 	if (IsValidPtr(this->mp_PlayerMngr)) {
@@ -115,7 +116,7 @@ void  HackKev::AmmoBox() {
 	if (mb_AmmoBox)return;
 	fb::Level* pLevel = p->m_pLevel;
 
-	// POINTERCHK
+
 	if (!IsValidPtr(pLevel)) {
 
 		mb_AmmoBox = false;	return;
@@ -133,14 +134,12 @@ void  HackKev::AmmoBox() {
 
 	fb::TeamData* Team;
 
-
-
 	for (int i = 1; i <= 2; i++) {
 
 		m_teamEntity = pLevel->m_TeamEntity[i];
 
 		if (!IsValidPtr(m_teamEntity))
-			return;
+			continue;
 
 		Team = m_teamEntity->m_Team;
 
@@ -156,9 +155,6 @@ void  HackKev::AmmoBox() {
 				//	slotG2_list[j][index] = Team->m_SoldierCustomization[j]->m_pWeaponTable->m_ppList[3]->m_SelectableUnlocks[index];
 				index++;
 			}
-
-
-
 
 		}
 		slotG1_list[3][15] = &EndOfArray;
@@ -181,19 +177,13 @@ void HackKev::MiniMap() {
 	if (!IsValidPtr(mp_PlayerMngr))return;
 
 	eastl::vector<fb::ClientPlayer*>* pVecCP = mp_PlayerMngr->getPlayers();
-
-
 	if (pVecCP->size() == 0) return;
-
-
 
 	for (int i = 0; i < pVecCP->size(); i++)
 	{
 		__try {
 
 			fb::ClientPlayer* pClientPlayer = pVecCP->at(i);
-
-
 
 			if (mp_LocalPlayer->m_TeamId == pClientPlayer->m_TeamId)continue;
 
@@ -232,8 +222,6 @@ void HackKev::MiniMap() {
 
 
 }
-
-
 void  HackKev::VehicleWeaponUpgrade() {
 
 
@@ -244,26 +232,60 @@ void  HackKev::VehicleWeaponUpgrade() {
 	__try {
 		fb::WeaponFiring* pWepFiring = *(fb::WeaponFiring**)OFFSET_PPCURRENTWEAPONFIRING;
 		fb::WeaponFiringData* pFiring = pWepFiring->m_pPrimaryFire;
+		if (pWepFiring->m_NextWeaponState == 7 || pWepFiring->m_NextWeaponState == 4 ||
+			pWepFiring->m_NextWeaponState == 8 || pWepFiring->m_NextWeaponState == 10 ||
+			pWepFiring->m_NextWeaponState == 11) {
+			pWepFiring->m_NextWeaponState = 3;
 
-
+		}
 
 		fb::FiringFunctionData* pFFD = pFiring->m_FiringData;
 		pFFD->m_Dispersion->MaxAngle = 0.f;
 		pFFD->m_Dispersion->MinAngle = 0.f;
 		pFFD->m_Dispersion->IncreasePerShot = 0.f;
-		pFFD->m_Dispersion->DecreasePerSecond = 100000.f;
+		pFFD->m_Dispersion->DecreasePerSecond = INFINITY;
 
-		pFFD->m_FireLogic.MaxRecoilAngleX = 0.f;
-		pFFD->m_FireLogic.MinRecoilAngleX = 0.f;
-		pFFD->m_FireLogic.MaxRecoilAngleY = 0.f;
-		pFFD->m_FireLogic.MinRecoilAngleY = 0.f;
-		pFFD->m_FireLogic.MaxRecoilAngleZ = 0.f;
-		pFFD->m_FireLogic.MinRecoilAngleZ = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MaxRecoilAngleX = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MinRecoilAngleX = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MaxRecoilAngleY = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MinRecoilAngleY = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MaxRecoilAngleZ = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MinRecoilAngleZ = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MaxRecoilFov = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MinRecoilFov = 0.f;
 
-		pFFD->m_OverHeat.HeatDropPerSecond = 1000.f;
+		pFFD->m_OverHeat.HeatDropPerSecond = INFINITY;
 		pFFD->m_OverHeat.HeatPerBullet = 0.f;
 		pFFD->m_OverHeat.OverHeatPenaltyTime = 0.f;
-		pFFD->m_OverHeat.OverHeatThreshold = 1000000.f;
+		pFFD->m_OverHeat.OverHeatThreshold = INFINITY;
+
+		pFFD->m_FireLogic.m_BoltAction.m_BoltActionDelay = 0.f;
+		pFFD->m_FireLogic.m_BoltAction.m_BoltActionTime = 0.f;
+
+
+		pFFD->m_FireLogic.ReloadDelay = 0.f;
+		pFFD->m_FireLogic.ReloadTime = 0.f;
+
+		float(*a)[4] = (pFFD->m_FireLogic.ReloadTimerArray);
+
+		(*a)[0] = 0.f;
+		(*a)[1] = 0.f;
+		(*a)[2] = 0.f;
+		(*a)[3] = 0.f;
+
+
+		pFFD->m_FireLogic.ReloadTimeBulletsLeft = 0.f;
+		pFFD->m_FireLogic.PreFireDelay = 0.f;
+		pFFD->m_FireLogic.PreFireDelayZoomed = 0.f;
+		pFFD->m_FireLogic.PreFireRequireHold = 0.f;
+		pFFD->m_FireLogic.AutomaticDelay = 0.f;
+
+
+		float f_AutoReplenishDelay = pFFD->m_Ammo.AutoReplenishDelay;
+		if (f_AutoReplenishDelay > 0.1f)pFFD->m_Ammo.AutoReplenishDelay = 0.1f;
+
+
+
 
 		auto veh = fb::MainVarPtr::Singleton()->pVehicleEntry;
 		auto vec = veh->GetVehicleVelocity();
@@ -326,8 +348,6 @@ void  HackKev::WeaponUpgrade() {
 
 		fb::ClientSoldierWeaponsComponent* pWepComp = fb::MainVarPtr::Singleton()->pWeaponComp;
 
-
-
 		fb::ClientSoldierWeapon* MySW = pWepComp->GetActiveSoldierWeapon();
 
 		if (!IsValidPtr(MySW)) {
@@ -335,34 +355,85 @@ void  HackKev::WeaponUpgrade() {
 		}
 
 
-		fb::WeaponFiring*	pWepFiring = MySW->m_pPrimary;
+		fb::WeaponFiring* pWepFiring = *(fb::WeaponFiring**)OFFSET_PPCURRENTWEAPONFIRING;
 
 		if (!IsValidPtr(pWepFiring)) {
 			return;
 		}
 
-
 		fb::FiringFunctionData* pFFD = pWepFiring->m_pPrimaryFire->m_FiringData;
 
-
-
 		if (pFFD->m_ShotConfigData.m_InitialSpeed.z < 10.f)return;
+
+		//if (pWepFiring->m_TimeToWait > 0.1f)pWepFiring ->m_TimeToWait= 0.1f;
+
+	//	pWepFiring->m_HoldReleaseMinDelay = 0.f;
+	//	pWepFiring->m_hasStoppedFiring = 1;
+	//	pWepFiring->m_primaryFireTriggeredLastFrame = 0;
+
+	
+
+
+
+		if (pWepFiring->m_NextWeaponState == 7 || pWepFiring->m_NextWeaponState == 4 ||
+			pWepFiring->m_NextWeaponState == 8) {
+			pWepFiring->m_NextWeaponState = 3;
+
+
+		}
+
+	
 
 
 		pFFD->m_Dispersion->MaxAngle = 0.f;
 		pFFD->m_Dispersion->MinAngle = 0.f;
 		pFFD->m_Dispersion->IncreasePerShot = 0.f;
-		pFFD->m_Dispersion->DecreasePerSecond = 1000.f;
+		pFFD->m_Dispersion->DecreasePerSecond = INFINITY;
 
-		pFFD->m_FireLogic.MaxRecoilAngleX = 0.f;
-		pFFD->m_FireLogic.MinRecoilAngleX = 0.f;
-		pFFD->m_FireLogic.MaxRecoilAngleY = 0.f;
-		pFFD->m_FireLogic.MinRecoilAngleY = 0.f;
-		pFFD->m_FireLogic.MaxRecoilAngleZ = 0.f;
-		pFFD->m_FireLogic.MinRecoilAngleZ = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MaxRecoilAngleX = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MinRecoilAngleX = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MaxRecoilAngleY = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MinRecoilAngleY = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MaxRecoilAngleZ = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MinRecoilAngleZ = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MaxRecoilFov = 0.f;
+		pFFD->m_FireLogic.m_Recoil.m_MinRecoilFov = 0.f;
 
-		pFFD->m_OverHeat.HeatDropPerSecond = 1000.f;
+		pFFD->m_FireLogic.m_BoltAction.m_BoltActionDelay =0.f;
+		pFFD->m_FireLogic.m_BoltAction.m_BoltActionTime = 0.f;
+
+	/*	if (pFFD->m_FireLogic.m_FireLogicType == fb::FireLogicType::fltSingleFireWithBoltAction)
+		{
+			pFFD->m_FireLogic.RateOfFire = 400.f;
+
+		}*/
+
+		pFFD->m_FireLogic.ReloadDelay = 0.f;
+		//pFFD->m_FireLogic.ReloadTime = 0.f;
+
+	//	float(*a)[4] = (pFFD->m_FireLogic.ReloadTimerArray);
+
+		//(*a)[0] = 0.f;
+		//(*a)[1] = 0.f;
+		//(*a)[2] = 0.f;
+		//(*a)[3] = 0.f;
+
+		//pFFD->m_FireLogic.ReloadTimeBulletsLeft = 0.f;
+		pFFD->m_FireLogic.PreFireDelay = 0.f;
+		pFFD->m_FireLogic.PreFireDelayZoomed = 0.f;
+//		pFFD->m_FireLogic.PreFireRequireHold = 0.f;
+//		pFFD->m_FireLogic.AutomaticDelay = 0.f;
+
+		pFFD->m_Ammo.AmmoBagPickupDelayMultiplier = 0.001f;
+		pFFD->m_Ammo.AmmoBagPickupAmount = -1;
+		pFFD->m_Ammo.AutoReplenishDelay = 0.f;
+
+		pFFD->m_OverHeat.HeatDropPerSecond = INFINITY;
 		pFFD->m_OverHeat.HeatPerBullet = 0.f;
+		pFFD->m_OverHeat.OverHeatPenaltyTime = 0.f;
+		pFFD->m_OverHeat.OverHeatThreshold = INFINITY;
+
+
 
 
 		fb::WeaponSway* pSway = pWepFiring->m_Sway;

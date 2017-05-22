@@ -564,8 +564,9 @@ namespace fb {
 	public:
 		char _0x0000[56];
 		LevelData* m_pLevelData; //0x0038 
-		Array<TeamEntityData *> m_TeamEntity;
-		char _0x0040[216];
+		Array<TeamEntityData *> m_TeamEntity;//0x0040
+		const char *name;
+		char _0x0040[0xd0];
 		HavokPhysicsManager* m_pHavokPhysics;
 		char _0x0128[8];
 		__int64 m_pGameWorld;
@@ -1150,33 +1151,47 @@ namespace fb {
 		}; //Size=0x0044
 		class FireLogicData
 		{
+			struct HoldAndReleaseData
+			{
+				float m_MaxHoldTime; //0x0000
+				float m_MinPowerModifier; //0x0004
+				float m_MaxPowerModifier; //0x0008
+				float m_PowerIncreasePerSecond; //0x000C
+				float m_Delay; //0x0010
+				float m_KilledHoldingPowerModifier; //0x0014
+				bool m_ForceFireWhenKilledHolding; //0x0018
+				char _0x0019[3];
+			};//Size=0x001C
+			struct BoltActionData
+			{
+				float m_BoltActionDelay; //0x0000
+				float m_BoltActionTime; //0x0004
+				bool m_HoldBoltActionUntilFireRelease; //0x0008
+				bool m_HoldBoltActionUntilZoomRelease; //0x0009
+				bool m_ForceBoltActionOnFireTrigger; //0x000A
+				bool m_UnZoomOnBoltAction; //0x000B
+				bool m_ReturnToZoomAfterBoltAction; //0x000C
+				char _0x000D[3];
+			};//Size=0x0010
+			
+			struct RecoilData
+			{
+				float m_MaxRecoilAngleX; //0x0000
+				float m_MinRecoilAngleX; //0x0004
+				float m_MaxRecoilAngleY; //0x0008
+				float m_MinRecoilAngleY; //0x000C
+				float m_MaxRecoilAngleZ; //0x0010
+				float m_MinRecoilAngleZ; //0x0014
+				float m_MaxRecoilFov; //0x0018
+				float m_MinRecoilFov; //0x001C
+				bool m_RecoilFollowsDispersion; //0x0020
+				char _0x0021[3];
+			};//Size=0x0024
+
 		public:
-			float MaxHoldTime; //0x0000 
-			float MinPowerModifier; //0x0004 
-			float MaxPowerModifier; //0x0008 
-			float PowerIncreasePerSecond; //0x000C 
-			float Delay; //0x0010 
-			float KilledHoldingPowerModifier; //0x0014 
-			unsigned char ForceFireWhenKilledHolding; //0x0018 
-			char pad_0x0019[0x3]; //0x0019
-			float BoltActionDelay; //0x001C 
-			float BoltActionTime; //0x0020 
-			unsigned char HoldBoltActionUntilFireRelease; //0x0024 
-			unsigned char HoldBoltActionUntilZoomRelease; //0x0025 
-			unsigned char ForceBoltActionOnFireTrigger; //0x0026 
-			unsigned char UnZoomOnBoltAction; //0x0027 
-			unsigned char ReturnToZoomAfterBoltAction; //0x0028 
-			char pad_0x0029[0x3]; //0x0029
-			float MaxRecoilAngleX; //0x002C 
-			float MinRecoilAngleX; //0x0030 
-			float MaxRecoilAngleY; //0x0034 
-			float MinRecoilAngleY; //0x0038 
-			float MaxRecoilAngleZ; //0x003C 
-			float MinRecoilAngleZ; //0x0040 
-			float MaxRecoilFov; //0x0044 
-			float MinRecoilFov; //0x0048 
-			unsigned char RecoilFollowsDispersion; //0x004C 
-			char pad_0x004D[0x3]; //0x004D
+			HoldAndReleaseData m_HoldAndRelease; //0x0000
+			BoltActionData m_BoltAction; //0x001C
+			RecoilData m_Recoil; //0x002C
 			__int32 FireInputAction; //0x0050 
 			__int32 ReloadInputAction; //0x0054 
 			__int32 CycleFireModeInputAction; //0x0058 
@@ -1187,18 +1202,18 @@ namespace fb {
 			float ClientFireRateMultiplier; //0x006C 
 			float ReloadDelay; //0x0070 
 			float ReloadTime; //0x0074 
-			void* ReloadTimerArray; //0x0078 
+			float (*ReloadTimerArray)[4]; //0x0078 
 			float ReloadTimeBulletsLeft; //0x0080 
 			float ReloadThreshold; //0x0084 
 			float PreFireDelay; //0x0088 
 			float PreFireDelayZoomed; //0x008C 
 			float PreFireRequireHold; //0x0090 
 			float AutomaticDelay; //0x0094 
-			__int32 ReloadLogic; //0x0098 
-			__int32 ReloadType; //0x009C 
-			__int32 FireLogicType; //0x00A0 
+			fb::ReloadLogic m_ReloadLogic; //0x0098
+			fb::ReloadType m_ReloadType; //0x009C
+			fb::FireLogicType m_FireLogicType; //0x00A0 
 			char pad_0x00A4[0x4]; //0x00A4
-			void* FireLogicTypeArray; //0x00A8 
+			fb::FireLogicType* m_FireLogicTypeArray; //0x00A8 
 			unsigned char HoldOffReloadUntilFireRelease; //0x00B0 
 			unsigned char HoldOffReloadUntilZoomRelease; //0x00B1 
 			unsigned char ForceReloadActionOnFireTrigger; //0x00B2 
@@ -1386,7 +1401,15 @@ namespace fb {
 	class WeaponFiring
 	{
 	public:
-		char _0x0000[120];
+		virtual void Function0(); // 0x0000 
+		virtual void Read(float SampleTime, bool VisualFrame); //0x0008  
+		virtual const char* Name(unsigned int); //0x0010  
+		virtual const char* Name(void); // 0x0018  
+		virtual unsigned int ControlCount(); // 0x0020  
+		virtual bool IsConnected(); // 0x0028 
+		virtual bool IsAnalogue(unsigned int); // 0x0030 
+		virtual float GetValue(unsigned int);    // 0x0038 
+		char _0x0000[112];
 		WeaponSway* m_Sway; //0x0078 
 		char _0x0080[168];
 		WeaponFiringData* m_pPrimaryFire; //0x0128 
@@ -1405,10 +1428,18 @@ namespace fb {
 		float m_RecoilFOVAngle; //0x0178 
 		float m_RecoilTimeMultiplier; //0x017C 
 		float m_OverheatDropMultiplier; //0x0180 
-		char _0x0184[40];
-		unsigned char m_IsNotFiring; //0x01AC 
-		unsigned char m_JustShot; //0x01AD 
-		unsigned char m_IsOverheated; //0x01AE 
+		char _0x0184[36];
+		unsigned __int32 m_numberOfProjectilesToFire;
+		BYTE m_hasStoppedFiring; //0x01AC 
+		BYTE m_primaryFireTriggeredLastFrame; //0x01AD 
+		BYTE m_isOverheated; //0x01AE 
+		BYTE m_unknown; //0x01AF 
+		char pad_0x01B0[8];
+		DWORD m_tickCounter; //0x01B8 
+		__int32 m_fireMode_index; //0x01BC 
+		char pad_0x01C0[8];
+		void* m_pFiringHolderData; //0x01C8 
+		unsigned __int32 * m_FireModes;
 	};//Size=0x01AF
 
 	class ClientSoldierBodyComponent

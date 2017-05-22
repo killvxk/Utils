@@ -347,7 +347,7 @@ fb::Vec4 * Aimbot::GetClosestPlayer(eastl::vector<fb::ClientPlayer*>* pVecCP, fb
 
 			if (!b_found) {
 
-				if ((pClientPlayer->InVehicle() && BulletClassID == 2441) || InVeh) {
+				if ((pClientPlayer->InVehicle() && missile) || InVeh) {
 
 
 					if (GetVectorFromVehicle(pClientPlayer, &v_EnemyVecTmp) != 0)return nullptr;
@@ -444,8 +444,6 @@ DWORD  Aimbot::AimCorrection2(fb::Vec4 MyPosition,
 			double c = (2.0f*(EnemyP.Dot(EnemyVelocity))) / mmm;
 
 			double d = EnemyP.Dot(EnemyP) / mmm;
-
-
 
 			int res1 = SolveP4(res, a, b, c, d);
 

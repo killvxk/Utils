@@ -20,9 +20,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="enums.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="poly34.h">
       <Filter>Header</Filter>
     </ClInclude>
