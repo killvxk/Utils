@@ -10,7 +10,7 @@
     <ProjectGuid>{CB81C021-7897-4323-B231-E9394CFE24A3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>vc4hk</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
