@@ -19,7 +19,7 @@ WCHAR* wc_DllPath = new WCHAR[MAX_PATH],
 *wc_ExePath = new WCHAR[MAX_PATH],
 *sz_SystemPath = new WCHAR[MAX_PATH],
 *szSystemDllPath = new WCHAR[MAX_PATH];
-PWCHAR 	pwc_DllName;
+PWCHAR 	pwc_dllName;
 PWCHAR 	pwc_ExeName;
 
 void SomeGameMod() {
@@ -495,7 +495,6 @@ IDirect3D9* WINAPI mod_Direct3DCreate9(UINT SDKVersion)
 }
 
 
-
 //void InitInstance(HANDLE hModule) 
 //{
 //	OutputDebugString(L"PROXYDLL: InitInstance called.\r\n");
@@ -542,14 +541,14 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 		GetModuleFileName(hExecutableInstance, wc_ExePath, MAX_PATH);
 
 
-		pwc_DllName = _tcsrchr(wc_DllPath, L'\\');
+		pwc_dllName = _tcsrchr(wc_DllPath, L'\\');
 
-		pwc_DllName = &pwc_DllName[1];
+		pwc_dllName = &pwc_dllName[1];
 
 		GetSystemDirectory(sz_SystemPath, MAX_PATH);
 
 
-		Redirect(pwc_DllName);
+		Redirect(pwc_dllName);
 
 		pwc_ExeName = _tcsrchr(wc_ExePath, L'\\');
 

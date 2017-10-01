@@ -2,19 +2,21 @@
 #include "stdafx.h"
 #include "proxydllx64.h"
 #include <stdio.h>
-
+#include <DXGI.h>
+#pragma comment(lib, "dxgi.lib")
 HMODULE dllModule;
 HINSTANCE hExecutableInstance;
 WCHAR* wc_DllPath = new WCHAR[MAX_PATH],
 *wc_ExePath = new WCHAR[MAX_PATH],
 *sz_SystemPath = new WCHAR[MAX_PATH],
 *szSystemDllPath = new WCHAR[MAX_PATH];
-PWCHAR 	pwc_DllName;
+PWCHAR 	pwc_dllName;
 PWCHAR 	pwc_ExeName;
-WCHAR g_szArgs_UNICODE[8200] = L"--force-fieldtrials=ExtensionDeveloperModeWarning/None/";
+WCHAR gpwc_args_UNICODE[] = L" --force-fieldtrials=ExtensionDeveloperModeWarning/None/";
 D3D_FEATURE_LEVEL FeatureL = { D3D_FEATURE_LEVEL_10_1 };
 UINT Flags_mask = D3D11_CREATE_DEVICE_SINGLETHREADED;
 bool hooked = false;
+bool b_forceiGPU = true;
 
 typedef HRESULT(*fn_CreatePixelShader)(
     ID3D11Device *,
@@ -68,20 +70,19 @@ fn_CreateComputeShader ori_CreateComputeShader = nullptr;
 fn_CreateHullShader ori_CreateHullShader = nullptr;
 fn_CreateDomainShader ori_CreateDomainShader = nullptr;
 
-char* memstr(char* full_data, int full_data_len, char* substr, int substr_len)
+intptr_t* memstr(intptr_t * full_data, int full_data_len, intptr_t * substr, int substr_len)
 {
-    if (full_data == NULL || full_data_len <= 0 || substr == NULL) {
-        return NULL;
+    if (full_data == nullptr || full_data_len <= 0 || substr == nullptr) {
+        return nullptr;
     }
 
-
     int i;
-    char* cur = full_data;
+    intptr_t * cur = full_data;
     int last_possible = full_data_len - substr_len + 1;
     for (i = 0; i < last_possible; i++) {
         if (*cur == *substr) {
             //assert(full_data_len - i >= sublen);  
-            if (memcmp(cur, substr, substr_len) == 0) {
+            if (!memcmp(cur, substr, substr_len)) {
                 //found  
                 return cur;
             }
@@ -122,21 +123,24 @@ void SetCommandLineW() {
     */
     //_pfnBase = 75c8e967
     intptr_t _pfnBase = (intptr_t)GetProcAddress(_kernelbase, "GetCommandLineW");
+
     // skip opcode a1 (1 byte)
-    intptr_t _pCmdLineBase = _pfnBase + 1;
+    intptr_t * _pCmdLineBase = *(intptr_t**)(_pfnBase + 1);
     // get address 75cc506c
-    _pCmdLineBase = *(intptr_t*)_pCmdLineBase;
+   // _pCmdLineBase = (intptr_t*)_pCmdLineBase;
+    wchar_t * sd = new wchar_t[8200];
+    wcscpy_s(sd, 8200, (wchar_t*)_pCmdLineBase);
 
-    //DWORD dwOldProtect;
+    MessageBoxW(NULL, GetCommandLineW(), L"Debug Info", MB_OK);
+    // DWORD dwOldProtect;
+     //VirtualProtect((wchar_t*)_pCmdLineBase, sizeof(intptr_t), PAGE_EXECUTE_READWRITE, &dwOldProtect);
 
-//	VirtualProtect(*(wchar_t**)_pCmdLineBase, 16, PAGE_EXECUTE_READWRITE, &dwOldProtect);
+     //wcscat_s((wchar_t*)_pCmdLineBase, 8100, g_szArgs_UNICODE);
 
-    wcscat_s(*(wchar_t**)_pCmdLineBase, 8100, g_szArgs_UNICODE);
+     //VirtualProtect((wchar_t*)_pCmdLineBase, sizeof(intptr_t), dwOldProtect, &dwOldProtect);
 
-    //	VirtualProtect(*(wchar_t**)_pCmdLineBase, 16, dwOldProtect, &dwOldProtect);
-    //	MessageBoxW(NULL, *(wchar_t**)_pCmdLineBase, L"Debug Info", MB_OK);
 
-        //*(wchar_t**)_pCmdLineBase = g_szArgs_UNICODE;
+         //*(wchar_t**)_pCmdLineBase = g_szArgs_UNICODE;
 
 }
 
@@ -144,15 +148,36 @@ void SomeGameMod() {
     if ((_tcsicmp(pwc_ExeName, L"chrome.exe") == NULL)
 
         ) {
+        intptr_t * pwc_cmdLine = (intptr_t*)0x7ff93a5d6ce0;
+        DWORD dwOldProtect;
+
+        size_t len = 512;
 
 
-        //	MessageBoxW(NULL, GetCommandLineW(), L"Debug Info", MB_OK);
+        VirtualProtect((wchar_t*)pwc_cmdLine, 512, PAGE_EXECUTE_READWRITE, &dwOldProtect);
+        char to_find[] = "\x33\xd8\x48\xa9\xfe\xff\xff\xff";
 
-        //	SetCommandLineW();
+        char * found = (char *)memstr((intptr_t*)pwc_cmdLine, (int)len, (intptr_t*)to_find, 8);
 
-        MessageBoxW(NULL, GetCommandLineW(), L"Debug Info", MB_OK);
+        MessageBoxW(NULL, L"Debug Info", L"Debug Info", MB_OK);
 
 
+        if (found != nullptr) {
+
+
+
+            char * patch = &found[8];
+            patch[0] = 0x32;
+            patch[1] = 0xc0;
+            patch[2] = 0x5b;
+            patch[3] = 0xc3;
+            patch[4] = 0x90;
+
+
+            MessageBoxW(NULL, L"Debug Info", L"Debug Info", MB_OK);
+
+        }
+        VirtualProtect((wchar_t*)pwc_cmdLine, 20, dwOldProtect, &dwOldProtect);
     }
 
 }
@@ -168,7 +193,7 @@ HRESULT mod_CreateVertexShader(
 
     char to_find[] = "m_FxaaConsole360ConstDir";
 
-    char * found = memstr((char *)pShaderBytecode, BytecodeLength, to_find, sizeof(to_find) - 1);
+    char * found = (char *)memstr((intptr_t*)pShaderBytecode, (int)BytecodeLength, (intptr_t*)to_find, (int)strlen(to_find));
     /* if (found != NULL)
      {
          char filename[MAX_PATH];
@@ -252,7 +277,7 @@ HRESULT mod_CreatePixelShader(
 
     char to_find[] = "fxaaConsoleRcp";
 
-    char * found = memstr((char *)pShaderBytecode, BytecodeLength, to_find, sizeof(to_find) - 1);
+    char * found = (char *)memstr((intptr_t*)pShaderBytecode, (int)BytecodeLength, (intptr_t*)to_find, (int)strlen(to_find));
     if (found == nullptr) {
         return ori_CreatePixelShader(
             ppDevice,
@@ -333,11 +358,32 @@ HRESULT __stdcall mod_D3D11CreateDevice(
     fn_D3D11CreateDevice ori_D3D11CreateDevice
         = (fn_D3D11CreateDevice)GetProcAddress(d3d11.dll, "D3D11CreateDevice");
 
-    HRESULT hr = ori_D3D11CreateDevice(pAdapter, DriverType, Software,
+    HRESULT hr=S_OK;
+    
+    if (b_forceiGPU) {
+        IDXGIFactory * pFactory = NULL;
+     
+        CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&pFactory);
+
+       
+        IDXGIAdapter * pAdapter_iGPU=NULL;
+     
+        pFactory->EnumAdapters(0, &pAdapter_iGPU);
+
+
+      
+       
+    
+     hr = ori_D3D11CreateDevice(pAdapter_iGPU, DriverType, Software,
         Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice
         , pFeatureLevel, ppImmediateContext);
-
-    if (!hooked)hook_D3D_Api(ppDevice);
+    }
+    else {
+         hr = ori_D3D11CreateDevice(pAdapter, DriverType, Software,
+            Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice
+            , pFeatureLevel, ppImmediateContext);
+    }
+    //if (!hooked)hook_D3D_Api(ppDevice);
     return hr;
 
 }
@@ -493,21 +539,20 @@ BOOL APIENTRY DllMain(HMODULE hInst,
         GetModuleFileName(hExecutableInstance, wc_ExePath, MAX_PATH);
 
 
-        pwc_DllName = _tcsrchr(wc_DllPath, L'\\');// \d3d11.dll
+        pwc_dllName = _tcsrchr(wc_DllPath, L'\\');// \d3d11.dll
 
-        pwc_DllName = &pwc_DllName[1];// d3d11.dll
+        pwc_dllName = &pwc_dllName[1];// d3d11.dll
 
         GetSystemDirectory(sz_SystemPath, MAX_PATH);
 
-
-        Redirect(pwc_DllName);
+        //proxy dll export function
+        Redirect(pwc_dllName);
 
         pwc_ExeName = _tcsrchr(wc_ExePath, L'\\');// \aaa.exe
 
         pwc_ExeName = &pwc_ExeName[1];//aaa.exe
 
-
-    //	SomeGameMod();
+        //SomeGameMod();
     }; break;
     case DLL_THREAD_ATTACH:break;
     case DLL_THREAD_DETACH:break;
