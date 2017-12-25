@@ -494,7 +494,6 @@ IDirect3D9* WINAPI mod_Direct3DCreate9(UINT SDKVersion)
 	return (gl_pmyIDirect3D9);
 }
 
-
 //void InitInstance(HANDLE hModule) 
 //{
 //	OutputDebugString(L"PROXYDLL: InitInstance called.\r\n");

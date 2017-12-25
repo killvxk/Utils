@@ -204,9 +204,6 @@ HRESULT myIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParameters
 	setParam(pPresentationParameters);
 
 
-
-	
-
 	//MessageBox(NULL, s.c_str(), L"reset", MB_ICONINFORMATION);
 	return(m_pIDirect3DDevice9->Reset(pPresentationParameters));
 }

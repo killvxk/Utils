@@ -32,7 +32,6 @@ private:
 
  static inline  void setParam(D3DPRESENT_PARAMETERS* pPresentationParameters) {
 	if(!pPresentationParameters->Windowed) pPresentationParameters->SwapEffect = D3DSWAPEFFECT_FLIP;
-
-	if (pPresentationParameters->BackBufferCount < 3)pPresentationParameters->BackBufferCount = 2;
+	if (pPresentationParameters->BackBufferCount < 2)pPresentationParameters->BackBufferCount = 2;
 	pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 }

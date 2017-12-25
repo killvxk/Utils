@@ -177,9 +177,6 @@ HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter,
 
 	*ppReturnedDeviceInterface = gl_pmyIDirect3DDevice9;
 	
-
-
-	
 	return(hres);
 
 }

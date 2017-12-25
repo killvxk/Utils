@@ -1,24 +1,18 @@
 
 #include "stdafx.h"
-#include "FB SDK\Frostbite.h"
+#include "FB_SDK\Frostbite.h"
 
+
+#include <iphlpapi.h>
+#include <icmpapi.h>
 #include "Functions.h"
 #include "VMTHook.h"
+#pragma comment(lib, "iphlpapi.lib")
 //void* g_pOriginalGetRecoil = NULL;
 //void* g_pOriginalGetDeviation = NULL;
 //void** g_pGetRecoilVTableAddress = (void**)0x20a3acc;
 //void** g_pGetDeviationVTableAddress = (void**)0x20a3ac8;
-#pragma region
-void* operator new[](size_t size, const char* pName, int flags, unsigned debugFlags, const char* file, int line)
-{
-	return malloc(size);
-}
-void* operator new[](size_t size, size_t alignment, size_t alignmentOffset, const char* pName, int flags, unsigned debugFlags, const char* file, int line)
-{
-	EASTL_ASSERT(alignment <= 8);
-	return malloc(size);
-}
-#pragma endregion EASTL
+
 
 #pragma region
 CVMTHookManager* PreFrameHook = 0;
@@ -35,7 +29,7 @@ tPresent oPresent;
 #pragma endregion Hook
 
 #pragma region
-LPCSTR time = __TIME__;
+//LPCSTR time = __TIME__;
 float g_pInputBuffers[123];
 
 DWORD GIVEDAMAGE = 0x00770F40;
@@ -106,7 +100,7 @@ void _stdcall Aimbot()
 		return;
 
 	fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
-	if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.empty())
+	if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.size()==0)
 		return;
 
 	fb::ClientPlayer* pLocalPlayer = pPlayerManager->m_localPlayer;
@@ -118,9 +112,7 @@ void _stdcall Aimbot()
 		return;
 
 	if (!pMySoldier->IsAlive()) return;
-
 	//int iWeaponID = GetWeaponID(pMySoldier);
-
 
 	if (pMySoldier->isInVehicle())return;
 
@@ -156,15 +148,10 @@ void _stdcall Aimbot()
 		&& IsValidPtr(MyCSW->m_weaponModifier.m_weaponShotModifier)	)
 	{
 		flbulletspeed = MyCSW->m_weaponModifier.m_weaponShotModifier->m_initialSpeed;
-		
-	
 	}
 	else{
 		flbulletspeed = pFFD->m_shot.m_initialSpeed;
 	}
-		
-
-
 
 	 flBulletGrav = pBED->m_gravity;
 	
@@ -180,16 +167,13 @@ void _stdcall Aimbot()
 	if (pMySoldier->isInVehicle())return;
 	eastl::vector<fb::ClientPlayer*> pVecCP = pPlayerManager->m_players;
 
-	if (pVecCP.empty())
+	if (pVecCP.size()==0)
 		return;
 
 	int size = pVecCP.size();
 
 //	fb::GameRenderer::Singleton()->m_viewParams.view.Update();//matrix not filled by default
 	fb::Vec3 Origin = MyCSW->m_weapon->m_shootSpace.trans;
-		
-	
-
 
 	fb::ClientPlayer* ClosestClient = NULL;
 	fb::ClientSoldierEntity* ClosestSold = NULL;
@@ -277,12 +261,9 @@ void _stdcall Aimbot()
 
 		if (!isalive(pEnemySoldier->isAlive()))return;
 
-
-
 		if (bAimHead)
 		{
 			if (!GetBonePos(pEnemySoldier, fb::Neck, &Enemyvectmp)) return;
-
 		}
 		else
 		{
@@ -319,10 +300,8 @@ void _stdcall Aimbot()
 	if (!IsValidPtr(ClosestSold))
 		return;
 
-
 	fb::Vec3 * vDir = new fb::Vec3;
 	DWORD rc;
-
 
 	if (ClosestSold->isInVehicle())
 	{
@@ -342,10 +321,7 @@ void _stdcall Aimbot()
 	if (!IsValidPtr(vDir)) return;
 	if (rc != 0x0)return;
 
-
-
 	aimer->m_fpsAimer->m_pitch = vDir->x;
-
 
 	aimer->m_fpsAimer->m_yaw = vDir->y;
 
@@ -422,10 +398,10 @@ void _stdcall PlayerIteration()
 		if (!IsValidPtr(g_pGameContext)) return;
 
 		fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
-		if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.empty()) return;
+		if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.size()==0) return;
 
 		eastl::vector<fb::ClientPlayer*> pVecCP = pPlayerManager->m_players;
-		if (pVecCP.empty()) return;
+		if (pVecCP.size()==0) return;
 
 		//fb::ClientSoldierEntity* pMySoldier = pPlayerManager->m_localPlayer->getSoldierEnt();
 
@@ -543,7 +519,7 @@ void _stdcall VehicleWeaponUpgrade()
 	if (!IsValidPtr(g_pGameContext)) return;
 
 	fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
-	if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.empty()) return;
+	if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.size()==0) return;
 
 	fb::ClientPlayer* pLocalPlayer = pPlayerManager->m_localPlayer;
 	if (!IsValidPtr(pLocalPlayer)) return;
@@ -597,7 +573,7 @@ void _stdcall VehicleWeaponUpgrade()
 					pWps->m_currentLagDeviation.m_roll = 0.0f;
 					pWps->m_currentLagDeviation.m_transY = 0.0f;
 
-					pWps->m_dispersionAngle = 0.00001f;//small crosshair
+					//pWps->m_dispersionAngle = 0.00001f;//small crosshair
 				}
 
 				pWeaponFiring->m_recoilAngleX = 0.0f;
@@ -633,7 +609,7 @@ void _stdcall VehicleWeaponUpgrade()
 			if (!IsValidPtr(g_pGameContext)) return;
 
 			fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
-			if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.empty()) return;
+			if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.size() == 0) return;
 
 			fb::ClientPlayer* pLocalPlayer = pPlayerManager->m_localPlayer;
 			if (!IsValidPtr(pLocalPlayer)) return;
@@ -648,7 +624,7 @@ void _stdcall VehicleWeaponUpgrade()
 			if (GetWeaponID(pMySoldier) != 0 && GetWeaponID(pMySoldier) != 1) return;
 
 			eastl::vector<fb::ClientPlayer*> pVecCP = pPlayerManager->m_players;
-			if (pVecCP.empty()) return;
+			if (pVecCP.size() == 0) return;
 
 			int size = pVecCP.size();
 			for (int i = 0; i < size; i++)
@@ -719,7 +695,7 @@ void _stdcall SoldierWeaponUpgrade()
 	if (!IsValidPtr(g_pGameContext)) return;
 
 	fb::ClientPlayerManager* pPlayerManager = g_pGameContext->m_clientPlayerManager;
-	if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.empty()) return;
+	if (!IsValidPtr(pPlayerManager) || pPlayerManager->m_players.size() == 0) return;
 
 	fb::ClientPlayer* pLocalPlayer = pPlayerManager->m_localPlayer;//[0x2380b58]fb::ClientPlayer*
 	if (!IsValidPtr(pLocalPlayer)) return;
@@ -738,12 +714,6 @@ void _stdcall SoldierWeaponUpgrade()
 
 	int iWeaponID = GetWeaponID(pMySoldier);
 	if (iWeaponID == -1) return;
-
-
-	fb::Vec3 myspeed = pMySoldier->linearVelocity();
-
-
-
 
 	fb::ClientSoldierWeapon* MyCSW = pMySoldier->GetCSW();
 	//valid checks on Weapons
@@ -765,8 +735,6 @@ void _stdcall SoldierWeaponUpgrade()
 
 	//disable sway multiplier on weapons with acogs ... this needs to be executed always
 	fb::ClientSoldierWeaponsComponent::ClientWeaponSwayCallbackImpl* pCWSCI = pMySoldier->m_soldierWeaponsComponent->m_weaponSwayCallback;
-
-
 
 	if (bNoSway && IsValidPtr(pCWSCI))
 	{
@@ -834,11 +802,6 @@ void _stdcall SoldierWeaponUpgrade()
 		pWps->m_currentLagDeviation.m_yaw = 0.0f;
 		pWps->m_currentLagDeviation.m_roll = 0.0f;
 		pWps->m_currentLagDeviation.m_transY = 0.0f;
-
-
-
-
-
 
 	}
 	fb::WeaponFiring* pWeaponFiring = pMySoldier->getCurrentWeaponFiring();
@@ -980,19 +943,13 @@ int WINAPI hkPreFrame(float DeltaTime)
 	return returnval;
 }
 signed int __stdcall hkPresent(int a1, int a2, int a3) {
-	__asm pushad;
-
 	//ButtonMenu();
-
 
 	SoldierWeaponUpgrade();
 	VehicleWeaponUpgrade();
 
 	PlayerIteration();
 	EntityWorld();
-
-
-	__asm popad;
 
 	return oPresent(a1, a2, a3);
 }
@@ -1021,7 +978,58 @@ DWORD WINAPI CreateConsole(LPVOID lpArgs)
 	freopen_s(&fp, "CONOUT$", "w", stderr);
 	return 1;
 }
+void writeJMP(BYTE* src, BYTE* dst, const int len)
+{
+    intptr_t dwRelAddr;
+    DWORD dwOldProtect;
 
+    VirtualProtect(src, len, PAGE_EXECUTE_READWRITE, &dwOldProtect);
+
+    dwRelAddr = (intptr_t)(dst - src) - 5;
+
+    src[0] = 0xE9;
+
+    *((intptr_t*)(src + 0x1)) = dwRelAddr;
+
+    for (intptr_t c = 0x5; c < len; c++)
+        *(src + c) = 0x90;
+
+    VirtualProtect(src, len, dwOldProtect, &dwOldProtect);
+}
+DWORD hkIcmpSendEcho(
+    HANDLE                 IcmpHandle,
+    IPAddr                 DestinationAddress,
+    LPVOID                 RequestData,
+    WORD                   RequestSize,
+    PIP_OPTION_INFORMATION RequestOptions,
+    LPVOID                 ReplyBuffer,
+    DWORD                  ReplySize,
+    DWORD                  Timeout
+) {
+
+    HANDLE hMutex = CreateMutex(NULL, false, "vc3Mutex");
+    WaitForSingleObject(hMutex, INFINITE);
+
+    DWORD ret = IcmpSendEcho2(IcmpHandle, NULL, NULL, NULL,
+        DestinationAddress,
+        RequestData,
+        RequestSize,
+        RequestOptions, ReplyBuffer, ReplySize, Timeout
+    );
+
+    PICMP_ECHO_REPLY ms = (PICMP_ECHO_REPLY)ReplyBuffer;
+
+    if (ms != nullptr) {
+
+        ms->RoundTripTime = ms->RoundTripTime & 0xf;
+        ms->RoundTripTime += 83;
+
+    }
+
+    ReleaseMutex(hMutex);
+    CloseHandle(hMutex);
+    return ret;
+}
 
 BOOL APIENTRY DllMain(HMODULE hModule, unsigned long ulReason, void* param)
 {
@@ -1032,7 +1040,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, unsigned long ulReason, void* param)
 #ifdef _DEBUG
 		CreateThread(NULL, NULL, &CreateConsole, NULL, NULL, NULL);
 #endif // DEBUG
-		printf_s(time);
+//		printf_s(time);
 		PresentHook = new CVMTHookManager((intptr_t**)fb::DxRenderer::Singleton()->pSwapChain);
 		oPresent = (tPresent)PresentHook->dwGetMethodAddress(8);
 		PresentHook->dwHookMethod((intptr_t)hkPresent, 8);
@@ -1044,15 +1052,14 @@ BOOL APIENTRY DllMain(HMODULE hModule, unsigned long ulReason, void* param)
 		//	  fopen_s(&m_log,"e:\log.txt", "a+" );
 
 			//ping proof
-
-
+        LPVOID pfn_IcmpSendEcho = (LPVOID)((intptr_t)GetProcAddress(GetModuleHandleW(L"iphlpapi.dll"), "IcmpSendEcho"));
+     //   writeJMP((BYTE*)pfn_IcmpSendEcho, (BYTE*)hkIcmpSendEcho, 9);
 
 	}
 	else if (ulReason == DLL_PROCESS_DETACH)
 	{
-
 		if (PresentHook != nullptr)PresentHook->UnHook();
 		//CloseHandle(CreateThread(NULL, 0, &HookThread, NULL, 0, NULL)); //Disable hook
 	}
-	return 1;
+	return TRUE;
 }

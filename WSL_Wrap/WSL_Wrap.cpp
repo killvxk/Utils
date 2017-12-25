@@ -8,103 +8,63 @@
 using namespace System;
 using namespace System::Text;
 using namespace System::Collections::Generic;
+using namespace System::Diagnostics;
 
 bool IsPathValid(String^ path) {
-	if (!(path->Contains(":\\")))return false;
-	try {
-		String^ fullPath = System::IO::Path::GetFullPath(path);
-		return !String::Compare(fullPath, path, true);
-	}
-	catch (System::Exception^) {
-		return false;
-	}}
-
-void MarshalString(String ^ s, std::wstring& os) {
-	using namespace Runtime::InteropServices;
-	const wchar_t* chars =
-		(const wchar_t*)(Marshal::StringToHGlobalUni(s)).ToPointer();
-	os = chars;
-	Marshal::FreeHGlobal(IntPtr((void*)chars));
+    if (!(path->Contains(":\\")))return false;
+    try {
+        String^ fullPath = System::IO::Path::GetFullPath(path);
+        return !String::Compare(fullPath, path, true);
+    }
+    catch (System::Exception^) {
+        return false;
+    }
 }
 
-int _tmain(int argc, TCHAR*argv[])
+
+int main(array<String^>^ args)
 {
-	setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "");
 
-	int nArgs;
+    String^ oExe = System::Diagnostics::Process::GetCurrentProcess()->MainModule->FileName;
 
-	LPWSTR *szArglist = CommandLineToArgvW(GetCommandLine(), &nArgs);
+    String^ outputExe= System::IO::Path::GetFileNameWithoutExtension(oExe);
 
-	if (NULL == szArglist)
-	{
-		return 0;
-	}
+    StringBuilder^ commandBuffer = gcnew StringBuilder("wsl.exe ");
 
-	String^  str_Exe_Const = gcnew String(szArglist[0]);
+    commandBuffer->Append(outputExe);
 
-	String ^ str_fullCommandLine_Const = gcnew String(GetCommandLine());
+    for (int i = 0; i < args->Length; i++) {
 
-	Text::StringBuilder^ str_fullCommandLine;
+        commandBuffer->Append(" ");
 
-	Text::StringBuilder^ str_Exe;
+        String ^ str_parameter = gcnew String(args[i]);
 
-	if (str_fullCommandLine_Const->StartsWith(L"\"")) {
-		str_fullCommandLine = gcnew StringBuilder(
-			str_fullCommandLine_Const->Substring(str_Exe_Const->Length + 2));
-	}
-	else {
-		str_fullCommandLine = gcnew StringBuilder(
-			str_fullCommandLine_Const->Substring(str_Exe_Const->Length));
-	}
+        if (IsPathValid(str_parameter)) {
 
-	int find = str_Exe_Const->LastIndexOf(L'\\');
+            StringBuilder path(L"/mnt/");
 
-	int n_FileNameStart = (find > -1) ? (find + 1) : 0;
+            path.Append(str_parameter->Substring(0, 1)->ToLower());
 
-	find = str_Exe_Const->LastIndexOf(L'.');
+            path.Append(str_parameter->Substring(2));
 
-	int n_FileNameLen = (find > -1) ? (find - n_FileNameStart) : (str_Exe_Const->Length - n_FileNameStart);
+            path.Replace(__T('\\'), __T('/'));
 
-	str_Exe = gcnew System::Text::StringBuilder(str_Exe_Const->Substring(
-		n_FileNameStart, n_FileNameLen));
+            str_parameter = path.ToString();
 
-	StringBuilder^ str_commandBuffer = gcnew StringBuilder(__T("bash -c \""));
+        }
 
-	str_commandBuffer->Append(str_Exe);
+        commandBuffer->Append(str_parameter);
 
-	for (int i = 1; i < argc; i++) {
+    }
 
-		String ^	str_parameter = gcnew String(argv[i]);
+    String^ argsx = commandBuffer->ToString();
 
-		if (IsPathValid(str_parameter)) {
+    const wchar_t* chars = (const wchar_t*)
+        (Runtime::InteropServices::Marshal::StringToHGlobalUni(argsx)).ToPointer();
 
-			StringBuilder path(L"/mnt/");
+    //wprintf(chars);
 
-			path.Append(str_parameter->Substring(0, 1)->ToLower());
+    return _wsystem(chars);
 
-			path.Append(str_parameter->Substring(2));
-
-			path.Replace(__T('\\'), __T('/'));
-
-			str_fullCommandLine->Replace(str_parameter, path.ToString());
-
-		}
-		else {
-			continue;
-		}
-
-	}
-
-	str_commandBuffer->Append(str_fullCommandLine);
-
-	str_commandBuffer->Append(__T('\"'));
-
-	std::wstring a;
-	MarshalString(str_commandBuffer->ToString(), a);
-#ifdef _DEBUG
-	printf_s("%ls", a.c_str());
-	return 0;
-#else
-	return _wsystem(a.c_str());
-#endif 
 }
