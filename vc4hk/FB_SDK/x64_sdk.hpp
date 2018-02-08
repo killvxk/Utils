@@ -1414,9 +1414,9 @@ namespace fb {
 		char _0x0080[168];
 		WeaponFiringData* m_pPrimaryFire; //0x0128 
 		char _0x0130[24];
-		__int32 m_WeaponState; //0x0148 
-		__int32 m_LastWeaponState; //0x014C 
-		__int32 m_NextWeaponState; //0x0150 
+		WeaponState m_WeaponState; //0x0148 
+		WeaponState m_LastWeaponState; //0x014C 
+		WeaponState m_NextWeaponState; //0x0150 
 		char _0x0154[8];
 		float m_TimeToWait; //0x015C 
 		float m_ReloadTimer; //0x0160 
@@ -1439,7 +1439,8 @@ namespace fb {
 		__int32 m_fireMode_index; //0x01BC 
 		char pad_0x01C0[8];
 		void* m_pFiringHolderData; //0x01C8 
-		unsigned __int32 * m_FireModes;
+		unsigned __int32 * m_FireModes;//0x01D0
+									   //0x01D8
 	};//Size=0x01AF
 
 	class ClientSoldierBodyComponent

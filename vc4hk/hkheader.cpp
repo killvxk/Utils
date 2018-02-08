@@ -128,7 +128,7 @@ void  HackKev::AmmoBox() {
 	};
 
 
-	intptr_t EndOfArray = 0;
+	intptr_t* EndOfArray = 0;
 
 	fb::TeamEntityData* m_teamEntity;
 
@@ -157,15 +157,17 @@ void  HackKev::AmmoBox() {
 			}
 
 		}
-		slotG1_list[3][15] = &EndOfArray;
+		slotG1_list[3][15] = EndOfArray;
 		//slotG2_list[3][15] = &EndOfArray;      //0  //1  //2 //5 //6 //7
 		for (int k = 0; k < 4; k++) {
 
-			Team->m_SoldierCustomization[k]->m_pWeaponTable->m_ppList[7]->m_SelectableUnlocks[2] = slotG1_list[2][6]; //ammobox
+			Team->m_SoldierCustomization[k]->m_pWeaponTable->m_ppList[7]->m_SelectableUnlocks[2] = slotG1_list[3][2]; //C4
+			Team->m_SoldierCustomization[k]->m_pWeaponTable->m_ppList[7]->m_SelectableUnlocks[3] = slotG1_list[2][6]; //ammobox
+			Team->m_SoldierCustomization[k]->m_pWeaponTable->m_ppList[7]->m_SelectableUnlocks[4] = slotG1_list[0][11]; //U_Medkit
 
-			Team->m_SoldierCustomization[k]->m_pWeaponTable->m_ppList[2]->m_SelectableUnlocks[0] = slotG1_list[0][11]; //U_Medkit
+			Team->m_SoldierCustomization[k]->m_pWeaponTable->m_ppList[2]->m_SelectableUnlocks[0] = slotG1_list[2][6]; //ammobox
 
-			Team->m_SoldierCustomization[k]->m_pWeaponTable->m_ppList[5]->m_SelectableUnlocks[0] = slotG1_list[3][2]; //C4
+			Team->m_SoldierCustomization[k]->m_pWeaponTable->m_ppList[5]->m_SelectableUnlocks[0] = slotG1_list[0][11]; //U_Medkit
 		}
 	}
 
@@ -232,10 +234,13 @@ void  HackKev::VehicleWeaponUpgrade() {
 	__try {
 		fb::WeaponFiring* pWepFiring = *(fb::WeaponFiring**)OFFSET_PPCURRENTWEAPONFIRING;
 		fb::WeaponFiringData* pFiring = pWepFiring->m_pPrimaryFire;
-		if (pWepFiring->m_NextWeaponState == 7 || pWepFiring->m_NextWeaponState == 4 ||
-			pWepFiring->m_NextWeaponState == 8 || pWepFiring->m_NextWeaponState == 10 ||
+		if (pWepFiring->m_NextWeaponState == 2 || 
+			pWepFiring->m_NextWeaponState == 4 || 
+			pWepFiring->m_NextWeaponState == 7 ||
+			pWepFiring->m_NextWeaponState == 8 || 
+			pWepFiring->m_NextWeaponState == 10 ||
 			pWepFiring->m_NextWeaponState == 11) {
-			pWepFiring->m_NextWeaponState = 3;
+			pWepFiring->m_NextWeaponState = fb::WeaponState::NoTrigger ;
 
 		}
 
@@ -364,26 +369,29 @@ void  HackKev::WeaponUpgrade() {
 		fb::FiringFunctionData* pFFD = pWepFiring->m_pPrimaryFire->m_FiringData;
 
 		if (pFFD->m_ShotConfigData.m_InitialSpeed.z < 10.f)return;
-
-		//if (pWepFiring->m_TimeToWait > 0.1f)pWepFiring ->m_TimeToWait= 0.1f;
-
-	//	pWepFiring->m_HoldReleaseMinDelay = 0.f;
-	//	pWepFiring->m_hasStoppedFiring = 1;
-	//	pWepFiring->m_primaryFireTriggeredLastFrame = 0;
+		//VirtualProtect(&pWepFiring->m_TimeToWait, 4, PAGE_EXECUTE_READWRITE, 0);
+		//if (pWepFiring->m_TimeToWait > 0.1f)pWepFiring ->m_TimeToWait= 0.0f;
+		//VirtualProtect(&pWepFiring->m_TimeToWait, 4, PAGE_READONLY, 0);
+		//VirtualProtect(&pWepFiring->m_HoldReleaseMinDelay, 4, PAGE_EXECUTE_READWRITE, 0);
+		//pWepFiring->m_HoldReleaseMinDelay = 0.f;
+		//VirtualProtect(&pWepFiring->m_HoldReleaseMinDelay, 4, PAGE_READONLY, 0);
+		//VirtualProtect(&pWepFiring->m_hasStoppedFiring, 1, PAGE_EXECUTE_READWRITE, 0);
+		//pWepFiring->m_hasStoppedFiring = 1;
+		//VirtualProtect(&pWepFiring->m_hasStoppedFiring, 1, PAGE_READONLY, 0);
+		//pWepFiring->m_primaryFireTriggeredLastFrame = 0;
 
 	
 
-
-
-		if (pWepFiring->m_NextWeaponState == 7 || pWepFiring->m_NextWeaponState == 4 ||
-			pWepFiring->m_NextWeaponState == 8) {
-			pWepFiring->m_NextWeaponState = 3;
-
+		if (pWepFiring->m_NextWeaponState == 2 ||
+			pWepFiring->m_NextWeaponState == 4 ||
+			pWepFiring->m_NextWeaponState == 7 ||
+			pWepFiring->m_NextWeaponState == 8 ||
+			pWepFiring->m_NextWeaponState == 10 ||
+			pWepFiring->m_NextWeaponState == 11) {
+			pWepFiring->m_NextWeaponState = fb::WeaponState::NoTrigger;
 
 		}
-
 	
-
 
 		pFFD->m_Dispersion->MaxAngle = 0.f;
 		pFFD->m_Dispersion->MinAngle = 0.f;
@@ -398,15 +406,28 @@ void  HackKev::WeaponUpgrade() {
 		pFFD->m_FireLogic.m_Recoil.m_MinRecoilAngleZ = 0.f;
 		pFFD->m_FireLogic.m_Recoil.m_MaxRecoilFov = 0.f;
 		pFFD->m_FireLogic.m_Recoil.m_MinRecoilFov = 0.f;
-
 		pFFD->m_FireLogic.m_BoltAction.m_BoltActionDelay =0.f;
 		pFFD->m_FireLogic.m_BoltAction.m_BoltActionTime = 0.f;
-
-	/*	if (pFFD->m_FireLogic.m_FireLogicType == fb::FireLogicType::fltSingleFireWithBoltAction)
+		pFFD->m_FireLogic.m_BoltAction.m_HoldBoltActionUntilFireRelease = false;
+		pFFD->m_FireLogic.m_BoltAction.m_HoldBoltActionUntilZoomRelease = false;
+		pFFD->m_FireLogic.m_BoltAction.m_ForceBoltActionOnFireTrigger = false;
+		pFFD->m_FireLogic.m_BoltAction.m_UnZoomOnBoltAction = false;
+		pFFD->m_FireLogic.m_BoltAction.m_ReturnToZoomAfterBoltAction = true;
+		if (pFFD->m_FireLogic.m_FireLogicType == fb::FireLogicType::fltSingleFireWithBoltAction)
 		{
-			pFFD->m_FireLogic.RateOfFire = 400.f;
+			//pFFD->m_FireLogic.m_FireLogicType = fb::FireLogicType::fltSingleFire;
 
-		}*/
+			*pFFD->m_FireLogic.m_FireLogicTypeArray= fb::FireLogicType::fltSingleFire;
+
+			pFFD->m_FireLogic.RateOfFire = 400.f;
+			//if (pWepFiring->m_TimeToWait > 0.15f)pWepFiring ->m_TimeToWait= 0.15f;
+			if (*pWepFiring->m_FireModes == 1) {
+				VirtualProtect(pWepFiring->m_FireModes, 4, PAGE_EXECUTE_READWRITE, 0);
+				*pWepFiring->m_FireModes = 0;
+
+				VirtualProtect(pWepFiring->m_FireModes, 4, PAGE_READONLY, 0);
+			}
+		}
 
 		pFFD->m_FireLogic.ReloadDelay = 0.f;
 		//pFFD->m_FireLogic.ReloadTime = 0.f;
@@ -424,15 +445,14 @@ void  HackKev::WeaponUpgrade() {
 //		pFFD->m_FireLogic.PreFireRequireHold = 0.f;
 //		pFFD->m_FireLogic.AutomaticDelay = 0.f;
 
-		pFFD->m_Ammo.AmmoBagPickupDelayMultiplier = 0.001f;
-		pFFD->m_Ammo.AmmoBagPickupAmount = -1;
+		pFFD->m_Ammo.AmmoBagPickupDelayMultiplier = 0.000f;
+		//pFFD->m_Ammo.AmmoBagPickupAmount = -1;
 		pFFD->m_Ammo.AutoReplenishDelay = 0.f;
 
 		pFFD->m_OverHeat.HeatDropPerSecond = INFINITY;
 		pFFD->m_OverHeat.HeatPerBullet = 0.f;
 		pFFD->m_OverHeat.OverHeatPenaltyTime = 0.f;
 		pFFD->m_OverHeat.OverHeatThreshold = INFINITY;
-
 
 
 
@@ -516,9 +536,6 @@ size_t HackKev::GetClientComponentByID(void* p_List,
 		}
 
 	}
-
-
-
 
 	return vector->size();
 }

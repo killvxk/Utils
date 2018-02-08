@@ -4,17 +4,17 @@
 namespace fb {
 	enum WeaponState
 	{
-		Deploy,
-		AltDeploy,
-		TriggerReleaseWait,
-		NoTrigger,
-		PreFireDelay,
-		PrimarySingleDelay,
-		PrimarySingle,
-		BoltActionDelay,
-		BoltAction,
-		PrimaryAutomaticFire,
-		ReloadDelay,
+		Deploy, //0
+		AltDeploy, //1
+		TriggerReleaseWait, //2
+		NoTrigger, //3
+		PreFireDelay, //4
+		PrimarySingleDelay, //5
+		PrimarySingle, //6
+		BoltActionDelay, //7
+		BoltAction, //8
+		PrimaryAutomaticFire, //9
+		ReloadDelay, //10
 		Reload,
 		PostReload,
 		PrimaryHoldAndRelease_Hold,

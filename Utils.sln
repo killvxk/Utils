@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AVL Tree", "AVL Tree\AVL Tree.vcxproj", "{70121DA3-DFFD-4C4E-86D8-588715FAE630}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vc3hk", "vc3hk\vc3hk.vcxproj", "{B99B32CE-F5BE-4A3A-8FBA-040E3E09B731}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ACR_SAVEGAME_TOOL_VB", "ACR SAVEGAME TOOL VB\ACR_SAVEGAME_TOOL_VB.vbproj", "{0C86F78D-DB6A-4420-91E9-ADB16D7C73D0}"
@@ -31,20 +29,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Debug|ARM.ActiveCfg = Debug|Win32
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Debug|Win32.ActiveCfg = Debug|Win32
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Debug|Win32.Build.0 = Debug|Win32
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Debug|Win32.Deploy.0 = Debug|Win32
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Debug|x64.ActiveCfg = Debug|x64
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Debug|x86.ActiveCfg = Debug|Win32
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Release|Any CPU.ActiveCfg = Release|Win32
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Release|ARM.ActiveCfg = Release|Win32
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Release|Win32.ActiveCfg = Release|Win32
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Release|Win32.Build.0 = Release|Win32
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Release|Win32.Deploy.0 = Release|Win32
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Release|x64.ActiveCfg = Release|x64
-		{70121DA3-DFFD-4C4E-86D8-588715FAE630}.Release|x86.ActiveCfg = Release|Win32
 		{B99B32CE-F5BE-4A3A-8FBA-040E3E09B731}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{B99B32CE-F5BE-4A3A-8FBA-040E3E09B731}.Debug|ARM.ActiveCfg = Debug|Win32
 		{B99B32CE-F5BE-4A3A-8FBA-040E3E09B731}.Debug|Win32.ActiveCfg = Debug|Win32

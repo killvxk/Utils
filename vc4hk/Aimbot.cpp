@@ -194,7 +194,7 @@ fb::Vec4  Aimbot::GetOriginAndUpdateCurrentAngle(fb::ClientPlayer* pLocalPlayer,
 	fb::Vec4 v_Right = ShootSpaceMat.right;
 
 
-	this->vOrigin = v_Tmp + v_Up*pFFD->m_ShotConfigData.m_InitialPosition.y + v_Right*pFFD->m_ShotConfigData.m_InitialPosition.x;
+	this->vOrigin = v_Tmp + v_Up*pFFD->m_ShotConfigData.m_InitialPosition.y + v_Right*pFFD->m_ShotConfigData.m_InitialPosition.x + vec_forward * pFFD->m_ShotConfigData.m_InitialPosition.z;
 
 	this->vOrigin.w = 0;
 	return this->vOrigin;
