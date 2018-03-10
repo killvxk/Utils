@@ -1,43 +1,69 @@
 #include "stdafx.h"
 #include <string> 
 #include "myIDirect3D9.h"
-#include "myIDirect3DDevice9.h"
 #include <d3d9.h>
 
+typedef HRESULT(WINAPI *fn_IDirect3DDevice9_Present)(const RECT *pSourceRect,
+	const RECT    *pDestRect,
+	HWND    hDestWindowOverride,
+	const RGNDATA *pDirtyRegion);
 
+typedef HRESULT(WINAPI  *fn_IDirect3DDevice9_Reset)(D3DPRESENT_PARAMETERS*);
+bool hooked = false;
+fn_IDirect3DDevice9_Present o_IDirect3DDevice9_Present;
+fn_IDirect3DDevice9_Reset o_Reset;
 
-typedef  HRESULT(WINAPI  *_Reset_type)(D3DPRESENT_PARAMETERS*);
-_Reset_type o_Reset;
+void setParameter(D3DPRESENT_PARAMETERS* pPresentationParameters) {
+	if (!pPresentationParameters->Windowed) pPresentationParameters->SwapEffect = D3DSWAPEFFECT_FLIP;
+	if (pPresentationParameters->BackBufferCount < 2)pPresentationParameters->BackBufferCount = 2;
+	pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+}
+static void* ReplaceVtblFunction(void* vtb, void* dwHook, const int Index)
+{
+	void* pOrig;
+	intptr_t *vtable = (intptr_t *)vtb;
+	pOrig = (void*)(vtable[Index]);
+	if (pOrig != dwHook) {
+		DWORD dwOld;
+		VirtualProtect(&(vtable[Index]), sizeof(intptr_t), PAGE_EXECUTE_READWRITE, &dwOld);
+		vtable[Index] = (intptr_t)dwHook; //Replace Vtable Function
+		VirtualProtect(&(vtable[Index]), sizeof(intptr_t), dwOld, NULL);
+	}
+	return pOrig;
+}
 
-
-HRESULT(WINAPI *o_IDirect3DDevice9_Present)( const RECT    *pSourceRect,
-	 const RECT    *pDestRect,
-	     HWND    hDestWindowOverride,
-	 const RGNDATA *pDirtyRegion);
-
-
-HRESULT WINAPI my_IDirect3DDevice9_Present( const RECT    *pSourceRect,
-	 const RECT    *pDestRect,
-	       HWND    hDestWindowOverride,
-	 const RGNDATA *pDirtyRegion) {
+HRESULT WINAPI my_IDirect3DDevice9_Present(const RECT    *pSourceRect,
+	const RECT    *pDestRect,
+	HWND    hDestWindowOverride,
+	const RGNDATA *pDirtyRegion) {
 
 	return o_IDirect3DDevice9_Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 }
-HRESULT WINAPI my_IDirect3DDevice9_Reset( D3DPRESENT_PARAMETERS* pPresentationParameters) {
 
-	
-	//pPresentationParameters->SwapEffect = D3DSWAPEFFECT_FLIP;
-	
-	
-	pPresentationParameters->BackBufferCount = 2;
-	pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+HRESULT WINAPI my_IDirect3DDevice9_Reset(D3DPRESENT_PARAMETERS* pPresentationParameters) {
 
+	setParameter(pPresentationParameters);
 
 	return o_Reset(pPresentationParameters);
 
 
-	
+
 }
+void hook_D3D_Api(IDirect3DDevice9* pDevice) {
+
+	void *vtb_IDirect3DDevice9 = *(void**)pDevice;
+
+	void *tmp;
+
+	tmp = (fn_IDirect3DDevice9_Reset)ReplaceVtblFunction(vtb_IDirect3DDevice9, my_IDirect3DDevice9_Reset, 16);
+	if (tmp != my_IDirect3DDevice9_Reset) {
+		o_Reset = (fn_IDirect3DDevice9_Reset)tmp;
+	}
+
+	hooked = true;
+
+}
+
 myIDirect3D9::myIDirect3D9(IDirect3D9 *pOriginal)
 {
     m_pIDirect3D9 = pOriginal;
@@ -161,23 +187,20 @@ HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter,
 	D3DPRESENT_PARAMETERS* pPresentationParameters,
 	IDirect3DDevice9** ppReturnedDeviceInterface)
 {
-
    
-	extern myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
+	//extern myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
 
-
-	setParam(pPresentationParameters);
+	setParameter(pPresentationParameters);
 	
 	// we intercept this call and provide our own "fake" Device Object
 	HRESULT hres = m_pIDirect3D9->CreateDevice( 
 		Adapter, DeviceType, hFocusWindow, BehaviorFlags,
 		pPresentationParameters, ppReturnedDeviceInterface);
 
-	gl_pmyIDirect3DDevice9 = new myIDirect3DDevice9(*ppReturnedDeviceInterface);
-
-	*ppReturnedDeviceInterface = gl_pmyIDirect3DDevice9;
+	//gl_pmyIDirect3DDevice9 = new myIDirect3DDevice9(*ppReturnedDeviceInterface);
+	if (!hooked)hook_D3D_Api(*ppReturnedDeviceInterface);
+	//*ppReturnedDeviceInterface = gl_pmyIDirect3DDevice9;
 	
 	return(hres);
 
 }
-  

@@ -1,4 +1,3 @@
-// dllmain.cpp : 定义 DLL 应用程序的入口点。
 #include "stdafx.h"
 #include "proxydllx64.h"
 #include <stdio.h>
@@ -92,6 +91,7 @@ intptr_t* memstr(intptr_t * full_data, int full_data_len, intptr_t * substr, int
 
     return NULL;
 }
+
 static void* ReplaceVtblFunction(void* vtb, void* dwHook, const int Index)
 {
     void* pOrig;

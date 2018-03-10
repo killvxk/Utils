@@ -22,7 +22,7 @@
     <ProjectGuid>{7435A69C-D696-4CA5-B14B-B316623D7BE5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>proxydll_x64</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
     <ProjectName>proxydll_x64</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

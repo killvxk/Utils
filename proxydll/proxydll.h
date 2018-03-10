@@ -2,16 +2,16 @@
 #pragma once
 
 HRESULT WINAPI mod_D3D11CreateDevice(
-	_In_opt_        IDXGIAdapter        *,
-	D3D_DRIVER_TYPE    ,
-	HMODULE             ,
-	UINT                ,
-	_In_opt_  D3D_FEATURE_LEVEL   *,
-	UINT              ,
-	UINT               , 
-	_Out_opt_       ID3D11Device        **,
-	_Out_opt_       D3D_FEATURE_LEVEL   *,
-	_Out_opt_       ID3D11DeviceContext **
+	_In_opt_ IDXGIAdapter *,
+	D3D_DRIVER_TYPE,
+	HMODULE,
+	UINT,
+	_In_opt_ D3D_FEATURE_LEVEL*,
+	UINT,
+	UINT, 
+	_Out_opt_ ID3D11Device        **,
+	_Out_opt_ D3D_FEATURE_LEVEL   *,
+	_Out_opt_ ID3D11DeviceContext **
 );
 
 IDirect3D9* WINAPI mod_Direct3DCreate9(UINT);
@@ -92,7 +92,7 @@ struct d3d9_dll
 	FARPROC D3DPERF_SetRegion;
 	FARPROC DebugSetLevel;
 	FARPROC DebugSetMute;
-	//  FARPROC Direct3D9EnableMaximizedWindowedModeShim;
+	FARPROC Direct3D9EnableMaximizedWindowedModeShim;
 	FARPROC Direct3DCreate9;
 	FARPROC Direct3DCreate9Ex;
 	FARPROC Direct3DShaderValidatorCreate9;
@@ -354,6 +354,13 @@ struct msacm32_dll
 	FARPROC acmStreamSize;
 	FARPROC acmStreamUnprepareHeader;
 } msacm32;
+
+struct ole32_dll
+{
+	HMODULE dll;
+	FARPROC exp[484];
+} ole32;
+
 //export
 __declspec(naked) void _DirectInput8Create() { _asm { jmp[dinput8.DirectInput8Create] } }
 __declspec(naked) void _DllCanUnloadNow() { _asm { jmp[dinput8.DllCanUnloadNow] } }
@@ -418,7 +425,7 @@ __declspec(naked) void _D3DPERF_SetOptions() { _asm { jmp[d3d9.D3DPERF_SetOption
 __declspec(naked) void _D3DPERF_SetRegion() { _asm { jmp[d3d9.D3DPERF_SetRegion] } }
 __declspec(naked) void _DebugSetLevel() { _asm { jmp[d3d9.DebugSetLevel] } }
 __declspec(naked) void _DebugSetMute() { _asm { jmp[d3d9.DebugSetMute] } }
-//__declspec(naked) void _Direct3D9EnableMaximizedWindowedModeShim() { _asm { jmp [d3d9.Direct3D9EnableMaximizedWindowedModeShim] } }
+__declspec(naked) void _Direct3D9EnableMaximizedWindowedModeShim() { _asm { jmp [d3d9.Direct3D9EnableMaximizedWindowedModeShim] } }
 __declspec(naked) void _Direct3DCreate9() { _asm { jmp[d3d9.Direct3DCreate9] } }
 __declspec(naked) void _Direct3DCreate9Ex() { _asm { jmp[d3d9.Direct3DCreate9Ex] } }
 __declspec(naked) void _Direct3DShaderValidatorCreate9() { _asm { jmp[d3d9.Direct3DShaderValidatorCreate9] } }
@@ -667,3 +674,488 @@ __declspec(naked) void _acmStreamPrepareHeader() { _asm { jmp[msacm32.acmStreamP
 __declspec(naked) void _acmStreamReset() { _asm { jmp[msacm32.acmStreamReset] } }
 __declspec(naked) void _acmStreamSize() { _asm { jmp[msacm32.acmStreamSize] } }
 __declspec(naked) void _acmStreamUnprepareHeader() { _asm { jmp[msacm32.acmStreamUnprepareHeader] } }
+
+__declspec(naked) void Proxy_CreateFileMoniker() { __asm { jmp ole32.exp[0 * 4]} }
+__declspec(naked) void Proxy_DestroyRunningObjectTable() { __asm { jmp ole32.exp[1 * 4]} }
+__declspec(naked) void Proxy_Ordinal800() { __asm { jmp ole32.exp[2 * 4]} }
+__declspec(naked) void Proxy_OleFlushClipboard() { __asm { jmp ole32.exp[3 * 4]} }
+__declspec(naked) void Proxy_OleSetClipboard() { __asm { jmp ole32.exp[4 * 4]} }
+__declspec(naked) void Proxy_OleQueryLinkFromData() { __asm { jmp ole32.exp[5 * 4]} }
+__declspec(naked) void Proxy_OleGetClipboard() { __asm { jmp ole32.exp[6 * 4]} }
+__declspec(naked) void Proxy_OleIsCurrentClipboard() { __asm { jmp ole32.exp[7 * 4]} }
+__declspec(naked) void Proxy_OleCreateFontIndirectExt() { __asm { jmp ole32.exp[8 * 4]} }
+__declspec(naked) void Proxy_ReadFmtUserTypeStg() { __asm { jmp ole32.exp[9 * 4]} }
+__declspec(naked) void Proxy_WriteFmtUserTypeStg() { __asm { jmp ole32.exp[10 * 4]} }
+__declspec(naked) void Proxy_WriteStringStream() { __asm { jmp ole32.exp[11 * 4]} }
+__declspec(naked) void Proxy_RegisterActiveObjectExt() { __asm { jmp ole32.exp[12 * 4]} }
+__declspec(naked) void Proxy_GetActiveObjectExt() { __asm { jmp ole32.exp[13 * 4]} }
+__declspec(naked) void Proxy_CoAllowSetForegroundWindow() { __asm { jmp ole32.exp[14 * 4]} }
+__declspec(naked) void Proxy_OleRun() { __asm { jmp ole32.exp[15 * 4]} }
+__declspec(naked) void Proxy_CreateClassMoniker() { __asm { jmp ole32.exp[16 * 4]} }
+__declspec(naked) void Proxy_OleSave() { __asm { jmp ole32.exp[17 * 4]} }
+__declspec(naked) void Proxy_RevokeActiveObjectExt() { __asm { jmp ole32.exp[18 * 4]} }
+__declspec(naked) void Proxy_StgCreateStorageEx() { __asm { jmp ole32.exp[19 * 4]} }
+__declspec(naked) void Proxy_StgCreateDocfileOnILockBytes() { __asm { jmp ole32.exp[20 * 4]} }
+__declspec(naked) void Proxy_StgIsStorageFile() { __asm { jmp ole32.exp[21 * 4]} }
+__declspec(naked) void Proxy_StgOpenStorageEx() { __asm { jmp ole32.exp[22 * 4]} }
+__declspec(naked) void Proxy_StgOpenStorageOnILockBytes() { __asm { jmp ole32.exp[23 * 4]} }
+__declspec(naked) void Proxy_WriteClassStg() { __asm { jmp ole32.exp[24 * 4]} }
+__declspec(naked) void Proxy_StgCreateDocfile() { __asm { jmp ole32.exp[25 * 4]} }
+__declspec(naked) void Proxy_CoBuildVersion() { __asm { jmp ole32.exp[26 * 4]} }
+__declspec(naked) void Proxy_OleBuildVersion() { __asm { jmp ole32.exp[27 * 4]} }
+__declspec(naked) void Proxy_Ordinal801() { __asm { jmp ole32.exp[28 * 4]} }
+__declspec(naked) void Proxy_Ordinal803() { __asm { jmp ole32.exp[29 * 4]} }
+__declspec(naked) void Proxy_CreateItemMoniker() { __asm { jmp ole32.exp[30 * 4]} }
+__declspec(naked) void Proxy_RevokeDragDrop() { __asm { jmp ole32.exp[31 * 4]} }
+__declspec(naked) void Proxy_CreateDataAdviseHolder() { __asm { jmp ole32.exp[32 * 4]} }
+__declspec(naked) void Proxy_OleUninitialize() { __asm { jmp ole32.exp[33 * 4]} }
+__declspec(naked) void Proxy_RegisterDragDrop() { __asm { jmp ole32.exp[34 * 4]} }
+__declspec(naked) void Proxy_CheckInitDde() { __asm { jmp ole32.exp[35 * 4]} }
+__declspec(naked) void Proxy_ClipboardProcessUninitialize() { __asm { jmp ole32.exp[36 * 4]} }
+__declspec(naked) void Proxy_OleInitialize() { __asm { jmp ole32.exp[37 * 4]} }
+__declspec(naked) void Proxy_CleanROTForApartment() { __asm { jmp ole32.exp[38 * 4]} }
+__declspec(naked) void Proxy_CoGetObject() { __asm { jmp ole32.exp[39 * 4]} }
+__declspec(naked) void Proxy_Ole32DllGetClassObject() { __asm { jmp ole32.exp[40 * 4]} }
+__declspec(naked) void Proxy_DllGetClassObject() { __asm { jmp ole32.exp[41 * 4]} }
+__declspec(naked) void Proxy_DllGetClassObjectWOW() { __asm { jmp ole32.exp[42 * 4]} }
+__declspec(naked) void Proxy_CreateGenericComposite() { __asm { jmp ole32.exp[43 * 4]} }
+__declspec(naked) void Proxy_MkParseDisplayName() { __asm { jmp ole32.exp[44 * 4]} }
+__declspec(naked) void Proxy_IsEqualGUID() { __asm { jmp ole32.exp[45 * 4]} }
+__declspec(naked) void Proxy_CoGetInterceptorForOle32() { __asm { jmp ole32.exp[46 * 4]} }
+__declspec(naked) void Proxy_CreateBindCtx() { __asm { jmp ole32.exp[47 * 4]} }
+__declspec(naked) void Proxy_IsValidInterface() { __asm { jmp ole32.exp[48 * 4]} }
+__declspec(naked) void Proxy_GetRunningObjectTable() { __asm { jmp ole32.exp[49 * 4]} }
+__declspec(naked) void Proxy_ReleaseStgMedium() { __asm { jmp ole32.exp[50 * 4]} }
+__declspec(naked) void Proxy_OleRegGetMiscStatus() { __asm { jmp ole32.exp[51 * 4]} }
+__declspec(naked) void Proxy_CoInitialize() { __asm { jmp ole32.exp[52 * 4]} }
+__declspec(naked) void Proxy_StgOpenStorage() { __asm { jmp ole32.exp[53 * 4]} }
+__declspec(naked) void Proxy_OleTranslateColorExt() { __asm { jmp ole32.exp[54 * 4]} }
+__declspec(naked) void Proxy_SetOleautModule() { __asm { jmp ole32.exp[55 * 4]} }
+__declspec(naked) void Proxy_OleReleaseEnumVerbCache() { __asm { jmp ole32.exp[56 * 4]} }
+__declspec(naked) void Proxy_CreatePointerMoniker() { __asm { jmp ole32.exp[57 * 4]} }
+__declspec(naked) void Proxy_BindMoniker() { __asm { jmp ole32.exp[58 * 4]} }
+__declspec(naked) void Proxy_StoreQITableEntry() { __asm { jmp ole32.exp[59 * 4]} }
+__declspec(naked) void Proxy_OleSaveToStream() { __asm { jmp ole32.exp[60 * 4]} }
+__declspec(naked) void Proxy_ClearQITableEntry() { __asm { jmp ole32.exp[61 * 4]} }
+__declspec(naked) void Proxy_ComPs_NdrDllCanUnloadNow() { __asm { jmp ole32.exp[62 * 4]} }
+__declspec(naked) void Proxy_IsValidIid() { __asm { jmp ole32.exp[63 * 4]} }
+__declspec(naked) void Proxy_CoSetState() { __asm { jmp ole32.exp[64 * 4]} }
+__declspec(naked) void Proxy_HWND_UserFreeExt() { __asm { jmp ole32.exp[65 * 4]} }
+__declspec(naked) void Proxy_CoFreeAllLibraries() { __asm { jmp ole32.exp[66 * 4]} }
+__declspec(naked) void Proxy_CreateStdProgressIndicator() { __asm { jmp ole32.exp[67 * 4]} }
+__declspec(naked) void Proxy_CoGetInterceptorFromTypeInfo() { __asm { jmp ole32.exp[68 * 4]} }
+__declspec(naked) void Proxy_OleLockRunning() { __asm { jmp ole32.exp[69 * 4]} }
+__declspec(naked) void Proxy_CreateOleAdviseHolder() { __asm { jmp ole32.exp[70 * 4]} }
+__declspec(naked) void Proxy_ReadClassStm() { __asm { jmp ole32.exp[71 * 4]} }
+__declspec(naked) void Proxy_FreePropVariantArray() { __asm { jmp ole32.exp[72 * 4]} }
+__declspec(naked) void Proxy_PropVariantClear() { __asm { jmp ole32.exp[73 * 4]} }
+__declspec(naked) void Proxy_PropVariantCopy() { __asm { jmp ole32.exp[74 * 4]} }
+__declspec(naked) void Proxy_CoInitializeWOW() { __asm { jmp ole32.exp[75 * 4]} }
+__declspec(naked) void Proxy_CoRegisterMessageFilter() { __asm { jmp ole32.exp[76 * 4]} }
+__declspec(naked) void Proxy_CoRegisterSurrogateEx() { __asm { jmp ole32.exp[77 * 4]} }
+__declspec(naked) void Proxy_CoUnloadingWOW() { __asm { jmp ole32.exp[78 * 4]} }
+__declspec(naked) void Proxy_DllRegisterServer() { __asm { jmp ole32.exp[79 * 4]} }
+__declspec(naked) void Proxy_CoAicGetTokenForCOM() { __asm { jmp ole32.exp[80 * 4]} }
+__declspec(naked) void Proxy_CoCheckElevationEnabled() { __asm { jmp ole32.exp[81 * 4]} }
+__declspec(naked) void Proxy_CoGetSystemWow64DirectoryW() { __asm { jmp ole32.exp[82 * 4]} }
+__declspec(naked) void Proxy_DeletePatternAndExtensionTables() { __asm { jmp ole32.exp[83 * 4]} }
+__declspec(naked) void Proxy_SetWOWThunkGlobalPtr() { __asm { jmp ole32.exp[84 * 4]} }
+__declspec(naked) void Proxy_CreateILockBytesOnHGlobal() { __asm { jmp ole32.exp[85 * 4]} }
+__declspec(naked) void Proxy_FmtIdToPropStgName() { __asm { jmp ole32.exp[86 * 4]} }
+__declspec(naked) void Proxy_GetConvertStg() { __asm { jmp ole32.exp[87 * 4]} }
+__declspec(naked) void Proxy_GetDocumentBitStg() { __asm { jmp ole32.exp[88 * 4]} }
+__declspec(naked) void Proxy_GetHGlobalFromILockBytes() { __asm { jmp ole32.exp[89 * 4]} }
+__declspec(naked) void Proxy_PropStgNameToFmtId() { __asm { jmp ole32.exp[90 * 4]} }
+__declspec(naked) void Proxy_PropSysAllocString() { __asm { jmp ole32.exp[91 * 4]} }
+__declspec(naked) void Proxy_PropSysFreeString() { __asm { jmp ole32.exp[92 * 4]} }
+__declspec(naked) void Proxy_PropVariantChangeType() { __asm { jmp ole32.exp[93 * 4]} }
+__declspec(naked) void Proxy_StgConvertPropertyToVariant() { __asm { jmp ole32.exp[94 * 4]} }
+__declspec(naked) void Proxy_StgConvertVariantToProperty() { __asm { jmp ole32.exp[95 * 4]} }
+__declspec(naked) void Proxy_StgCreatePropSetStg() { __asm { jmp ole32.exp[96 * 4]} }
+__declspec(naked) void Proxy_StgCreatePropStg() { __asm { jmp ole32.exp[97 * 4]} }
+__declspec(naked) void Proxy_StgGetIFillLockBytesOnFile() { __asm { jmp ole32.exp[98 * 4]} }
+__declspec(naked) void Proxy_StgGetIFillLockBytesOnILockBytes() { __asm { jmp ole32.exp[99 * 4]} }
+__declspec(naked) void Proxy_StgIsStorageILockBytes() { __asm { jmp ole32.exp[100 * 4]} }
+__declspec(naked) void Proxy_StgOpenAsyncDocfileOnIFillLockBytes() { __asm { jmp ole32.exp[101 * 4]} }
+__declspec(naked) void Proxy_StgOpenPropStg() { __asm { jmp ole32.exp[102 * 4]} }
+__declspec(naked) void Proxy_StgOpenStorageOnHandle() { __asm { jmp ole32.exp[103 * 4]} }
+__declspec(naked) void Proxy_StgPropertyLengthAsVariant() { __asm { jmp ole32.exp[104 * 4]} }
+__declspec(naked) void Proxy_StgSetTimes() { __asm { jmp ole32.exp[105 * 4]} }
+__declspec(naked) void Proxy_WriteClassStm() { __asm { jmp ole32.exp[106 * 4]} }
+__declspec(naked) void Proxy_CreateAntiMoniker() { __asm { jmp ole32.exp[107 * 4]} }
+__declspec(naked) void Proxy_CreateObjrefMoniker() { __asm { jmp ole32.exp[108 * 4]} }
+__declspec(naked) void Proxy_OleLoadFromStream() { __asm { jmp ole32.exp[109 * 4]} }
+__declspec(naked) void Proxy_MonikerCommonPrefixWith() { __asm { jmp ole32.exp[110 * 4]} }
+__declspec(naked) void Proxy_MonikerRelativePathTo() { __asm { jmp ole32.exp[111 * 4]} }
+__declspec(naked) void Proxy_FindExt() { __asm { jmp ole32.exp[112 * 4]} }
+__declspec(naked) void Proxy_GetClassFile() { __asm { jmp ole32.exp[113 * 4]} }
+__declspec(naked) void Proxy_CoFreeLibrary() { __asm { jmp ole32.exp[114 * 4]} }
+__declspec(naked) void Proxy_CoInstall() { __asm { jmp ole32.exp[115 * 4]} }
+__declspec(naked) void Proxy_CoLoadLibrary() { __asm { jmp ole32.exp[116 * 4]} }
+__declspec(naked) void Proxy_CoQueryReleaseObject() { __asm { jmp ole32.exp[117 * 4]} }
+__declspec(naked) void Proxy_IsRoInitializeASTAAllowedInDesktop() { __asm { jmp ole32.exp[118 * 4]} }
+__declspec(naked) void Proxy_CoIsOle1Class() { __asm { jmp ole32.exp[119 * 4]} }
+__declspec(naked) void Proxy_CoTreatAsClass() { __asm { jmp ole32.exp[120 * 4]} }
+__declspec(naked) void Proxy_IsValidPtrIn() { __asm { jmp ole32.exp[121 * 4]} }
+__declspec(naked) void Proxy_IsValidPtrOut() { __asm { jmp ole32.exp[122 * 4]} }
+__declspec(naked) void Proxy_CoDosDateTimeToFileTime() { __asm { jmp ole32.exp[123 * 4]} }
+__declspec(naked) void Proxy_CoFileTimeToDosDateTime() { __asm { jmp ole32.exp[124 * 4]} }
+__declspec(naked) void Proxy_HENHMETAFILE_UserFree() { __asm { jmp ole32.exp[125 * 4]} }
+__declspec(naked) void Proxy_HENHMETAFILE_UserMarshal() { __asm { jmp ole32.exp[126 * 4]} }
+__declspec(naked) void Proxy_HENHMETAFILE_UserSize() { __asm { jmp ole32.exp[127 * 4]} }
+__declspec(naked) void Proxy_HENHMETAFILE_UserUnmarshal() { __asm { jmp ole32.exp[128 * 4]} }
+__declspec(naked) void Proxy_HMETAFILEPICT_UserFree() { __asm { jmp ole32.exp[129 * 4]} }
+__declspec(naked) void Proxy_HMETAFILEPICT_UserMarshal() { __asm { jmp ole32.exp[130 * 4]} }
+__declspec(naked) void Proxy_HMETAFILEPICT_UserSize() { __asm { jmp ole32.exp[131 * 4]} }
+__declspec(naked) void Proxy_HMETAFILEPICT_UserUnmarshal() { __asm { jmp ole32.exp[132 * 4]} }
+__declspec(naked) void Proxy_HMETAFILE_UserFree() { __asm { jmp ole32.exp[133 * 4]} }
+__declspec(naked) void Proxy_HMETAFILE_UserMarshal() { __asm { jmp ole32.exp[134 * 4]} }
+__declspec(naked) void Proxy_HMETAFILE_UserSize() { __asm { jmp ole32.exp[135 * 4]} }
+__declspec(naked) void Proxy_HMETAFILE_UserUnmarshal() { __asm { jmp ole32.exp[136 * 4]} }
+__declspec(naked) void Proxy_SNB_UserFree() { __asm { jmp ole32.exp[137 * 4]} }
+__declspec(naked) void Proxy_SNB_UserMarshal() { __asm { jmp ole32.exp[138 * 4]} }
+__declspec(naked) void Proxy_SNB_UserSize() { __asm { jmp ole32.exp[139 * 4]} }
+__declspec(naked) void Proxy_SNB_UserUnmarshal() { __asm { jmp ole32.exp[140 * 4]} }
+__declspec(naked) void Proxy_STGMEDIUM_UserFree() { __asm { jmp ole32.exp[141 * 4]} }
+__declspec(naked) void Proxy_STGMEDIUM_UserMarshal() { __asm { jmp ole32.exp[142 * 4]} }
+__declspec(naked) void Proxy_STGMEDIUM_UserSize() { __asm { jmp ole32.exp[143 * 4]} }
+__declspec(naked) void Proxy_STGMEDIUM_UserUnmarshal() { __asm { jmp ole32.exp[144 * 4]} }
+__declspec(naked) void Proxy_CLIPFORMAT_UserFreeExt() { __asm { jmp ole32.exp[145 * 4]} }
+__declspec(naked) void Proxy_HWND_UserUnmarshalExt() { __asm { jmp ole32.exp[146 * 4]} }
+__declspec(naked) void Proxy_HWND_UserMarshalExt() { __asm { jmp ole32.exp[147 * 4]} }
+__declspec(naked) void Proxy_HWND_UserSizeExt() { __asm { jmp ole32.exp[148 * 4]} }
+__declspec(naked) void Proxy_CoGetInterceptor() { __asm { jmp ole32.exp[149 * 4]} }
+__declspec(naked) void Proxy_ComPs_NdrDllGetClassObject() { __asm { jmp ole32.exp[150 * 4]} }
+__declspec(naked) void Proxy_ComPs_NdrDllRegisterProxy() { __asm { jmp ole32.exp[151 * 4]} }
+__declspec(naked) void Proxy_ComPs_NdrDllUnregisterProxy() { __asm { jmp ole32.exp[152 * 4]} }
+__declspec(naked) void Proxy_GetObjectFromRotByPath() { __asm { jmp ole32.exp[153 * 4]} }
+__declspec(naked) void Proxy_DdeBindToObject() { __asm { jmp ole32.exp[154 * 4]} }
+__declspec(naked) void Proxy_OleCreate() { __asm { jmp ole32.exp[155 * 4]} }
+__declspec(naked) void Proxy_OleCreateEx() { __asm { jmp ole32.exp[156 * 4]} }
+__declspec(naked) void Proxy_OleCreateFromData() { __asm { jmp ole32.exp[157 * 4]} }
+__declspec(naked) void Proxy_OleCreateFromDataEx() { __asm { jmp ole32.exp[158 * 4]} }
+__declspec(naked) void Proxy_OleCreateFromFile() { __asm { jmp ole32.exp[159 * 4]} }
+__declspec(naked) void Proxy_OleCreateFromFileEx() { __asm { jmp ole32.exp[160 * 4]} }
+__declspec(naked) void Proxy_OleCreateLink() { __asm { jmp ole32.exp[161 * 4]} }
+__declspec(naked) void Proxy_OleCreateLinkEx() { __asm { jmp ole32.exp[162 * 4]} }
+__declspec(naked) void Proxy_OleCreateLinkFromData() { __asm { jmp ole32.exp[163 * 4]} }
+__declspec(naked) void Proxy_OleCreateLinkFromDataEx() { __asm { jmp ole32.exp[164 * 4]} }
+__declspec(naked) void Proxy_OleCreateLinkToFile() { __asm { jmp ole32.exp[165 * 4]} }
+__declspec(naked) void Proxy_OleCreateLinkToFileEx() { __asm { jmp ole32.exp[166 * 4]} }
+__declspec(naked) void Proxy_OleCreateStaticFromData() { __asm { jmp ole32.exp[167 * 4]} }
+__declspec(naked) void Proxy_OleDoAutoConvert() { __asm { jmp ole32.exp[168 * 4]} }
+__declspec(naked) void Proxy_OleLoad() { __asm { jmp ole32.exp[169 * 4]} }
+__declspec(naked) void Proxy_OleQueryCreateFromData() { __asm { jmp ole32.exp[170 * 4]} }
+__declspec(naked) void Proxy_OleDraw() { __asm { jmp ole32.exp[171 * 4]} }
+__declspec(naked) void Proxy_OleDuplicateData() { __asm { jmp ole32.exp[172 * 4]} }
+__declspec(naked) void Proxy_OleIsRunning() { __asm { jmp ole32.exp[173 * 4]} }
+__declspec(naked) void Proxy_OleNoteObjectVisible() { __asm { jmp ole32.exp[174 * 4]} }
+__declspec(naked) void Proxy_OleSetContainedObject() { __asm { jmp ole32.exp[175 * 4]} }
+__declspec(naked) void Proxy_ReadOleStg() { __asm { jmp ole32.exp[176 * 4]} }
+__declspec(naked) void Proxy_SetConvertStg() { __asm { jmp ole32.exp[177 * 4]} }
+__declspec(naked) void Proxy_SetDocumentBitStg() { __asm { jmp ole32.exp[178 * 4]} }
+__declspec(naked) void Proxy_WriteOleStg() { __asm { jmp ole32.exp[179 * 4]} }
+__declspec(naked) void Proxy_OleInitializeWOW() { __asm { jmp ole32.exp[180 * 4]} }
+__declspec(naked) void Proxy_CreateDataCache() { __asm { jmp ole32.exp[181 * 4]} }
+__declspec(naked) void Proxy_OleGetClipboardWithEnterpriseInfo() { __asm { jmp ole32.exp[182 * 4]} }
+__declspec(naked) void Proxy_Ordinal804() { __asm { jmp ole32.exp[183 * 4]} }
+__declspec(naked) void Proxy_OleGetPackageClipboardOwner() { __asm { jmp ole32.exp[184 * 4]} }
+__declspec(naked) void Proxy_DoDragDrop() { __asm { jmp ole32.exp[185 * 4]} }
+__declspec(naked) void Proxy_DragDropSetFDT() { __asm { jmp ole32.exp[186 * 4]} }
+__declspec(naked) void Proxy_Ordinal822() { __asm { jmp ole32.exp[187 * 4]} }
+__declspec(naked) void Proxy_Ordinal820() { __asm { jmp ole32.exp[188 * 4]} }
+__declspec(naked) void Proxy_Ordinal821() { __asm { jmp ole32.exp[189 * 4]} }
+__declspec(naked) void Proxy_Ordinal823() { __asm { jmp ole32.exp[190 * 4]} }
+__declspec(naked) void Proxy_IsAccelerator() { __asm { jmp ole32.exp[191 * 4]} }
+__declspec(naked) void Proxy_OleCreateMenuDescriptor() { __asm { jmp ole32.exp[192 * 4]} }
+__declspec(naked) void Proxy_OleDestroyMenuDescriptor() { __asm { jmp ole32.exp[193 * 4]} }
+__declspec(naked) void Proxy_OleSetMenuDescriptor() { __asm { jmp ole32.exp[194 * 4]} }
+__declspec(naked) void Proxy_OleTranslateAccelerator() { __asm { jmp ole32.exp[195 * 4]} }
+__declspec(naked) void Proxy_OleCreateDefaultHandler() { __asm { jmp ole32.exp[196 * 4]} }
+__declspec(naked) void Proxy_OleCreateEmbeddingHelper() { __asm { jmp ole32.exp[197 * 4]} }
+__declspec(naked) void Proxy_OleGetAutoConvert() { __asm { jmp ole32.exp[198 * 4]} }
+__declspec(naked) void Proxy_OleRegGetUserType() { __asm { jmp ole32.exp[199 * 4]} }
+__declspec(naked) void Proxy_OleSetAutoConvert() { __asm { jmp ole32.exp[200 * 4]} }
+__declspec(naked) void Proxy_OleGetIconOfClass() { __asm { jmp ole32.exp[201 * 4]} }
+__declspec(naked) void Proxy_OleGetIconOfFile() { __asm { jmp ole32.exp[202 * 4]} }
+__declspec(naked) void Proxy_OleMetafilePictFromIconAndLabel() { __asm { jmp ole32.exp[203 * 4]} }
+__declspec(naked) void Proxy_OleRegEnumFormatEtc() { __asm { jmp ole32.exp[204 * 4]} }
+__declspec(naked) void Proxy_OleRegEnumVerbs() { __asm { jmp ole32.exp[205 * 4]} }
+__declspec(naked) void Proxy_OleConvertIStorageToOLESTREAM() { __asm { jmp ole32.exp[206 * 4]} }
+__declspec(naked) void Proxy_OleConvertIStorageToOLESTREAMEx() { __asm { jmp ole32.exp[207 * 4]} }
+__declspec(naked) void Proxy_OleConvertOLESTREAMToIStorage() { __asm { jmp ole32.exp[208 * 4]} }
+__declspec(naked) void Proxy_OleConvertOLESTREAMToIStorageEx() { __asm { jmp ole32.exp[209 * 4]} }
+__declspec(naked) void Proxy_OpenOrCreateStream() { __asm { jmp ole32.exp[210 * 4]} }
+__declspec(naked) void Proxy_ReadStringStream() { __asm { jmp ole32.exp[211 * 4]} }
+__declspec(naked) void Proxy_UtConvertDvtd16toDvtd32() { __asm { jmp ole32.exp[212 * 4]} }
+__declspec(naked) void Proxy_UtConvertDvtd32toDvtd16() { __asm { jmp ole32.exp[213 * 4]} }
+__declspec(naked) void Proxy_UtGetDvtd16Info() { __asm { jmp ole32.exp[214 * 4]} }
+__declspec(naked) void Proxy_UtGetDvtd32Info() { __asm { jmp ole32.exp[215 * 4]} }
+__declspec(naked) void Proxy_StdTypesGetClassObject() { __asm { jmp ole32.exp[216 * 4]} }
+__declspec(naked) void Proxy_StdTypesRegisterServer() { __asm { jmp ole32.exp[217 * 4]} }
+__declspec(naked) void Proxy_OleCreatePictureIndirectExt() { __asm { jmp ole32.exp[218 * 4]} }
+__declspec(naked) void Proxy_OleIconToCursorExt() { __asm { jmp ole32.exp[219 * 4]} }
+__declspec(naked) void Proxy_OleLoadPictureExt() { __asm { jmp ole32.exp[220 * 4]} }
+__declspec(naked) void Proxy_OleLoadPicturePathExt() { __asm { jmp ole32.exp[221 * 4]} }
+__declspec(naked) void Proxy_OleCreatePropertyFrameIndirectExt() { __asm { jmp ole32.exp[222 * 4]} }
+__declspec(naked) void Proxy_OleLoadPictureFileExt() { __asm { jmp ole32.exp[223 * 4]} }
+__declspec(naked) void Proxy_OleSavePictureFileExt() { __asm { jmp ole32.exp[224 * 4]} }
+__declspec(naked) void Proxy_CLIPFORMAT_UserMarshalExt() { __asm { jmp ole32.exp[225 * 4]} }
+__declspec(naked) void Proxy_CLIPFORMAT_UserSizeExt() { __asm { jmp ole32.exp[226 * 4]} }
+__declspec(naked) void Proxy_CLIPFORMAT_UserUnmarshalExt() { __asm { jmp ole32.exp[227 * 4]} }
+__declspec(naked) void Proxy_HPALETTE_UserFreeExt() { __asm { jmp ole32.exp[228 * 4]} }
+__declspec(naked) void Proxy_HPALETTE_UserMarshalExt() { __asm { jmp ole32.exp[229 * 4]} }
+__declspec(naked) void Proxy_HPALETTE_UserSizeExt() { __asm { jmp ole32.exp[230 * 4]} }
+__declspec(naked) void Proxy_HPALETTE_UserUnmarshalExt() { __asm { jmp ole32.exp[231 * 4]} }
+__declspec(naked) void Proxy_MonikerLoadTypeLib() { __asm { jmp ole32.exp[232 * 4]} }
+__declspec(naked) void Proxy_ReadStorageProperties() { __asm { jmp ole32.exp[233 * 4]} }
+__declspec(naked) void Proxy_ReadClassStg() { __asm { jmp ole32.exp[234 * 4]} }
+__declspec(naked) void Proxy_STGMEDIUM_UserFreeExt() { __asm { jmp ole32.exp[235 * 4]} }
+__declspec(naked) void Proxy_STGMEDIUM_UserMarshalExt() { __asm { jmp ole32.exp[236 * 4]} }
+__declspec(naked) void Proxy_STGMEDIUM_UserSizeExt() { __asm { jmp ole32.exp[237 * 4]} }
+__declspec(naked) void Proxy_STGMEDIUM_UserUnmarshalExt() { __asm { jmp ole32.exp[238 * 4]} }
+__declspec(naked) void Proxy_WriteStorageProperties() { __asm { jmp ole32.exp[239 * 4]} }
+__declspec(naked) void Proxy_HRGN_UserFree() { __asm { jmp ole32.exp[240 * 4]} }
+__declspec(naked) void Proxy_HRGN_UserMarshal() { __asm { jmp ole32.exp[241 * 4]} }
+__declspec(naked) void Proxy_HRGN_UserSize() { __asm { jmp ole32.exp[242 * 4]} }
+__declspec(naked) void Proxy_HRGN_UserUnmarshal() { __asm { jmp ole32.exp[243 * 4]} }
+__declspec(naked) void Proxy_CLIPFORMAT_UserFree() { __asm { jmp ole32.exp[244 * 4]} }
+__declspec(naked) void Proxy_CLIPFORMAT_UserMarshal() { __asm { jmp ole32.exp[245 * 4]} }
+__declspec(naked) void Proxy_CLIPFORMAT_UserSize() { __asm { jmp ole32.exp[246 * 4]} }
+__declspec(naked) void Proxy_CLIPFORMAT_UserUnmarshal() { __asm { jmp ole32.exp[247 * 4]} }
+__declspec(naked) void Proxy_CLSIDFromOle1Class() { __asm { jmp ole32.exp[248 * 4]} }
+__declspec(naked) void Proxy_CLSIDFromProgID() { __asm { jmp ole32.exp[249 * 4]} }
+__declspec(naked) void Proxy_CLSIDFromProgIDEx() { __asm { jmp ole32.exp[250 * 4]} }
+__declspec(naked) void Proxy_CLSIDFromString() { __asm { jmp ole32.exp[251 * 4]} }
+__declspec(naked) void Proxy_CStdAsyncStubBuffer2_Connect() { __asm { jmp ole32.exp[252 * 4]} }
+__declspec(naked) void Proxy_CStdAsyncStubBuffer2_Disconnect() { __asm { jmp ole32.exp[253 * 4]} }
+__declspec(naked) void Proxy_CStdAsyncStubBuffer2_Release() { __asm { jmp ole32.exp[254 * 4]} }
+__declspec(naked) void Proxy_CStdAsyncStubBuffer_AddRef() { __asm { jmp ole32.exp[255 * 4]} }
+__declspec(naked) void Proxy_CStdAsyncStubBuffer_Connect() { __asm { jmp ole32.exp[256 * 4]} }
+__declspec(naked) void Proxy_CStdAsyncStubBuffer_Disconnect() { __asm { jmp ole32.exp[257 * 4]} }
+__declspec(naked) void Proxy_CStdAsyncStubBuffer_Invoke() { __asm { jmp ole32.exp[258 * 4]} }
+__declspec(naked) void Proxy_CStdAsyncStubBuffer_QueryInterface() { __asm { jmp ole32.exp[259 * 4]} }
+__declspec(naked) void Proxy_CStdAsyncStubBuffer_Release() { __asm { jmp ole32.exp[260 * 4]} }
+__declspec(naked) void Proxy_CStdStubBuffer2_Connect() { __asm { jmp ole32.exp[261 * 4]} }
+__declspec(naked) void Proxy_CStdStubBuffer2_CountRefs() { __asm { jmp ole32.exp[262 * 4]} }
+__declspec(naked) void Proxy_CStdStubBuffer2_Disconnect() { __asm { jmp ole32.exp[263 * 4]} }
+__declspec(naked) void Proxy_CStdStubBuffer2_QueryInterface() { __asm { jmp ole32.exp[264 * 4]} }
+__declspec(naked) void Proxy_CoAddRefServerProcess() { __asm { jmp ole32.exp[265 * 4]} }
+__declspec(naked) void Proxy_CoAllowUnmarshalerCLSID() { __asm { jmp ole32.exp[266 * 4]} }
+__declspec(naked) void Proxy_CoCancelCall() { __asm { jmp ole32.exp[267 * 4]} }
+__declspec(naked) void Proxy_CoCopyProxy() { __asm { jmp ole32.exp[268 * 4]} }
+__declspec(naked) void Proxy_CoCreateFreeThreadedMarshaler() { __asm { jmp ole32.exp[269 * 4]} }
+__declspec(naked) void Proxy_CoCreateGuid() { __asm { jmp ole32.exp[270 * 4]} }
+__declspec(naked) void Proxy_CoCreateInstance() { __asm { jmp ole32.exp[271 * 4]} }
+__declspec(naked) void Proxy_CoCreateInstanceEx() { __asm { jmp ole32.exp[272 * 4]} }
+__declspec(naked) void Proxy_CoCreateInstanceFromApp() { __asm { jmp ole32.exp[273 * 4]} }
+__declspec(naked) void Proxy_CoCreateObjectInContext() { __asm { jmp ole32.exp[274 * 4]} }
+__declspec(naked) void Proxy_CoDeactivateObject() { __asm { jmp ole32.exp[275 * 4]} }
+__declspec(naked) void Proxy_CoDecodeProxy() { __asm { jmp ole32.exp[276 * 4]} }
+__declspec(naked) void Proxy_CoDecrementMTAUsage() { __asm { jmp ole32.exp[277 * 4]} }
+__declspec(naked) void Proxy_CoDisableCallCancellation() { __asm { jmp ole32.exp[278 * 4]} }
+__declspec(naked) void Proxy_CoDisconnectContext() { __asm { jmp ole32.exp[279 * 4]} }
+__declspec(naked) void Proxy_CoDisconnectObject() { __asm { jmp ole32.exp[280 * 4]} }
+__declspec(naked) void Proxy_CoEnableCallCancellation() { __asm { jmp ole32.exp[281 * 4]} }
+__declspec(naked) void Proxy_CoFileTimeNow() { __asm { jmp ole32.exp[282 * 4]} }
+__declspec(naked) void Proxy_CoFreeUnusedLibraries() { __asm { jmp ole32.exp[283 * 4]} }
+__declspec(naked) void Proxy_CoFreeUnusedLibrariesEx() { __asm { jmp ole32.exp[284 * 4]} }
+__declspec(naked) void Proxy_CoGetActivationState() { __asm { jmp ole32.exp[285 * 4]} }
+__declspec(naked) void Proxy_CoGetApartmentID() { __asm { jmp ole32.exp[286 * 4]} }
+__declspec(naked) void Proxy_CoGetApartmentType() { __asm { jmp ole32.exp[287 * 4]} }
+__declspec(naked) void Proxy_CoGetCallContext() { __asm { jmp ole32.exp[288 * 4]} }
+__declspec(naked) void Proxy_CoGetCallState() { __asm { jmp ole32.exp[289 * 4]} }
+__declspec(naked) void Proxy_CoGetCallerTID() { __asm { jmp ole32.exp[290 * 4]} }
+__declspec(naked) void Proxy_CoGetCancelObject() { __asm { jmp ole32.exp[291 * 4]} }
+__declspec(naked) void Proxy_CoGetClassObject() { __asm { jmp ole32.exp[292 * 4]} }
+__declspec(naked) void Proxy_CoGetClassVersion() { __asm { jmp ole32.exp[293 * 4]} }
+__declspec(naked) void Proxy_CoGetComCatalog() { __asm { jmp ole32.exp[294 * 4]} }
+__declspec(naked) void Proxy_CoGetContextToken() { __asm { jmp ole32.exp[295 * 4]} }
+__declspec(naked) void Proxy_CoGetCurrentLogicalThreadId() { __asm { jmp ole32.exp[296 * 4]} }
+__declspec(naked) void Proxy_CoGetCurrentProcess() { __asm { jmp ole32.exp[297 * 4]} }
+__declspec(naked) void Proxy_CoGetDefaultContext() { __asm { jmp ole32.exp[298 * 4]} }
+__declspec(naked) void Proxy_CoGetInstanceFromFile() { __asm { jmp ole32.exp[299 * 4]} }
+__declspec(naked) void Proxy_CoGetInstanceFromIStorage() { __asm { jmp ole32.exp[300 * 4]} }
+__declspec(naked) void Proxy_CoGetInterfaceAndReleaseStream() { __asm { jmp ole32.exp[301 * 4]} }
+__declspec(naked) void Proxy_CoGetMalloc() { __asm { jmp ole32.exp[302 * 4]} }
+__declspec(naked) void Proxy_CoGetMarshalSizeMax() { __asm { jmp ole32.exp[303 * 4]} }
+__declspec(naked) void Proxy_CoGetModuleType() { __asm { jmp ole32.exp[304 * 4]} }
+__declspec(naked) void Proxy_CoGetObjectContext() { __asm { jmp ole32.exp[305 * 4]} }
+__declspec(naked) void Proxy_CoGetPSClsid() { __asm { jmp ole32.exp[306 * 4]} }
+__declspec(naked) void Proxy_CoGetProcessIdentifier() { __asm { jmp ole32.exp[307 * 4]} }
+__declspec(naked) void Proxy_CoGetStandardMarshal() { __asm { jmp ole32.exp[308 * 4]} }
+__declspec(naked) void Proxy_CoGetStdMarshalEx() { __asm { jmp ole32.exp[309 * 4]} }
+__declspec(naked) void Proxy_CoGetSystemSecurityPermissions() { __asm { jmp ole32.exp[310 * 4]} }
+__declspec(naked) void Proxy_CoGetTreatAsClass() { __asm { jmp ole32.exp[311 * 4]} }
+__declspec(naked) void Proxy_CoHandlePriorityEventsFromMessagePump() { __asm { jmp ole32.exp[312 * 4]} }
+__declspec(naked) void Proxy_CoImpersonateClient() { __asm { jmp ole32.exp[313 * 4]} }
+__declspec(naked) void Proxy_CoIncrementMTAUsage() { __asm { jmp ole32.exp[314 * 4]} }
+__declspec(naked) void Proxy_CoInitializeEx() { __asm { jmp ole32.exp[315 * 4]} }
+__declspec(naked) void Proxy_CoInitializeSecurity() { __asm { jmp ole32.exp[316 * 4]} }
+__declspec(naked) void Proxy_CoInvalidateRemoteMachineBindings() { __asm { jmp ole32.exp[317 * 4]} }
+__declspec(naked) void Proxy_CoIsHandlerConnected() { __asm { jmp ole32.exp[318 * 4]} }
+__declspec(naked) void Proxy_CoLockObjectExternal() { __asm { jmp ole32.exp[319 * 4]} }
+__declspec(naked) void Proxy_CoMarshalHresult() { __asm { jmp ole32.exp[320 * 4]} }
+__declspec(naked) void Proxy_CoMarshalInterThreadInterfaceInStream() { __asm { jmp ole32.exp[321 * 4]} }
+__declspec(naked) void Proxy_CoMarshalInterface() { __asm { jmp ole32.exp[322 * 4]} }
+__declspec(naked) void Proxy_CoPopServiceDomain() { __asm { jmp ole32.exp[323 * 4]} }
+__declspec(naked) void Proxy_CoPushServiceDomain() { __asm { jmp ole32.exp[324 * 4]} }
+__declspec(naked) void Proxy_CoQueryAuthenticationServices() { __asm { jmp ole32.exp[325 * 4]} }
+__declspec(naked) void Proxy_CoQueryClientBlanket() { __asm { jmp ole32.exp[326 * 4]} }
+__declspec(naked) void Proxy_CoQueryProxyBlanket() { __asm { jmp ole32.exp[327 * 4]} }
+__declspec(naked) void Proxy_CoReactivateObject() { __asm { jmp ole32.exp[328 * 4]} }
+__declspec(naked) void Proxy_CoRegisterActivationFilter() { __asm { jmp ole32.exp[329 * 4]} }
+__declspec(naked) void Proxy_CoRegisterChannelHook() { __asm { jmp ole32.exp[330 * 4]} }
+__declspec(naked) void Proxy_CoRegisterClassObject() { __asm { jmp ole32.exp[331 * 4]} }
+__declspec(naked) void Proxy_CoRegisterInitializeSpy() { __asm { jmp ole32.exp[332 * 4]} }
+__declspec(naked) void Proxy_CoRegisterMallocSpy() { __asm { jmp ole32.exp[333 * 4]} }
+__declspec(naked) void Proxy_CoRegisterPSClsid() { __asm { jmp ole32.exp[334 * 4]} }
+__declspec(naked) void Proxy_CoRegisterSurrogate() { __asm { jmp ole32.exp[335 * 4]} }
+__declspec(naked) void Proxy_CoReleaseMarshalData() { __asm { jmp ole32.exp[336 * 4]} }
+__declspec(naked) void Proxy_CoReleaseServerProcess() { __asm { jmp ole32.exp[337 * 4]} }
+__declspec(naked) void Proxy_CoResumeClassObjects() { __asm { jmp ole32.exp[338 * 4]} }
+__declspec(naked) void Proxy_CoRetireServer() { __asm { jmp ole32.exp[339 * 4]} }
+__declspec(naked) void Proxy_CoRevertToSelf() { __asm { jmp ole32.exp[340 * 4]} }
+__declspec(naked) void Proxy_CoRevokeClassObject() { __asm { jmp ole32.exp[341 * 4]} }
+__declspec(naked) void Proxy_CoRevokeInitializeSpy() { __asm { jmp ole32.exp[342 * 4]} }
+__declspec(naked) void Proxy_CoRevokeMallocSpy() { __asm { jmp ole32.exp[343 * 4]} }
+__declspec(naked) void Proxy_CoSetCancelObject() { __asm { jmp ole32.exp[344 * 4]} }
+__declspec(naked) void Proxy_CoSetMessageDispatcher() { __asm { jmp ole32.exp[345 * 4]} }
+__declspec(naked) void Proxy_CoSetProxyBlanket() { __asm { jmp ole32.exp[346 * 4]} }
+__declspec(naked) void Proxy_CoSuspendClassObjects() { __asm { jmp ole32.exp[347 * 4]} }
+__declspec(naked) void Proxy_CoSwitchCallContext() { __asm { jmp ole32.exp[348 * 4]} }
+__declspec(naked) void Proxy_CoTaskMemAlloc() { __asm { jmp ole32.exp[349 * 4]} }
+__declspec(naked) void Proxy_CoTaskMemFree() { __asm { jmp ole32.exp[350 * 4]} }
+__declspec(naked) void Proxy_CoTaskMemRealloc() { __asm { jmp ole32.exp[351 * 4]} }
+__declspec(naked) void Proxy_CoTestCancel() { __asm { jmp ole32.exp[352 * 4]} }
+__declspec(naked) void Proxy_CoUninitialize() { __asm { jmp ole32.exp[353 * 4]} }
+__declspec(naked) void Proxy_CoUnmarshalHresult() { __asm { jmp ole32.exp[354 * 4]} }
+__declspec(naked) void Proxy_CoUnmarshalInterface() { __asm { jmp ole32.exp[355 * 4]} }
+__declspec(naked) void Proxy_CoVrfCheckThreadState() { __asm { jmp ole32.exp[356 * 4]} }
+__declspec(naked) void Proxy_CoVrfGetThreadState() { __asm { jmp ole32.exp[357 * 4]} }
+__declspec(naked) void Proxy_CoVrfReleaseThreadState() { __asm { jmp ole32.exp[358 * 4]} }
+__declspec(naked) void Proxy_CoWaitForMultipleHandles() { __asm { jmp ole32.exp[359 * 4]} }
+__declspec(naked) void Proxy_CoWaitForMultipleObjects() { __asm { jmp ole32.exp[360 * 4]} }
+__declspec(naked) void Proxy_CreateErrorInfo() { __asm { jmp ole32.exp[361 * 4]} }
+__declspec(naked) void Proxy_CreateStreamOnHGlobal() { __asm { jmp ole32.exp[362 * 4]} }
+__declspec(naked) void Proxy_DcomChannelSetHResult() { __asm { jmp ole32.exp[363 * 4]} }
+__declspec(naked) void Proxy_DllDebugObjectRPCHook() { __asm { jmp ole32.exp[364 * 4]} }
+__declspec(naked) void Proxy_EnableHookObject() { __asm { jmp ole32.exp[365 * 4]} }
+__declspec(naked) void Proxy_GetErrorInfo() { __asm { jmp ole32.exp[366 * 4]} }
+__declspec(naked) void Proxy_GetHGlobalFromStream() { __asm { jmp ole32.exp[367 * 4]} }
+__declspec(naked) void Proxy_GetHookInterface() { __asm { jmp ole32.exp[368 * 4]} }
+__declspec(naked) void Proxy_HACCEL_UserFree() { __asm { jmp ole32.exp[369 * 4]} }
+__declspec(naked) void Proxy_HACCEL_UserMarshal() { __asm { jmp ole32.exp[370 * 4]} }
+__declspec(naked) void Proxy_HACCEL_UserSize() { __asm { jmp ole32.exp[371 * 4]} }
+__declspec(naked) void Proxy_HACCEL_UserUnmarshal() { __asm { jmp ole32.exp[372 * 4]} }
+__declspec(naked) void Proxy_HBITMAP_UserFree() { __asm { jmp ole32.exp[373 * 4]} }
+__declspec(naked) void Proxy_HBITMAP_UserMarshal() { __asm { jmp ole32.exp[374 * 4]} }
+__declspec(naked) void Proxy_HBITMAP_UserSize() { __asm { jmp ole32.exp[375 * 4]} }
+__declspec(naked) void Proxy_HBITMAP_UserUnmarshal() { __asm { jmp ole32.exp[376 * 4]} }
+__declspec(naked) void Proxy_HBRUSH_UserFree() { __asm { jmp ole32.exp[377 * 4]} }
+__declspec(naked) void Proxy_HBRUSH_UserMarshal() { __asm { jmp ole32.exp[378 * 4]} }
+__declspec(naked) void Proxy_HBRUSH_UserSize() { __asm { jmp ole32.exp[379 * 4]} }
+__declspec(naked) void Proxy_HBRUSH_UserUnmarshal() { __asm { jmp ole32.exp[380 * 4]} }
+__declspec(naked) void Proxy_HDC_UserFree() { __asm { jmp ole32.exp[381 * 4]} }
+__declspec(naked) void Proxy_HDC_UserMarshal() { __asm { jmp ole32.exp[382 * 4]} }
+__declspec(naked) void Proxy_HDC_UserSize() { __asm { jmp ole32.exp[383 * 4]} }
+__declspec(naked) void Proxy_HDC_UserUnmarshal() { __asm { jmp ole32.exp[384 * 4]} }
+__declspec(naked) void Proxy_HGLOBAL_UserFree() { __asm { jmp ole32.exp[385 * 4]} }
+__declspec(naked) void Proxy_HGLOBAL_UserMarshal() { __asm { jmp ole32.exp[386 * 4]} }
+__declspec(naked) void Proxy_HGLOBAL_UserSize() { __asm { jmp ole32.exp[387 * 4]} }
+__declspec(naked) void Proxy_HGLOBAL_UserUnmarshal() { __asm { jmp ole32.exp[388 * 4]} }
+__declspec(naked) void Proxy_HICON_UserFree() { __asm { jmp ole32.exp[389 * 4]} }
+__declspec(naked) void Proxy_HICON_UserMarshal() { __asm { jmp ole32.exp[390 * 4]} }
+__declspec(naked) void Proxy_HICON_UserSize() { __asm { jmp ole32.exp[391 * 4]} }
+__declspec(naked) void Proxy_HICON_UserUnmarshal() { __asm { jmp ole32.exp[392 * 4]} }
+__declspec(naked) void Proxy_HMENU_UserFree() { __asm { jmp ole32.exp[393 * 4]} }
+__declspec(naked) void Proxy_HMENU_UserMarshal() { __asm { jmp ole32.exp[394 * 4]} }
+__declspec(naked) void Proxy_HMENU_UserSize() { __asm { jmp ole32.exp[395 * 4]} }
+__declspec(naked) void Proxy_HMENU_UserUnmarshal() { __asm { jmp ole32.exp[396 * 4]} }
+__declspec(naked) void Proxy_HMONITOR_UserFree() { __asm { jmp ole32.exp[397 * 4]} }
+__declspec(naked) void Proxy_HMONITOR_UserMarshal() { __asm { jmp ole32.exp[398 * 4]} }
+__declspec(naked) void Proxy_HMONITOR_UserSize() { __asm { jmp ole32.exp[399 * 4]} }
+__declspec(naked) void Proxy_HMONITOR_UserUnmarshal() { __asm { jmp ole32.exp[400 * 4]} }
+__declspec(naked) void Proxy_HPALETTE_UserFree() { __asm { jmp ole32.exp[401 * 4]} }
+__declspec(naked) void Proxy_HPALETTE_UserMarshal() { __asm { jmp ole32.exp[402 * 4]} }
+__declspec(naked) void Proxy_HPALETTE_UserSize() { __asm { jmp ole32.exp[403 * 4]} }
+__declspec(naked) void Proxy_HPALETTE_UserUnmarshal() { __asm { jmp ole32.exp[404 * 4]} }
+__declspec(naked) void Proxy_HWND_UserFree() { __asm { jmp ole32.exp[405 * 4]} }
+__declspec(naked) void Proxy_HWND_UserMarshal() { __asm { jmp ole32.exp[406 * 4]} }
+__declspec(naked) void Proxy_HWND_UserSize() { __asm { jmp ole32.exp[407 * 4]} }
+__declspec(naked) void Proxy_HWND_UserUnmarshal() { __asm { jmp ole32.exp[408 * 4]} }
+__declspec(naked) void Proxy_HkOleRegisterObject() { __asm { jmp ole32.exp[409 * 4]} }
+__declspec(naked) void Proxy_IIDFromString() { __asm { jmp ole32.exp[410 * 4]} }
+__declspec(naked) void Proxy_NdrOleInitializeExtension() { __asm { jmp ole32.exp[411 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction10() { __asm { jmp ole32.exp[412 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction11() { __asm { jmp ole32.exp[413 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction12() { __asm { jmp ole32.exp[414 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction13() { __asm { jmp ole32.exp[415 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction14() { __asm { jmp ole32.exp[416 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction15() { __asm { jmp ole32.exp[417 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction16() { __asm { jmp ole32.exp[418 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction17() { __asm { jmp ole32.exp[419 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction18() { __asm { jmp ole32.exp[420 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction19() { __asm { jmp ole32.exp[421 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction20() { __asm { jmp ole32.exp[422 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction21() { __asm { jmp ole32.exp[423 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction22() { __asm { jmp ole32.exp[424 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction23() { __asm { jmp ole32.exp[425 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction24() { __asm { jmp ole32.exp[426 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction25() { __asm { jmp ole32.exp[427 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction26() { __asm { jmp ole32.exp[428 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction27() { __asm { jmp ole32.exp[429 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction28() { __asm { jmp ole32.exp[430 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction29() { __asm { jmp ole32.exp[431 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction30() { __asm { jmp ole32.exp[432 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction31() { __asm { jmp ole32.exp[433 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction32() { __asm { jmp ole32.exp[434 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction3() { __asm { jmp ole32.exp[435 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction4() { __asm { jmp ole32.exp[436 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction5() { __asm { jmp ole32.exp[437 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction6() { __asm { jmp ole32.exp[438 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction7() { __asm { jmp ole32.exp[439 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction8() { __asm { jmp ole32.exp[440 * 4]} }
+__declspec(naked) void Proxy_NdrProxyForwardingFunction9() { __asm { jmp ole32.exp[441 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient10() { __asm { jmp ole32.exp[442 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient11() { __asm { jmp ole32.exp[443 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient12() { __asm { jmp ole32.exp[444 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient13() { __asm { jmp ole32.exp[445 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient14() { __asm { jmp ole32.exp[446 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient15() { __asm { jmp ole32.exp[447 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient16() { __asm { jmp ole32.exp[448 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient17() { __asm { jmp ole32.exp[449 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient18() { __asm { jmp ole32.exp[450 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient19() { __asm { jmp ole32.exp[451 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient20() { __asm { jmp ole32.exp[452 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient21() { __asm { jmp ole32.exp[453 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient22() { __asm { jmp ole32.exp[454 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient23() { __asm { jmp ole32.exp[455 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient24() { __asm { jmp ole32.exp[456 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient25() { __asm { jmp ole32.exp[457 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient26() { __asm { jmp ole32.exp[458 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient27() { __asm { jmp ole32.exp[459 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient28() { __asm { jmp ole32.exp[460 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient29() { __asm { jmp ole32.exp[461 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient30() { __asm { jmp ole32.exp[462 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient31() { __asm { jmp ole32.exp[463 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient32() { __asm { jmp ole32.exp[464 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient3() { __asm { jmp ole32.exp[465 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient4() { __asm { jmp ole32.exp[466 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient5() { __asm { jmp ole32.exp[467 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient6() { __asm { jmp ole32.exp[468 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient7() { __asm { jmp ole32.exp[469 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient8() { __asm { jmp ole32.exp[470 * 4]} }
+__declspec(naked) void Proxy_ObjectStublessClient9() { __asm { jmp ole32.exp[471 * 4]} }
+__declspec(naked) void Proxy_ProgIDFromCLSID() { __asm { jmp ole32.exp[472 * 4]} }
+__declspec(naked) void Proxy_RoGetAgileReference() { __asm { jmp ole32.exp[473 * 4]} }
+__declspec(naked) void Proxy_SetErrorInfo() { __asm { jmp ole32.exp[474 * 4]} }
+__declspec(naked) void Proxy_StringFromCLSID() { __asm { jmp ole32.exp[475 * 4]} }
+__declspec(naked) void Proxy_StringFromGUID2() { __asm { jmp ole32.exp[476 * 4]} }
+__declspec(naked) void Proxy_StringFromIID() { __asm { jmp ole32.exp[477 * 4]} }
+__declspec(naked) void Proxy_UpdateDCOMSettings() { __asm { jmp ole32.exp[478 * 4]} }
+__declspec(naked) void Proxy_UpdateProcessTracing() { __asm { jmp ole32.exp[479 * 4]} }
+__declspec(naked) void Proxy_WdtpInterfacePointer_UserFree() { __asm { jmp ole32.exp[480 * 4]} }
+__declspec(naked) void Proxy_WdtpInterfacePointer_UserMarshal() { __asm { jmp ole32.exp[481 * 4]} }
+__declspec(naked) void Proxy_WdtpInterfacePointer_UserSize() { __asm { jmp ole32.exp[482 * 4]} }
+__declspec(naked) void Proxy_WdtpInterfacePointer_UserUnmarshal() { __asm { jmp ole32.exp[483 * 4]} }

@@ -5,23 +5,20 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="source">
+    <Filter Include="Source">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="proxydll.cpp">
-      <Filter>source</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
-      <Filter>source</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="myIDirect3D9.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="myIDirect3DDevice9.cpp">
-      <Filter>source</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -32,9 +29,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="myIDirect3D9.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="myIDirect3DDevice9.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">

@@ -29,9 +29,3 @@ public:
 private:
 	IDirect3D9 *m_pIDirect3D9;
 };
-
- static inline  void setParam(D3DPRESENT_PARAMETERS* pPresentationParameters) {
-	if(!pPresentationParameters->Windowed) pPresentationParameters->SwapEffect = D3DSWAPEFFECT_FLIP;
-	if (pPresentationParameters->BackBufferCount < 2)pPresentationParameters->BackBufferCount = 2;
-	pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
-}
