@@ -1,6 +1,6 @@
 // proxydll.cpp
 #include "stdafx.h"
-
+#include <stdio.h>
 #include "myIDirect3D9.h"
 #include "proxydll.h"
 // global variables
@@ -20,6 +20,89 @@ WCHAR* wc_DllPath = new WCHAR[MAX_PATH],
 PWCHAR 	pwc_dllName;
 PWCHAR 	pwc_ExeName;
 
+typedef HRESULT(*fn_CreatePixelShader)(
+	ID3D11Device *,
+	const void*pShaderBytecode,
+	SIZE_T             BytecodeLength,
+	ID3D11ClassLinkage *pClassLinkage,
+	ID3D11PixelShader  **ppPixelShader
+	);
+
+typedef HRESULT(*fn_CreateHullShader)(
+	ID3D11Device *,
+	const void               *pShaderBytecode,
+	SIZE_T             BytecodeLength,
+	ID3D11ClassLinkage *pClassLinkage,
+	ID3D11HullShader   **ppHullShader
+	);
+
+typedef HRESULT(*fn_CreateVertexShader)(
+	ID3D11Device *,
+	const void         *pShaderBytecode,
+	SIZE_T             BytecodeLength,
+	ID3D11ClassLinkage *pClassLinkage,
+	ID3D11VertexShader **ppVertexShader
+	);
+
+typedef HRESULT(*fn_CreateBuffer)(
+	ID3D11Device *,
+	const D3D11_BUFFER_DESC      *pDesc,
+	const D3D11_SUBRESOURCE_DATA *pInitialData,
+	ID3D11Buffer           **ppBuffer
+	);
+typedef HRESULT(*fn_CreateComputeShader)(
+	void *,
+	const void                *pShaderBytecode,
+	SIZE_T              BytecodeLength,
+	ID3D11ClassLinkage  *pClassLinkage,
+	ID3D11ComputeShader **ppComputeShader
+	);
+typedef HRESULT(*fn_CreateDomainShader)(
+	ID3D11Device *,
+	const void *pShaderBytecode,
+	SIZE_T BytecodeLength,
+	ID3D11ClassLinkage *pClassLinkage,
+	ID3D11DomainShader **ppDomainShader
+	);
+fn_CreatePixelShader ori_CreatePixelShader = nullptr;
+fn_CreateBuffer ori_CreateBuffer = nullptr;
+fn_CreateVertexShader ori_CreateVertexShader = nullptr;
+fn_CreateComputeShader ori_CreateComputeShader = nullptr;
+fn_CreateHullShader ori_CreateHullShader = nullptr;
+fn_CreateDomainShader ori_CreateDomainShader = nullptr;
+
+BYTE* memstr(BYTE * full_data, int full_data_len, BYTE * substr, int substr_len)
+{
+	//__try
+	//{
+	if (full_data == nullptr || full_data_len <= 0 || substr == nullptr || full_data_len<substr_len || substr_len>full_data_len) {
+		return nullptr;
+	}
+	//DWORD dwOld;
+	//VirtualProtect(full_data, full_data_len, PAGE_EXECUTE_READWRITE, &dwOld);
+
+
+	int i;
+	BYTE * cur = full_data;
+	int last_possible = full_data_len - substr_len + 1;
+	for (i = 0; i < last_possible; i++) {
+		if (*cur == *substr) {
+			//assert(full_data_len - i >= sublen);  
+			if (!memcmp(cur, substr, substr_len)) {
+				//found  
+				return cur;
+			}
+		}
+		cur++;
+	}
+	//VirtualProtect(full_data, full_data_len, dwOld, NULL);
+	//}
+	//__except (EXCEPTION_EXECUTE_HANDLER)
+	//{
+	//	return nullptr;
+	//}
+	return nullptr;
+}
 
 void SomeGameMod() {
 	//L.A.Noire 60 fps unlock
@@ -37,7 +120,6 @@ void SomeGameMod() {
 		BYTE Hijack_spoof_2[7] = { 0xc6,0x40,0x04,0x01 ,0xc2,0x04,0x00 };
 
 		memcpy_s(pAddress, 7, Hijack_spoof_2, 7);
-
 
 		VirtualProtect(pAddress, 7, dwOld, NULL);
 
@@ -59,7 +141,6 @@ void SomeGameMod() {
 		BYTE Hijack_spoof_2[6] = { 0xbe,0x00,0x00,0x00 ,0x80,0x90 };
 
 		memcpy_s(pAddress, 6, Hijack_spoof_2, 6);
-
 
 		VirtualProtect(pAddress, 7, dwOld, NULL);
 	}
@@ -137,20 +218,102 @@ void InitInstance(HANDLE hModule)
 	gl_hThisInstance = (HINSTANCE)hModule;
 }
 
-
-HRESULT WINAPI mod_D3D11CreateDevice(
-	_In_opt_ IDXGIAdapter *pAdapter,
-	D3D_DRIVER_TYPE DriverType,
-	HMODULE Software,
-	UINT  Flags,
-	_In_opt_ D3D_FEATURE_LEVEL *pFeatureLevels,
-	UINT FeatureLevels,
-	UINT SDKVersion,
-	_Out_opt_ ID3D11Device **ppDevice,
-	_Out_opt_ D3D_FEATURE_LEVEL *pFeatureLevel,
-	_Out_opt_ ID3D11DeviceContext **ppImmediateContext
+HRESULT mod_CreatePixelShader(
+	ID3D11Device *ppDevice,
+	const void*pShaderBytecode,
+	SIZE_T             BytecodeLength,
+	ID3D11ClassLinkage *pClassLinkage,
+	ID3D11PixelShader  **ppPixelShader
 ) {
-	typedef HRESULT(*ori_D3D11CreateDevice_fn)(IDXGIAdapter*,
+	bool enableFxaa = true;
+	if (!_tcsicmp(pwc_ExeName, L"AC3SP.exe")) {
+		BYTE to_find[200];
+		strcpy_s((char*)to_find, 15, "FxaaConsoleRcp");
+		BYTE * found = memstr((BYTE*)pShaderBytecode, BytecodeLength, to_find, strlen((char*)to_find));
+		if (found != nullptr&&
+			BytecodeLength <= 5732
+			) {
+			enableFxaa = false;
+
+		}
+
+	}
+	if (enableFxaa) {
+		return ori_CreatePixelShader(
+			ppDevice,
+			pShaderBytecode,
+			BytecodeLength,
+			pClassLinkage,
+			ppPixelShader);
+	}
+	else {
+
+		if (false)
+		{
+			MessageBox(0, L"fxaa found",
+				L"ASI Loader", MB_ICONINFORMATION);
+			char* filename = new char[200];
+
+			sprintf_s(filename, 200, "d:\\tmp\\PixelShader_dump_%d_size_%ld.bin", GetTickCount(), BytecodeLength);
+			FILE *out;
+			fopen_s(&out, filename, "wb");
+			if (out != NULL)
+			{
+				size_t to_go = BytecodeLength;
+				while (to_go > 0)
+				{
+					const size_t wrote = fwrite(pShaderBytecode, to_go, 1, out);
+					if (wrote == 0)
+						break;
+					to_go -= wrote;
+				}
+				fclose(out);
+			}
+		}
+		*ppPixelShader = NULL;
+		return S_OK;
+	}
+}
+
+void hook_D3D_Api(ID3D11Device **ppDevice) {
+
+	void *vtb_ID3D11Device = *(void**)*ppDevice;
+
+	void *tmp;
+
+	tmp = (fn_CreatePixelShader)ReplaceVtblFunction(vtb_ID3D11Device, mod_CreatePixelShader, 15);
+	if (tmp != mod_CreatePixelShader) {
+
+		//MessageBox(0, L"hook api",
+		//	L"ASI Loader", MB_ICONINFORMATION);
+		ori_CreatePixelShader = (fn_CreatePixelShader)tmp;
+	}
+	//tmp = (fn_CreateHullShader)ReplaceVtblFunction(vtb_ID3D11Device, mod_CreateHullShader, 16);
+	//if (tmp != mod_CreateHullShader) {
+	//    ori_CreateHullShader = (fn_CreateHullShader)tmp;
+	//}
+
+	//tmp = (fn_CreateDomainShader)ReplaceVtblFunction(vtb_ID3D11Device, mod_CreateDomainShader, 17);
+	//if (tmp != mod_CreateDomainShader) {
+	//    ori_CreateDomainShader = (fn_CreateDomainShader)tmp;
+	//}
+	//hooked = true;
+
+}
+HRESULT __stdcall mod_D3D11CreateDevice(
+	_In_opt_        IDXGIAdapter        *pAdapter,
+	D3D_DRIVER_TYPE     DriverType,
+	HMODULE             Software,
+	UINT                Flags,
+	_In_opt_  D3D_FEATURE_LEVEL   *pFeatureLevels,
+	UINT                FeatureLevels,
+	UINT                SDKVersion,
+	_Out_opt_       ID3D11Device        **ppDevice,
+	_Out_opt_       D3D_FEATURE_LEVEL   *pFeatureLevel,
+	_Out_opt_       ID3D11DeviceContext **ppImmediateContext
+) {
+
+	typedef HRESULT(*fn_D3D11CreateDevice)(IDXGIAdapter *,
 		D3D_DRIVER_TYPE,
 		HMODULE,
 		UINT,
@@ -158,25 +321,59 @@ HRESULT WINAPI mod_D3D11CreateDevice(
 		UINT,
 		UINT,
 		ID3D11Device**,
-		D3D_FEATURE_LEVEL*,
-		ID3D11DeviceContext**);
+		D3D_FEATURE_LEVEL   *,
+		ID3D11DeviceContext **);
+
+	fn_D3D11CreateDevice ori_D3D11CreateDevice
+		= (fn_D3D11CreateDevice)GetProcAddress(d3d11.dll, "D3D11CreateDevice");
+
+	HRESULT hr
 
 
-
-	ori_D3D11CreateDevice_fn ori_D3D11CreateDevice = (ori_D3D11CreateDevice_fn)GetProcAddress(
-		d3d11.dll, "D3D11CreateDevice");
-
-	HRESULT hr =
-
-		ori_D3D11CreateDevice(pAdapter, DriverType, Software,
+		= ori_D3D11CreateDevice(pAdapter, DriverType, Software,
 			Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice
 			, pFeatureLevel, ppImmediateContext);
 
-
-
+	hook_D3D_Api(ppDevice);
 	return hr;
-	//d3d11.D3D11CreateDevice = GetProcAddress(d3d11.dll, "D3D11CreateDevice")
 
+}
+
+HRESULT __stdcall mod_D3D11CreateDeviceAndSwapChain(
+	_In_opt_        IDXGIAdapter         *pAdapter,
+	D3D_DRIVER_TYPE      DriverType,
+	HMODULE              Software,
+	UINT                 Flags,
+	_In_opt_  const D3D_FEATURE_LEVEL    *pFeatureLevels,
+	UINT                 FeatureLevels,
+	UINT                 SDKVersion,
+	_In_opt_  const DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+	_Out_opt_       IDXGISwapChain       **ppSwapChain,
+	_Out_opt_       ID3D11Device         **ppDevice,
+	_Out_opt_       D3D_FEATURE_LEVEL    *pFeatureLevel,
+	_Out_opt_       ID3D11DeviceContext  **ppImmediateContext
+) {
+
+	typedef HRESULT(*fn_D3D11CreateDeviceAndSwapChain)(IDXGIAdapter *,
+		D3D_DRIVER_TYPE,
+		HMODULE,
+		UINT,
+		const D3D_FEATURE_LEVEL*,
+		UINT,
+		UINT, const DXGI_SWAP_CHAIN_DESC*, IDXGISwapChain**,
+		ID3D11Device**,
+		D3D_FEATURE_LEVEL   *,
+		ID3D11DeviceContext **);
+
+	fn_D3D11CreateDeviceAndSwapChain ori_D3D11CreateDeviceAndSwapChain
+		= (fn_D3D11CreateDeviceAndSwapChain)GetProcAddress(d3d11.dll, "D3D11CreateDeviceAndSwapChain");
+
+	HRESULT hr = ori_D3D11CreateDeviceAndSwapChain(pAdapter, DriverType, Software,
+		Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice
+		, pFeatureLevel, ppImmediateContext);
+
+	hook_D3D_Api(ppDevice);
+	return hr;
 }
 
 void Redirect(PWCHAR name)
@@ -761,9 +958,10 @@ void Redirect(PWCHAR name)
 		d3d11.D3D11CoreCreateLayeredDevice = GetProcAddress(d3d11.dll, "D3D11CoreCreateLayeredDevice");
 		d3d11.D3D11CoreGetLayeredDeviceSize = GetProcAddress(d3d11.dll, "D3D11CoreGetLayeredDeviceSize");
 		d3d11.D3D11CoreRegisterLayers = GetProcAddress(d3d11.dll, "D3D11CoreRegisterLayers");
-		d3d11.D3D11CreateDevice = (FARPROC)mod_D3D11CreateDevice;
 		//d3d11.D3D11CreateDevice = GetProcAddress(d3d11.dll, "D3D11CreateDevice");
-		d3d11.D3D11CreateDeviceAndSwapChain = GetProcAddress(d3d11.dll, "D3D11CreateDeviceAndSwapChain");
+		//d3d11.D3D11CreateDeviceAndSwapChain = GetProcAddress(d3d11.dll, "D3D11CreateDeviceAndSwapChain");
+		d3d11.D3D11CreateDevice = (FARPROC)mod_D3D11CreateDevice;
+		d3d11.D3D11CreateDeviceAndSwapChain = (FARPROC)mod_D3D11CreateDeviceAndSwapChain;
 		d3d11.D3DKMTCloseAdapter = GetProcAddress(d3d11.dll, "D3DKMTCloseAdapter");
 		d3d11.D3DKMTCreateAllocation = GetProcAddress(d3d11.dll, "D3DKMTCreateAllocation");
 		d3d11.D3DKMTCreateContext = GetProcAddress(d3d11.dll, "D3DKMTCreateContext");

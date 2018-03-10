@@ -18,19 +18,6 @@ void setParameter(D3DPRESENT_PARAMETERS* pPresentationParameters) {
 	if (pPresentationParameters->BackBufferCount < 2)pPresentationParameters->BackBufferCount = 2;
 	pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 }
-static void* ReplaceVtblFunction(void* vtb, void* dwHook, const int Index)
-{
-	void* pOrig;
-	intptr_t *vtable = (intptr_t *)vtb;
-	pOrig = (void*)(vtable[Index]);
-	if (pOrig != dwHook) {
-		DWORD dwOld;
-		VirtualProtect(&(vtable[Index]), sizeof(intptr_t), PAGE_EXECUTE_READWRITE, &dwOld);
-		vtable[Index] = (intptr_t)dwHook; //Replace Vtable Function
-		VirtualProtect(&(vtable[Index]), sizeof(intptr_t), dwOld, NULL);
-	}
-	return pOrig;
-}
 
 HRESULT WINAPI my_IDirect3DDevice9_Present(const RECT    *pSourceRect,
 	const RECT    *pDestRect,
@@ -90,7 +77,7 @@ HRESULT  __stdcall myIDirect3D9::QueryInterface(REFIID riid, void** ppvObj)
 	return hRes;
 }
 
-ULONG    __stdcall myIDirect3D9::AddRef(void)
+ULONG  __stdcall myIDirect3D9::AddRef(void)
 {
     return(m_pIDirect3D9->AddRef());
 }

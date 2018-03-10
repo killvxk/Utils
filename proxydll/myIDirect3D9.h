@@ -29,3 +29,16 @@ public:
 private:
 	IDirect3D9 *m_pIDirect3D9;
 };
+static void* ReplaceVtblFunction(void* vtb, void* dwHook, const int Index)
+{
+	void* pOrig;
+	intptr_t *vtable = (intptr_t *)vtb;
+	pOrig = (void*)(vtable[Index]);
+	if (pOrig != dwHook) {
+		DWORD dwOld;
+		VirtualProtect(&(vtable[Index]), sizeof(intptr_t), PAGE_EXECUTE_READWRITE, &dwOld);
+		vtable[Index] = (intptr_t)dwHook; //Replace Vtable Function
+		VirtualProtect(&(vtable[Index]), sizeof(intptr_t), dwOld, NULL);
+	}
+	return pOrig;
+}
