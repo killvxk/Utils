@@ -116,7 +116,6 @@ void SomeGameMod() {
 		DWORD dwOld;
 		VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
 
-
 		BYTE Hijack_spoof_2[7] = { 0xc6,0x40,0x04,0x01 ,0xc2,0x04,0x00 };
 
 		memcpy_s(pAddress, 7, Hijack_spoof_2, 7);
@@ -127,15 +126,15 @@ void SomeGameMod() {
 	else if (_tcsicmp(pwc_ExeName, L"AC4BFSP.exe") == NULL) {
 
 
-		BYTE *pAddress_windowed = (BYTE *)0x435272;
+		BYTE *pAddress = (BYTE *)((size_t)GetModuleHandle(pwc_ExeName) + 0x35272);
 		DWORD dwOld;
-		VirtualProtect(pAddress_windowed, 7, PAGE_EXECUTE_READWRITE, &dwOld);
+		VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
 
-		*pAddress_windowed = 0x86;
+		*pAddress = 0x86;
 
-		VirtualProtect(pAddress_windowed, 7, dwOld, NULL);
-		BYTE *pAddress = (BYTE *)0x00406540;
-		
+		VirtualProtect(pAddress, 7, dwOld, NULL);
+		pAddress = (BYTE *)((size_t)GetModuleHandle(pwc_ExeName) + 0x0006540);
+
 		VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
 
 		BYTE Hijack_spoof_2[6] = { 0xbe,0x00,0x00,0x00 ,0x80,0x90 };
@@ -147,7 +146,7 @@ void SomeGameMod() {
 	else if (_tcsicmp(pwc_ExeName, L"AC3SP.exe") == NULL) {
 
 
-		BYTE *pAddress = (BYTE *)0x4825FC;
+		BYTE *pAddress = (BYTE *)((size_t)GetModuleHandle(pwc_ExeName) + (size_t)0x825FC);
 		DWORD dwOld;
 		VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
 
@@ -155,7 +154,7 @@ void SomeGameMod() {
 
 		VirtualProtect(pAddress, 7, dwOld, NULL);
 
-		pAddress = (BYTE *)0x00406440;
+		pAddress = (BYTE *)((size_t)GetModuleHandle(pwc_ExeName) + (size_t)0x06440);
 
 		VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
 
@@ -168,7 +167,7 @@ void SomeGameMod() {
 	else if (_tcsicmp(pwc_ExeName, L"ACRSP.exe") == NULL) {
 
 		DWORD dwOld;
-		BYTE *pAddress = (BYTE *)0xE4FD7F;
+		BYTE *pAddress = (BYTE *)((size_t)GetModuleHandle(pwc_ExeName) + (size_t)0xAFD7F);
 
 		VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
 
@@ -178,23 +177,23 @@ void SomeGameMod() {
 
 		VirtualProtect(pAddress, 7, dwOld, NULL);
 
-		 pAddress = (BYTE *)0xE4FDDA;
+		// pAddress = (BYTE *)0xE4FDDA;
 
-		VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
+		//VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
 
-		*pAddress = 0xEB;
-		*(pAddress + 1) = 0x2C;
+		//*pAddress = 0xEB;
+		//*(pAddress + 1) = 0x2C;
 
-		VirtualProtect(pAddress, 7, dwOld, NULL);
+		//VirtualProtect(pAddress, 7, dwOld, NULL);
 
-		pAddress = (BYTE *)0xE4FEEF;
+		//pAddress = (BYTE *)0xE4FEEF;
 
-		VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
+		//VirtualProtect(pAddress, 7, PAGE_EXECUTE_READWRITE, &dwOld);
 
-		*pAddress = 0xEB;
-		*(pAddress + 1) = 0x4D;
+		//*pAddress = 0xEB;
+		//*(pAddress + 1) = 0x4D;
 
-		VirtualProtect(pAddress, 7, dwOld, NULL);
+		//VirtualProtect(pAddress, 7, dwOld, NULL);
 	}
 	else {
 
@@ -376,6 +375,34 @@ HRESULT __stdcall mod_D3D11CreateDeviceAndSwapChain(
 	return hr;
 }
 
+HRESULT mod_DirectInput8Create(
+	HINSTANCE hinst,
+	DWORD dwVersion,
+	REFIID riidltf,
+	LPVOID * ppvOut,
+	LPUNKNOWN punkOuter
+) {
+
+	typedef HRESULT(*fn_DirectInput8Create)(
+		HINSTANCE,
+		DWORD,
+		REFIID,
+		LPVOID *,
+		LPUNKNOWN);
+	fn_DirectInput8Create ori_DirectInput8Create
+		= (fn_DirectInput8Create)GetProcAddress(dinput8.dll, "DirectInput8Create");
+
+	HRESULT hr = ori_DirectInput8Create(hinst, dwVersion, riidltf, ppvOut, punkOuter);
+
+	if (_tcsicmp(pwc_ExeName, L"Conviction_game.exe") == NULL) {
+		//MessageBox(0, L"Conviction_game found",
+		//	L"ASI Loader", MB_ICONINFORMATION);
+		SetWindowLongPtr(NULL, GWL_STYLE, WS_POPUP | WS_DISABLED);
+	}
+
+	return hr;
+}
+
 void Redirect(PWCHAR name)
 {
 
@@ -405,7 +432,8 @@ void Redirect(PWCHAR name)
 	}
 	else if (_tcsicmp(DllName, L"dinput8.dll") == NULL) {
 		dinput8.dll = LoadLibrary(szSystemDllPath);
-		dinput8.DirectInput8Create = GetProcAddress(dinput8.dll, "DirectInput8Create");
+		//dinput8.DirectInput8Create = GetProcAddress(dinput8.dll, "DirectInput8Create");
+		dinput8.DirectInput8Create = (FARPROC)mod_DirectInput8Create;
 		dinput8.DllCanUnloadNow = GetProcAddress(dinput8.dll, "DllCanUnloadNow");
 		dinput8.DllGetClassObject = GetProcAddress(dinput8.dll, "DllGetClassObject");
 		dinput8.DllRegisterServer = GetProcAddress(dinput8.dll, "DllRegisterServer");
